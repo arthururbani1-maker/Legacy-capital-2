@@ -7871,6 +7871,16 @@
     });
   },120);
 
+  // ── Renda constants — must be before renderAll() to avoid TDZ ──
+  const RENDA_KEY = 'patrimonio_renda_v2';
+  const INCOME_CATS = {
+    'Receita Ativa':   ['Salário','Pró-labore','Comissão','Venda','Bônus','Prestação de Serviço'],
+    'Receita Passiva': ['Dividendos','Juros','Aluguel','Rendimentos','Cashback','Distribuição'],
+    'Outros':          ['Transferência','Entrada Manual']
+  };
+  const EXPENSE_CATS = ['Moradia','Transporte','Mercado','Saúde','Lazer','Investimentos','Parcelas','Consórcios','Impostos','Cartão','Empresa','Outros'];
+  const PASSIVE_SUBS = ['Dividendos','Juros','Aluguel','Rendimentos','Cashback','Distribuição'];
+
   function renderAll(){
     renderTabs();
     renderKpis();
@@ -7878,7 +7888,6 @@
     renderCharts();
     renderReceipts();
     renderCalendar();
-    renderRelatoriosRenda();
     renderDividas();
   }
   setupUploader();
@@ -8037,16 +8046,6 @@
   // ============================================================
   // CONTROLE DE RENDA — Módulo Completo
   // ============================================================
-  const RENDA_KEY = 'patrimonio_renda_v2';
-
-  const INCOME_CATS = {
-    'Receita Ativa':   ['Salário','Pró-labore','Comissão','Venda','Bônus','Prestação de Serviço'],
-    'Receita Passiva': ['Dividendos','Juros','Aluguel','Rendimentos','Cashback','Distribuição'],
-    'Outros':          ['Transferência','Entrada Manual']
-  };
-  const EXPENSE_CATS = ['Moradia','Transporte','Mercado','Saúde','Lazer','Investimentos','Parcelas','Consórcios','Impostos','Cartão','Empresa','Outros'];
-  const PASSIVE_SUBS = ['Dividendos','Juros','Aluguel','Rendimentos','Cashback','Distribuição'];
-
   let RS = { income:[], expenses:[], accounts:[], goals:[], month: new Date().getMonth(), year: new Date().getFullYear() };
   let _rendaCharts = {};
 
