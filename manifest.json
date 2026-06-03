@@ -1,0 +1,53 @@
+{
+  "name": "Patrimônio · Painel Premium",
+  "short_name": "Patrimônio",
+  "description": "Dashboard de gestão patrimonial — imóveis, consórcios, leilões, investimentos e custos operacionais",
+  "start_url": "./",
+  "scope": "./",
+  "id": "/patrimonio-app",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#0B1020",
+  "theme_color": "#0B1020",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "business"],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Adicionar ativo",
+      "short_name": "Novo",
+      "description": "Cadastrar um novo ativo",
+      "url": "./?action=add",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Calendário",
+      "short_name": "Agenda",
+      "description": "Calendário financeiro",
+      "url": "./?view=calendar",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
