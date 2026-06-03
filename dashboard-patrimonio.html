@@ -1632,6 +1632,43 @@
   @media(max-width:960px){#lp-calc>div{grid-template-columns:1fr}}
   @media(max-width:960px){#leilao_live_result{position:static!important}}
 
+  /* ── Benchmark ────────────────────────────────────────────── */
+  .bmk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+  @media(max-width:768px){.bmk-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.bmk-grid{grid-template-columns:1fr}}
+  .bmk-stat{background:var(--bg-elev);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .bmk-stat-label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .bmk-stat-value{font-family:'Manrope',system-ui;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.5px}
+  .bmk-stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+  .bmk-brand-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .bmk-brand-row:last-child{border-bottom:none}
+  .bmk-brand-name{font-size:12px;font-weight:700;color:var(--ink);min-width:72px}
+  .bmk-brand-track{flex:1;background:var(--bg-soft);border-radius:99px;height:7px;overflow:hidden}
+  .bmk-brand-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+  .bmk-brand-pct{font-size:11.5px;font-weight:700;color:var(--ink-2);min-width:42px;text-align:right}
+  .bmk-brand-n{font-size:10.5px;color:var(--muted);min-width:28px;text-align:right}
+  .bmk-pct-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
+  .bmk-great{background:rgba(34,197,94,.12);color:#16a34a}
+  .bmk-good{background:rgba(59,130,246,.12);color:#2563eb}
+  .bmk-med{background:rgba(234,179,8,.12);color:#b45309}
+  .bmk-bad{background:rgba(239,68,68,.12);color:#dc2626}
+  .bmk-table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .bmk-table th{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .bmk-table td{padding:9px 12px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:middle}
+  .bmk-table tr:last-child td{border-bottom:none}
+  .bmk-table tbody tr:hover td{background:var(--bg-soft)}
+  .bmk-import-area{background:var(--bg-soft);border:1.5px dashed var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+  .bmk-import-area textarea{width:100%;background:transparent;border:none;outline:none;font-size:12.5px;color:var(--ink);font-family:inherit;resize:vertical;min-height:110px;line-height:1.65}
+  .bmk-suggestion{background:linear-gradient(135deg,rgba(59,130,246,.07),rgba(99,102,241,.06));border:1.5px solid rgba(59,130,246,.22);border-radius:11px;padding:10px 13px;margin-top:8px;display:none}
+  .bmk-suggestion.show{display:block}
+  .bmk-suggestion.conf-high{border-color:rgba(34,197,94,.3);background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(16,185,129,.06))}
+  .bmk-suggestion.conf-low{border-color:rgba(234,179,8,.3);background:linear-gradient(135deg,rgba(234,179,8,.07),rgba(245,158,11,.06))}
+  .bmk-sug-title{font-size:10px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+  .bmk-sug-range{font-family:'Manrope',system-ui;font-size:13.5px;font-weight:800;color:var(--ink)}
+  .bmk-sug-sub{font-size:11px;color:var(--muted);margin-top:2px}
+  #lp-benchmark .two-col{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
+  @media(max-width:900px){#lp-benchmark .two-col{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -2118,6 +2155,76 @@
     </div>
 
   </div><!-- /sec-dividas -->
+
+  <!-- MODAL BENCHMARK — Adicionar/Editar compra -->
+  <div class="backdrop" id="bmkModal" onclick="if(event.target.id==='bmkModal')closeBmkModal()">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+      <div class="modal-h">
+        <h3 id="bmkModalTitle">Registrar Compra</h3>
+        <button class="modal-close" onclick="closeBmkModal()">✕</button>
+      </div>
+      <div class="modal-b" style="padding:20px 24px;overflow-y:auto">
+        <input type="hidden" id="bmk_edit_id">
+        <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:12px;margin-bottom:12px">
+          <div class="field"><label>Marca</label><input id="bmk_marca" placeholder="Toyota"></div>
+          <div class="field"><label>Modelo</label><input id="bmk_modelo" placeholder="Corolla"></div>
+          <div class="field"><label>Ano</label><input id="bmk_ano" type="number" placeholder="2019" min="1990" max="2030"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="field"><label>Tabela FIPE (R$)</label><input id="bmk_fipe" class="money" placeholder="ex: 65.000" oninput="bmkMoneyFmt(this)"></div>
+          <div class="field"><label>Valor do Arremate (R$)</label><input id="bmk_lance" class="money" placeholder="ex: 42.000" oninput="bmkMoneyFmt(this)"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="field"><label>Custo Total (R$) <span style="font-weight:400;color:var(--muted)">opcional</span></label><input id="bmk_custo" class="money" placeholder="ex: 50.000" oninput="bmkMoneyFmt(this)"></div>
+          <div class="field"><label>Valor de Venda (R$) <span style="font-weight:400;color:var(--muted)">opcional</span></label><input id="bmk_venda" class="money" placeholder="ex: 72.000" oninput="bmkMoneyFmt(this)"></div>
+        </div>
+        <!-- Preview % FIPE ao vivo -->
+        <div id="bmk_modal_preview" style="display:none;background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap">
+          <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">% FIPE</div><div id="bmk_prev_pct" style="font-family:'Manrope',system-ui;font-size:18px;font-weight:800;color:var(--ink)">—</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Lucro</div><div id="bmk_prev_lucro" style="font-family:'Manrope',system-ui;font-size:18px;font-weight:800;color:var(--ink)">—</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Rentabilidade</div><div id="bmk_prev_rent" style="font-family:'Manrope',system-ui;font-size:18px;font-weight:800;color:var(--ink)">—</div></div>
+        </div>
+      </div>
+      <div class="modal-f" style="padding:16px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end">
+        <button class="tba" onclick="closeBmkModal()">Cancelar</button>
+        <button class="tba primary" onclick="saveBmkEntry()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL BENCHMARK — Importar texto -->
+  <div class="backdrop" id="bmkImportModal" onclick="if(event.target.id==='bmkImportModal')closeBmkImport()">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:540px">
+      <div class="modal-h">
+        <h3>Importar do WhatsApp / Texto</h3>
+        <button class="modal-close" onclick="closeBmkImport()">✕</button>
+      </div>
+      <div class="modal-b" style="padding:20px 24px;overflow-y:auto">
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.6">Cole abaixo o texto com as compras. O sistema reconhece formatos variados como mensagens de WhatsApp, anotações e planilhas copiadas. <b>Um registro por linha.</b></div>
+        <div style="font-size:11.5px;background:var(--bg-soft);border-radius:8px;padding:10px 12px;color:var(--muted);margin-bottom:14px;line-height:1.7">
+          <b style="color:var(--ink-2)">Exemplos aceitos:</b><br>
+          Corolla 2019 FIPE 68000 lance 43000<br>
+          Honda Civic 2020 - fipe: 85.000 - arremate: 58.000<br>
+          VW Golf 2018 | FIPE 72k | Lance 48k<br>
+          Hilux 2017 fipe 145000 arrematei 92000 vendi 135000
+        </div>
+        <div class="bmk-import-area">
+          <textarea id="bmk_import_text" placeholder="Cole aqui o texto com as compras…"></textarea>
+        </div>
+        <div id="bmk_import_preview" style="display:none">
+          <div style="font-size:11.5px;font-weight:700;color:var(--ink-2);margin-bottom:8px" id="bmk_import_preview_title"></div>
+          <div id="bmk_import_preview_list" style="max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:10px"></div>
+        </div>
+      </div>
+      <div class="modal-f" style="padding:16px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:space-between;align-items:center">
+        <button class="tba" onclick="bmkParseImport()">🔍 Analisar texto</button>
+        <div style="display:flex;gap:10px">
+          <button class="tba" onclick="closeBmkImport()">Cancelar</button>
+          <button class="tba primary" id="bmk_import_confirm_btn" style="display:none" onclick="bmkConfirmImport()">Importar registros</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL CARTÃO -->
   <div class="backdrop" id="cartaoModal" onclick="if(event.target.id==='cartaoModal')closeCartaoModal()">
@@ -2649,7 +2756,8 @@
       <button class="renda-tab-btn"         id="ltab-dash"      onclick="showLeilaoTab('dash')">📊 Análise</button>
       <button class="renda-tab-btn"         id="ltab-edital"    onclick="showLeilaoTab('edital')">📄 Edital</button>
       <button class="renda-tab-btn"         id="ltab-checklist" onclick="showLeilaoTab('checklist')">✅ Checklist</button>
-      <button class="renda-tab-btn"         id="ltab-historico" onclick="showLeilaoTab('historico')">🕐 Histórico <span class="renda-tab-badge" id="leilao-hist-badge">0</span></button>
+      <button class="renda-tab-btn"         id="ltab-historico"  onclick="showLeilaoTab('historico')">🕐 Histórico <span class="renda-tab-badge" id="leilao-hist-badge">0</span></button>
+      <button class="renda-tab-btn"         id="ltab-benchmark"  onclick="showLeilaoTab('benchmark')">🎯 Benchmark <span class="renda-tab-badge" id="bmk-badge">0</span></button>
     </div>
 
     <!-- ── Tab: CALCULADORA ── -->
@@ -2768,7 +2876,13 @@
               </div>
             </div>
             <!-- Mini breakdown -->
-            <div id="lcr_mini_break" style="padding:0 20px 18px;display:flex;flex-direction:column;gap:6px"></div>
+            <div id="lcr_mini_break" style="padding:0 20px 12px;display:flex;flex-direction:column;gap:6px"></div>
+            <!-- Benchmark suggestion -->
+            <div id="lcr_bmk_suggestion" class="bmk-suggestion" style="margin:0 12px 14px">
+              <div class="bmk-sug-title" id="lcr_bmk_title">🎯 Sugestão baseada no seu histórico</div>
+              <div class="bmk-sug-range" id="lcr_bmk_range">—</div>
+              <div class="bmk-sug-sub" id="lcr_bmk_sub">—</div>
+            </div>
           </div>
         </div>
 
@@ -2865,6 +2979,82 @@
         <div class="leilao-empty"><div class="es-ico" style="font-size:42px;opacity:.2;margin-bottom:12px">🕐</div><div class="es-title" style="font-size:14px;font-weight:700;color:var(--ink-2)">Nenhuma análise salva</div><div class="es-sub" style="font-size:12.5px;color:var(--muted);margin:6px auto 16px;max-width:260px">Preencha os dados e clique em "Salvar no Histórico" para registrar uma análise.</div></div>
       </div>
     </div><!-- /lp-historico -->
+
+    <!-- ── Tab: BENCHMARK ── -->
+    <div class="renda-pane" id="lp-benchmark">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.3px">Padrões de Compra</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:3px">Registre seus arremates históricos e o sistema aprende o padrão ideal de lance por marca e faixa de preço</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="tba" onclick="openBmkImport()">📋 Importar texto</button>
+          <button class="tba primary" onclick="openBmkModal(null)">+ Adicionar compra</button>
+        </div>
+      </div>
+
+      <!-- KPI Stats -->
+      <div class="bmk-grid">
+        <div class="bmk-stat">
+          <div class="bmk-stat-label">Compras registradas</div>
+          <div class="bmk-stat-value" id="bmk_count">0</div>
+          <div class="bmk-stat-sub">no histórico de benchmark</div>
+        </div>
+        <div class="bmk-stat">
+          <div class="bmk-stat-label">% FIPE médio</div>
+          <div class="bmk-stat-value" id="bmk_avg_fipe">—</div>
+          <div class="bmk-stat-sub">arremate ÷ tabela FIPE</div>
+        </div>
+        <div class="bmk-stat">
+          <div class="bmk-stat-label">Melhor arremate</div>
+          <div class="bmk-stat-value" id="bmk_best_pct">—</div>
+          <div class="bmk-stat-sub" id="bmk_best_car">—</div>
+        </div>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="two-col">
+
+        <!-- Left: brands pattern -->
+        <div>
+          <div class="lc-section" style="padding:18px 20px;margin-bottom:14px">
+            <div class="lc-section-title" style="margin-bottom:14px"><span>📊</span> % FIPE por Marca</div>
+            <div id="bmk_brands_list">
+              <div style="text-align:center;padding:20px 0">
+                <div style="font-size:28px;opacity:.2;margin-bottom:8px">📊</div>
+                <div style="font-size:12px;color:var(--muted)">Adicione compras para ver o padrão</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info card -->
+          <div style="background:linear-gradient(135deg,rgba(59,130,246,.07),rgba(99,102,241,.06));border:1px solid rgba(59,130,246,.2);border-radius:14px;padding:16px 18px">
+            <div style="font-size:10.5px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">💡 Como funciona</div>
+            <div style="font-size:12px;color:var(--ink-2);line-height:1.65">Com base nos arremates cadastrados, o sistema calcula o padrão ideal por marca e faixa de preço. Na <b>Calculadora</b>, ao informar marca e FIPE, aparece automaticamente a sugestão de lance baseada nesse histórico.</div>
+          </div>
+        </div>
+
+        <!-- Right: entries table -->
+        <div class="lc-section" style="padding:18px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+            <div class="lc-section-title"><span>📋</span> Compras Registradas</div>
+            <input id="bmk_search" type="text" placeholder="Buscar veículo…" oninput="renderBenchmarkTable()" style="padding:6px 12px;border:1px solid var(--line);border-radius:8px;font-size:12px;background:var(--bg-soft);color:var(--ink);outline:none;width:150px">
+          </div>
+          <div style="overflow-x:auto" id="bmk_table_wrap">
+            <div class="bmk-empty">
+              <div style="font-size:38px;opacity:.2;margin-bottom:10px">🎯</div>
+              <div style="font-size:13px;font-weight:700;color:var(--ink-2)">Nenhuma compra registrada</div>
+              <div style="font-size:12px;color:var(--muted);margin:6px auto 16px;max-width:260px">Cadastre suas compras históricas para o sistema aprender seus padrões de arremate e sugerir lances inteligentes.</div>
+              <button class="tba primary" onclick="openBmkModal(null)">+ Adicionar primeira compra</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /two-col -->
+
+    </div><!-- /lp-benchmark -->
 
   </div><!-- /sec-leilao -->
 
@@ -11017,10 +11207,10 @@
 
   // ── Auto-calculate on any input change ───────────────────────
   function leilaoAutoCalc(){
-    const d    = leilaoGetFormData();
+    const d = leilaoGetFormData();
     saveLeilaoState(d, null, null);
-    // Update live result panel
     if(document.getElementById('lcr_verdict')) leilaoRenderLive(d);
+    if(typeof leilaoUpdateBenchmarkSuggestion==='function') leilaoUpdateBenchmarkSuggestion();
   }
 
   // ── Live result panel (right side of calc tab) ────────────────
@@ -11483,11 +11673,13 @@
     if(name==='dash')      leilaoRenderDashboard();
     if(name==='checklist') leilaoRenderChecklist();
     if(name==='historico') leilaoRenderHistorico();
+    if(name==='benchmark') renderBenchmarkSection();
   }
 
   // ── Init (called when section becomes visible) ────────────────
   function initLeilaoSection(){
     leilaoUpdateHistBadge();
+    bmkUpdateBadge();
     // Restore last saved form data (simplified fields only)
     try{
       const s = getLeilaoState();
@@ -11503,10 +11695,409 @@
         sm('lc_docs_total',d._docsTotal);
         sm('lc_recuperacao_total',d._recuperacaoTotal);
         if(d.margemTarget) sv('lc_margem_target',d.margemTarget);
-        // Refresh live result panel with restored values
         leilaoAutoCalc();
       }
     }catch(e){}
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // BENCHMARK — Padrões de Compra
+  // ══════════════════════════════════════════════════════════════
+  const BMK_KEY = 'patrimonio_benchmark_v1';
+
+  function getBmkEntries(){
+    try{ return JSON.parse(localStorage.getItem(BMK_KEY)||'[]'); }catch(e){ return []; }
+  }
+  function saveBmkEntries(arr){
+    localStorage.setItem(BMK_KEY, JSON.stringify(arr));
+  }
+
+  // ── Badge ────────────────────────────────────────────────────
+  function bmkUpdateBadge(){
+    const n = getBmkEntries().length;
+    const el = document.getElementById('bmk-badge');
+    if(el){ el.textContent = n; el.style.display = n>0?'':'none'; }
+  }
+
+  // ── Money formatter for modal inputs ─────────────────────────
+  function bmkMoneyFmt(el){
+    el.dataset.raw = el.value.replace(/[^\d,\.]/g,'');
+    bmkUpdateModalPreview();
+  }
+  function bmkParseMoney(el){
+    if(!el) return 0;
+    const v = el.value.replace(/\./g,'').replace(',','.');
+    return parseFloat(v)||0;
+  }
+
+  // ── Modal: open / close / save ───────────────────────────────
+  function openBmkModal(id){
+    const m = document.getElementById('bmkModal');
+    if(!m) return;
+    document.getElementById('bmk_edit_id').value = id||'';
+    document.getElementById('bmkModalTitle').textContent = id ? 'Editar Compra' : 'Registrar Compra';
+    if(id){
+      const entry = getBmkEntries().find(e=>e.id===id);
+      if(entry){
+        document.getElementById('bmk_marca').value  = entry.marca||'';
+        document.getElementById('bmk_modelo').value = entry.modelo||'';
+        document.getElementById('bmk_ano').value    = entry.ano||'';
+        const fmt = v => v>0 ? Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '';
+        document.getElementById('bmk_fipe').value   = fmt(entry.fipe);
+        document.getElementById('bmk_lance').value  = fmt(entry.lance);
+        document.getElementById('bmk_custo').value  = fmt(entry.custo||0);
+        document.getElementById('bmk_venda').value  = fmt(entry.venda||0);
+      }
+    } else {
+      ['bmk_marca','bmk_modelo','bmk_ano','bmk_fipe','bmk_lance','bmk_custo','bmk_venda'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    }
+    bmkUpdateModalPreview();
+    m.classList.add('show');
+  }
+  function closeBmkModal(){
+    const m = document.getElementById('bmkModal');
+    if(m) m.classList.remove('show');
+  }
+  function bmkUpdateModalPreview(){
+    const fipe  = bmkParseMoney(document.getElementById('bmk_fipe'));
+    const lance = bmkParseMoney(document.getElementById('bmk_lance'));
+    const custo = bmkParseMoney(document.getElementById('bmk_custo'))||lance;
+    const venda = bmkParseMoney(document.getElementById('bmk_venda'));
+    const pctEl  = document.getElementById('bmk_prev_pct');
+    const lucEl  = document.getElementById('bmk_prev_lucro');
+    const rentEl = document.getElementById('bmk_prev_rent');
+    const box    = document.getElementById('bmk_modal_preview');
+    if(!pctEl) return;
+    if(fipe>0 && lance>0){
+      const pct  = lance/fipe*100;
+      const lucro = venda>0 ? venda-custo : 0;
+      const rent  = custo>0 && venda>0 ? lucro/custo*100 : 0;
+      pctEl.textContent  = pct.toFixed(1)+'%';
+      pctEl.style.color  = pct<70?'#16a34a':pct<80?'#2563eb':pct<90?'#b45309':'#dc2626';
+      lucEl.textContent  = venda>0 ? (lucro>=0?'+':'')+fmtMoney(lucro) : '—';
+      lucEl.style.color  = lucro>=0?'#16a34a':'#dc2626';
+      rentEl.textContent = venda>0 ? rent.toFixed(1)+'%' : '—';
+      box.style.display  = 'flex';
+    } else {
+      box.style.display = 'none';
+    }
+  }
+  function saveBmkEntry(){
+    const marca  = (document.getElementById('bmk_marca')?.value||'').trim();
+    const modelo = (document.getElementById('bmk_modelo')?.value||'').trim();
+    const ano    = parseInt(document.getElementById('bmk_ano')?.value)||0;
+    const fipe   = bmkParseMoney(document.getElementById('bmk_fipe'));
+    const lance  = bmkParseMoney(document.getElementById('bmk_lance'));
+    if(!marca || !modelo || !fipe || !lance){
+      toast('Preencha pelo menos marca, modelo, FIPE e lance','error'); return;
+    }
+    const custo = bmkParseMoney(document.getElementById('bmk_custo'))||0;
+    const venda = bmkParseMoney(document.getElementById('bmk_venda'))||0;
+    const editId = document.getElementById('bmk_edit_id')?.value||'';
+    const entries = getBmkEntries();
+    if(editId){
+      const idx = entries.findIndex(e=>e.id===editId);
+      if(idx>=0) entries[idx] = {...entries[idx], marca, modelo, ano, fipe, lance, custo, venda};
+    } else {
+      entries.push({ id:uid(), data:new Date().toLocaleDateString('pt-BR'), marca, modelo, ano, fipe, lance, custo, venda });
+    }
+    saveBmkEntries(entries);
+    closeBmkModal();
+    bmkUpdateBadge();
+    renderBenchmarkSection();
+    leilaoAutoCalc(); // refresh suggestion in calculator
+    toast(editId?'Compra atualizada':'Compra registrada','success');
+  }
+  function deleteBmkEntry(id){
+    if(!confirm('Remover este registro do benchmark?')) return;
+    saveBmkEntries(getBmkEntries().filter(e=>e.id!==id));
+    bmkUpdateBadge();
+    renderBenchmarkSection();
+    leilaoAutoCalc();
+    toast('Registro removido','success');
+  }
+
+  // ── Import modal ─────────────────────────────────────────────
+  let _bmkParsed = [];
+  function openBmkImport(){
+    _bmkParsed = [];
+    const m = document.getElementById('bmkImportModal');
+    if(!m) return;
+    const ta = document.getElementById('bmk_import_text');
+    if(ta) ta.value = '';
+    const prev = document.getElementById('bmk_import_preview');
+    if(prev) prev.style.display = 'none';
+    const btn = document.getElementById('bmk_import_confirm_btn');
+    if(btn) btn.style.display = 'none';
+    m.classList.add('show');
+  }
+  function closeBmkImport(){
+    const m = document.getElementById('bmkImportModal');
+    if(m) m.classList.remove('show');
+  }
+  function bmkParseImport(){
+    const text = document.getElementById('bmk_import_text')?.value||'';
+    _bmkParsed = bmkParseText(text);
+    const prev  = document.getElementById('bmk_import_preview');
+    const plist = document.getElementById('bmk_import_preview_list');
+    const ptitle= document.getElementById('bmk_import_preview_title');
+    const btn   = document.getElementById('bmk_import_confirm_btn');
+    if(!prev || !plist) return;
+    if(_bmkParsed.length===0){
+      ptitle.textContent = 'Nenhum registro reconhecido. Verifique o formato.';
+      plist.innerHTML = '';
+      btn.style.display = 'none';
+    } else {
+      ptitle.textContent = `${_bmkParsed.length} registro(s) reconhecido(s):`;
+      plist.innerHTML = _bmkParsed.map((e,i)=>`
+        <div style="padding:8px 12px;border-bottom:1px solid var(--line);font-size:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <span style="font-weight:700;color:var(--ink)">${e.marca} ${e.modelo} ${e.ano||''}</span>
+          <span style="color:var(--muted)">FIPE: <b style="color:var(--ink-2)">${BRL(e.fipe)}</b></span>
+          <span style="color:var(--muted)">Lance: <b style="color:var(--ink-2)">${BRL(e.lance)}</b></span>
+          <span class="bmk-pct-badge ${e.lance/e.fipe<.70?'bmk-great':e.lance/e.fipe<.80?'bmk-good':e.lance/e.fipe<.90?'bmk-med':'bmk-bad'}">${(e.lance/e.fipe*100).toFixed(1)}%</span>
+        </div>`).join('');
+      btn.style.display = 'inline-flex';
+    }
+    prev.style.display = 'block';
+  }
+  function bmkConfirmImport(){
+    if(!_bmkParsed.length) return;
+    const entries = getBmkEntries();
+    _bmkParsed.forEach(e=>entries.push({id:uid(), data:new Date().toLocaleDateString('pt-BR'), ...e}));
+    saveBmkEntries(entries);
+    closeBmkImport();
+    bmkUpdateBadge();
+    renderBenchmarkSection();
+    leilaoAutoCalc();
+    toast(`${_bmkParsed.length} registro(s) importado(s)!`,'success');
+    _bmkParsed = [];
+  }
+
+  // ── Text parser (WhatsApp / notas) ───────────────────────────
+  function bmkParseText(text){
+    const lines = text.split(/\n/).map(l=>l.trim()).filter(l=>l.length>3);
+    const BRANDS = ['toyota','honda','volkswagen','vw','chevrolet','ford','hyundai','nissan','fiat','renault','jeep','mitsubishi','kia','bmw','mercedes','audi','volvo','ram','land rover','hilux','corolla','civic','gol','onix','hb20','polo','compass','renegade','toro','s10','ranger','l200','montana','tucson','ix35','creta','kwid','sandero','duster','tracker','spin','cruze','cobalt','prisma','fit','hrv','srx'];
+    const parsed = [];
+    for(const line of lines){
+      const l = line.toLowerCase();
+      // Extract year (4-digit between 1990-2030)
+      const yearMatch = line.match(/\b(19[9]\d|20[0-3]\d)\b/);
+      const ano = yearMatch ? parseInt(yearMatch[1]) : 0;
+      // Extract money values: find all numbers >= 1000
+      const moneys = [];
+      const moneyRe = /R?\$?\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?|\d{4,}(?:[.,]\d{2})?)\s*k?/gi;
+      let mm;
+      while((mm=moneyRe.exec(line))!==null){
+        let raw = mm[1].replace(/\./g,'').replace(',','.');
+        let val = parseFloat(raw)||0;
+        if(mm[0].toLowerCase().includes('k')) val*=1000;
+        if(val>=1000) moneys.push(val);
+      }
+      if(moneys.length<2) continue; // need at least FIPE + lance
+      // Sort descending, largest = FIPE, second = lance (unless keywords override)
+      let fipe=0, lance=0;
+      // Try keyword detection first
+      const fipeKw  = l.match(/fipe[:\s]+/);
+      const lanceKw = l.match(/(?:lance|arremate|arrematei|arrematado)[:\s]+/);
+      if(fipeKw && lanceKw){
+        const fi = fipeKw.index, li = lanceKw.index;
+        // find closest number after each keyword
+        const afterFipe  = moneys.find((v,i)=>{
+          const moneyPos = line.indexOf(String(Math.round(v)));
+          return moneyPos > fi;
+        });
+        const afterLance = moneys.find((v,i)=>{
+          const moneyPos = line.indexOf(String(Math.round(v)));
+          return moneyPos > li;
+        });
+        fipe  = afterFipe  || Math.max(...moneys);
+        lance = afterLance || Math.min(...moneys);
+      } else {
+        // Fallback: largest = FIPE, smallest = lance
+        fipe  = Math.max(...moneys);
+        lance = Math.min(...moneys);
+        if(fipe===lance && moneys.length>=2){ fipe=moneys[0]; lance=moneys[1]; }
+      }
+      if(fipe<=0||lance<=0||lance>fipe*1.2) continue; // skip implausible
+      // Extract brand/model
+      let marca='', modelo='';
+      for(const b of BRANDS){
+        if(l.includes(b)){ marca=b.charAt(0).toUpperCase()+b.slice(1); break; }
+      }
+      // Model: first capitalized word after brand or first token
+      const words = line.replace(/[|:\-]/g,' ').split(/\s+/).filter(w=>w.length>1);
+      if(marca){
+        const bi = words.findIndex(w=>w.toLowerCase().includes(marca.toLowerCase().split(' ')[0]));
+        modelo = words.slice(bi+1).find(w=>!/^\d+$/.test(w)&&!/^r\$/i.test(w))||words[0]||'';
+      } else {
+        marca  = words[0]||'Outros';
+        modelo = words[1]||'';
+      }
+      parsed.push({ marca:marca.charAt(0).toUpperCase()+marca.slice(1).toLowerCase(), modelo:modelo.charAt(0).toUpperCase()+modelo.slice(1).toLowerCase(), ano, fipe, lance, custo:0, venda:0 });
+    }
+    return parsed;
+  }
+
+  // ── Analysis engine ──────────────────────────────────────────
+  function bmkAnalyze(){
+    const entries = getBmkEntries();
+    if(!entries.length) return null;
+    const valid = entries.filter(e=>e.fipe>0&&e.lance>0);
+    if(!valid.length) return null;
+    const pcts = valid.map(e=>e.lance/e.fipe*100);
+    const avg  = pcts.reduce((a,b)=>a+b,0)/pcts.length;
+    const sorted = [...pcts].sort((a,b)=>a-b);
+    const median = sorted[Math.floor(sorted.length/2)];
+    // Best/worst
+    const best  = valid.reduce((a,b)=>b.lance/b.fipe < a.lance/a.fipe ? b : a);
+    // By brand
+    const brands = {};
+    valid.forEach(e=>{
+      const k = e.marca||'Outros';
+      if(!brands[k]) brands[k]={total:0,count:0,pcts:[]};
+      brands[k].total += e.lance/e.fipe*100;
+      brands[k].count++;
+      brands[k].pcts.push(e.lance/e.fipe*100);
+    });
+    Object.keys(brands).forEach(k=>{
+      brands[k].avg = brands[k].total/brands[k].count;
+      brands[k].min = Math.min(...brands[k].pcts);
+      brands[k].max = Math.max(...brands[k].pcts);
+    });
+    return { count:valid.length, avg, median, best, brands };
+  }
+
+  // ── Suggestion for calculator ────────────────────────────────
+  function bmkGetSuggestion(marca, fipe){
+    const entries = getBmkEntries().filter(e=>e.fipe>0&&e.lance>0);
+    if(!entries.length) return null;
+    const marcaNorm = (marca||'').toLowerCase().trim();
+    // Priority 1: same brand
+    let pool = marcaNorm ? entries.filter(e=>(e.marca||'').toLowerCase().includes(marcaNorm)||marcaNorm.includes((e.marca||'').toLowerCase())) : [];
+    let confidence = 'high';
+    // Priority 2: similar price range (±40%)
+    if(pool.length<3 && fipe>0){
+      const lo=fipe*.6, hi=fipe*1.4;
+      pool = entries.filter(e=>e.fipe>=lo&&e.fipe<=hi);
+      confidence = 'medium';
+    }
+    // Priority 3: all entries
+    if(pool.length<2){
+      pool = entries;
+      confidence = 'low';
+    }
+    if(!pool.length) return null;
+    const pcts = pool.map(e=>e.lance/e.fipe*100).sort((a,b)=>a-b);
+    const avg  = pcts.reduce((a,b)=>a+b,0)/pcts.length;
+    const p25  = pcts[Math.floor(pcts.length*.25)]||pcts[0];
+    const p75  = pcts[Math.ceil(pcts.length*.75)-1]||pcts[pcts.length-1];
+    const sugMin = fipe>0 ? fipe*p25/100 : 0;
+    const sugMax = fipe>0 ? fipe*p75/100 : 0;
+    return { avg, p25, p75, sugMin, sugMax, count:pool.length, confidence };
+  }
+
+  // ── Render section ───────────────────────────────────────────
+  function renderBenchmarkSection(){
+    renderBenchmarkStats();
+    renderBenchmarkBrands();
+    renderBenchmarkTable();
+  }
+
+  function renderBenchmarkStats(){
+    const analysis = bmkAnalyze();
+    const setEl = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+    if(!analysis){
+      setEl('bmk_count','0'); setEl('bmk_avg_fipe','—'); setEl('bmk_best_pct','—'); setEl('bmk_best_car','—');
+      return;
+    }
+    setEl('bmk_count', analysis.count);
+    setEl('bmk_avg_fipe', analysis.avg.toFixed(1)+'%');
+    setEl('bmk_best_pct', (analysis.best.lance/analysis.best.fipe*100).toFixed(1)+'%');
+    setEl('bmk_best_car', `${analysis.best.marca} ${analysis.best.modelo} ${analysis.best.ano||''}`);
+  }
+
+  function renderBenchmarkBrands(){
+    const analysis = bmkAnalyze();
+    const wrap = document.getElementById('bmk_brands_list');
+    if(!wrap) return;
+    if(!analysis){
+      wrap.innerHTML='<div style="text-align:center;padding:20px 0"><div style="font-size:28px;opacity:.2;margin-bottom:8px">📊</div><div style="font-size:12px;color:var(--muted)">Adicione compras para ver o padrão</div></div>';
+      return;
+    }
+    const brands = Object.entries(analysis.brands).sort((a,b)=>a[1].avg-b[1].avg);
+    // max avg for bar scale
+    const maxAvg = Math.max(...brands.map(b=>b[1].avg),100);
+    wrap.innerHTML = brands.map(([name,b])=>{
+      const cls = b.avg<70?'bmk-great':b.avg<80?'bmk-good':b.avg<90?'bmk-med':'bmk-bad';
+      const fillW = Math.round(b.avg/maxAvg*100);
+      return `<div class="bmk-brand-row">
+        <div class="bmk-brand-name">${name}</div>
+        <div class="bmk-brand-track"><div class="bmk-brand-fill" style="width:${fillW}%"></div></div>
+        <div class="bmk-brand-pct"><span class="bmk-pct-badge ${cls}">${b.avg.toFixed(1)}%</span></div>
+        <div class="bmk-brand-n">${b.count}×</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderBenchmarkTable(){
+    const wrap = document.getElementById('bmk_table_wrap');
+    if(!wrap) return;
+    const query = (document.getElementById('bmk_search')?.value||'').toLowerCase();
+    let entries = getBmkEntries();
+    if(query) entries = entries.filter(e=>`${e.marca} ${e.modelo} ${e.ano}`.toLowerCase().includes(query));
+    if(!entries.length){
+      wrap.innerHTML=`<div class="bmk-empty"><div style="font-size:38px;opacity:.2;margin-bottom:10px">🎯</div><div style="font-size:13px;font-weight:700;color:var(--ink-2)">Nenhuma compra registrada</div><div style="font-size:12px;color:var(--muted);margin:6px auto 16px;max-width:260px">Cadastre suas compras para o sistema aprender seus padrões de arremate.</div><button class="tba primary" onclick="openBmkModal(null)">+ Adicionar primeira compra</button></div>`;
+      return;
+    }
+    const rows = entries.slice().reverse().map(e=>{
+      const pct = e.fipe>0 ? e.lance/e.fipe*100 : 0;
+      const cls = pct<70?'bmk-great':pct<80?'bmk-good':pct<90?'bmk-med':'bmk-bad';
+      const lucro = e.venda>0 ? e.venda-(e.custo||e.lance) : null;
+      return `<tr>
+        <td>${e.data||'—'}</td>
+        <td style="font-weight:700">${e.marca} ${e.modelo}</td>
+        <td style="text-align:center">${e.ano||'—'}</td>
+        <td style="text-align:right">${BRL(e.fipe)}</td>
+        <td style="text-align:right">${BRL(e.lance)}</td>
+        <td style="text-align:center"><span class="bmk-pct-badge ${cls}">${pct>0?pct.toFixed(1)+'%':'—'}</span></td>
+        <td style="text-align:right;font-weight:700;color:${lucro===null?'var(--muted)':lucro>=0?'#16a34a':'#dc2626'}">${lucro===null?'—':(lucro>=0?'+':'')+BRL(lucro)}</td>
+        <td style="white-space:nowrap">
+          <button class="tba" style="padding:4px 10px;font-size:11px" onclick="openBmkModal('${e.id}')">Editar</button>
+          <button class="tba" style="padding:4px 10px;font-size:11px;color:var(--danger);margin-left:4px" onclick="deleteBmkEntry('${e.id}')">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+    wrap.innerHTML=`<table class="bmk-table"><thead><tr>
+      <th>Data</th><th>Veículo</th><th style="text-align:center">Ano</th>
+      <th style="text-align:right">FIPE</th><th style="text-align:right">Lance</th>
+      <th style="text-align:center">% FIPE</th><th style="text-align:right">Lucro</th><th>Ações</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  // ── Integration: suggestion in calculator live panel ─────────
+  function leilaoUpdateBenchmarkSuggestion(){
+    const marca = document.getElementById('lc_marca')?.value||'';
+    const fipe  = parseMoney(document.getElementById('lc_fipe')?.value||'')||0;
+    const box   = document.getElementById('lcr_bmk_suggestion');
+    if(!box) return;
+    const sug = bmkGetSuggestion(marca, fipe);
+    if(!sug || sug.count===0){ box.classList.remove('show'); return; }
+    box.className = `bmk-suggestion show conf-${sug.confidence}`;
+    const titleEl = document.getElementById('lcr_bmk_title');
+    const rangeEl = document.getElementById('lcr_bmk_range');
+    const subEl   = document.getElementById('lcr_bmk_sub');
+    const src = sug.confidence==='high' ? `${sug.count} compra${sug.count>1?'s':''} da mesma marca`
+              : sug.confidence==='medium' ? `${sug.count} compra${sug.count>1?'s':''} na mesma faixa`
+              : `${sug.count} compra${sug.count>1?'s':''} no histórico geral`;
+    if(titleEl) titleEl.textContent = `🎯 Padrão histórico (${src})`;
+    if(rangeEl){
+      if(fipe>0 && sug.sugMin>0){
+        rangeEl.textContent = `${BRL(sug.sugMin)} – ${BRL(sug.sugMax)}`;
+      } else {
+        rangeEl.textContent = `${sug.p25.toFixed(1)}% – ${sug.p75.toFixed(1)}% da FIPE`;
+      }
+    }
+    if(subEl) subEl.textContent = `Média histórica: ${sug.avg.toFixed(1)}% da FIPE`;
   }
 </script>
 </body>
