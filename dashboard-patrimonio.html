@@ -8658,10 +8658,8 @@
   // SERVICE WORKER REGISTRATION
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      // Cache bust: versão no URL força o browser a buscar SW atualizado sempre
-      const swVer = '1.4.0';
+      const swVer = '1.5.0';
       navigator.serviceWorker.register('service-worker.js?v='+swVer).then(reg=>{
-        // Força verificação imediata de update
         reg.update();
 
         // Detect updates
