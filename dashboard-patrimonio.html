@@ -2,6 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
 <title>Patrimônio · Painel Premium</title>
 
@@ -92,19 +95,20 @@
   .sidebar.collapsed .sb-collapse{margin:0 auto}
   .sidebar.collapsed .sb-collapse svg{transform:rotate(180deg)}
 
-  .sb-nav{flex:1;overflow-y:scroll;overflow-x:hidden;padding:8px 4px 16px 8px;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:#C7D0DC transparent}
-  .sb-nav::-webkit-scrollbar{width:5px}
-  .sb-nav::-webkit-scrollbar-track{background:transparent;margin:8px 0}
-  .sb-nav::-webkit-scrollbar-thumb{background:#C7D0DC;border-radius:99px}
-  .sb-nav::-webkit-scrollbar-thumb:hover{background:#94A3B8}
-  :root[data-theme="dark"] .sb-nav{scrollbar-color:#243044 transparent}
-  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb{background:#243044}
-  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb:hover{background:#334155}
+  .sb-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 2px 16px 8px;display:flex;flex-direction:column;scrollbar-width:auto;scrollbar-color:#B0BEC5 #F0F4F8}
+  .sb-nav::-webkit-scrollbar{width:7px}
+  .sb-nav::-webkit-scrollbar-track{background:#F0F4F8;border-radius:99px}
+  .sb-nav::-webkit-scrollbar-thumb{background:#B0BEC5;border-radius:99px;border:1px solid #F0F4F8}
+  .sb-nav::-webkit-scrollbar-thumb:hover{background:#78909C}
+  :root[data-theme="dark"] .sb-nav{scrollbar-color:#2D3E54 #0D1829}
+  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-track{background:#0D1829}
+  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb{background:#2D3E54;border-color:#0D1829}
+  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb:hover{background:#3D5068}
 
-  .sb-section-label{font-size:9.5px;font-weight:700;color:#B8C4D0;text-transform:uppercase;letter-spacing:.9px;padding:14px 6px 4px;white-space:nowrap}
+  .sb-section-label{font-size:10px;font-weight:700;color:#B8C4D0;text-transform:uppercase;letter-spacing:.8px;padding:12px 6px 3px;white-space:nowrap}
   .sidebar.collapsed .sb-section-label{display:none}
 
-  .sb-item{display:flex;align-items:center;gap:9px;padding:7px 8px 7px 10px;border-radius:8px;color:#64748B;font-size:12.5px;font-weight:500;cursor:pointer;transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;white-space:nowrap;overflow:hidden;position:relative;margin:1px 0}
+  .sb-item{display:flex;align-items:center;gap:9px;padding:8px 8px 8px 10px;border-radius:8px;color:#64748B;font-size:13px;font-weight:500;cursor:pointer;transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;white-space:nowrap;overflow:hidden;position:relative;margin:1px 0}
   .sb-item::before{content:'';position:absolute;left:0;top:7px;bottom:7px;width:0;background:#3B82F6;border-radius:0 2px 2px 0;transition:width .14s}
   .sb-item:hover{background:#F0F4F9;color:#334155}
   .sb-item.active{background:#EBF3FF;color:#1D4ED8;font-weight:600}
@@ -8654,7 +8658,12 @@
   // SERVICE WORKER REGISTRATION
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      navigator.serviceWorker.register('service-worker.js').then(reg=>{
+      // Cache bust: versão no URL força o browser a buscar SW atualizado sempre
+      const swVer = '1.4.0';
+      navigator.serviceWorker.register('service-worker.js?v='+swVer).then(reg=>{
+        // Força verificação imediata de update
+        reg.update();
+
         // Detect updates
         reg.addEventListener('updatefound',()=>{
           const w = reg.installing;

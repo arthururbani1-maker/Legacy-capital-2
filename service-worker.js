@@ -2,7 +2,7 @@
 // Patrimônio · Service Worker
 // Offline-first com network-first para HTML (atualização automática)
 // =============================================================
-const CACHE_VERSION = 'v1.3.0';
+const CACHE_VERSION = 'v1.4.0';
 const CACHE_NAME = `patrimonio-${CACHE_VERSION}`;
 
 const CORE_ASSETS = [
