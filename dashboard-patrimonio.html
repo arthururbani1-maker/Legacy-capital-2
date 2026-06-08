@@ -1525,6 +1525,30 @@
   .lc-section{background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:16px}
   .lc-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
   .lc-section-title span{font-size:14px}
+  /* ═══════ Leilão · tema fintech claro (escopo #sec-leilao) ═══════ */
+  #sec-leilao{--lc-g1:#3B82F6;--lc-g2:#8B5CF6;--lc-grad:linear-gradient(135deg,#3B82F6,#8B5CF6);--lc-grad-soft:linear-gradient(135deg,rgba(59,130,246,.10),rgba(139,92,246,.10))}
+  #sec-leilao .lc-hero{position:relative;overflow:hidden;border-radius:24px;padding:28px 30px;margin-bottom:22px;background:linear-gradient(135deg,#EEF4FF 0%,#F4EEFF 100%);border:1px solid rgba(139,92,246,.14)}
+  :root[data-theme="dark"] #sec-leilao .lc-hero{background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(139,92,246,.14));border-color:rgba(139,92,246,.22)}
+  #sec-leilao .lc-hero-glow{position:absolute;top:-70px;right:-50px;width:260px;height:260px;background:radial-gradient(circle,rgba(139,92,246,.22),transparent 70%);pointer-events:none}
+  #sec-leilao .lc-hero-content{position:relative;z-index:1}
+  #sec-leilao .lc-hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#6D28D9;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.22);padding:5px 12px;border-radius:99px;margin-bottom:13px;letter-spacing:.2px}
+  :root[data-theme="dark"] #sec-leilao .lc-hero-badge{color:#C4B5FD;background:rgba(139,92,246,.18)}
+  #sec-leilao .lc-hero-title{font-family:'Manrope',system-ui;font-size:26px;font-weight:800;letter-spacing:-.6px;color:var(--ink);margin:0 0 6px}
+  #sec-leilao .lc-hero-sub{font-size:13.5px;color:var(--muted);margin:0;max-width:540px;line-height:1.6}
+  #sec-leilao .renda-tabs{background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:5px;gap:4px}
+  #sec-leilao .renda-tab-btn{border-radius:10px!important;border-bottom:none!important;margin-bottom:0;padding:9px 14px;transition:.16s}
+  #sec-leilao .renda-tab-btn.active{background:var(--bg-elev);color:var(--lc-g2);box-shadow:0 1px 4px rgba(15,23,42,.10)}
+  #sec-leilao .renda-tab-btn.active .renda-tab-badge{background:var(--lc-g2);border-color:var(--lc-g2);color:#fff}
+  #sec-leilao .lc-section{border-radius:20px;border:1px solid var(--line);box-shadow:0 1px 3px rgba(15,23,42,.03),0 10px 26px rgba(15,23,42,.045)}
+  #sec-leilao .lc-section-title span{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:var(--lc-grad-soft);font-size:15px}
+  #sec-leilao .lc-field input,#sec-leilao .lc-field select{border-radius:12px;padding:11px 14px;font-size:13.5px}
+  #sec-leilao .lc-field input:focus,#sec-leilao .lc-field select:focus{border-color:var(--lc-g2);box-shadow:0 0 0 3px rgba(139,92,246,.13)}
+  #sec-leilao .lc-field.highlight input{border-color:rgba(139,92,246,.35);background:var(--lc-grad-soft)}
+  #sec-leilao .tba.primary{background:var(--lc-grad)!important;border:none!important;color:#fff!important;box-shadow:0 4px 14px rgba(99,102,241,.28)}
+  #sec-leilao .tba.primary:hover{filter:brightness(1.06)}
+  #sec-leilao #leilao_live_result>div{border-radius:20px!important;box-shadow:0 10px 34px rgba(99,102,241,.10)!important;border:1px solid rgba(139,92,246,.15)!important}
+  #sec-leilao #leilao_live_result>div>div:first-child{background:var(--lc-grad-soft)}
+  #sec-leilao #lcr_verdict{font-size:21px!important;letter-spacing:-.4px!important;margin-top:2px}
   .lc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .lc-grid.col2{grid-template-columns:repeat(2,1fr)}
   .lc-grid.col4{grid-template-columns:repeat(4,1fr)}
@@ -2963,6 +2987,16 @@
 
   <!-- ═══ CALCULADORA DE LEILÃO ═══ -->
   <div class="page-sec" id="sec-leilao">
+
+    <!-- Hero -->
+    <div class="lc-hero">
+      <div class="lc-hero-glow"></div>
+      <div class="lc-hero-content">
+        <span class="lc-hero-badge">⚡ Inteligência de arremate · 35 dados reais</span>
+        <h2 class="lc-hero-title">Quanto vale dar o lance?</h2>
+        <p class="lc-hero-sub">Simule custos, descubra o lance ideal por FIPE e quilometragem, e veja o lucro projetado em tempo real.</p>
+      </div>
+    </div>
 
     <!-- Tabs -->
     <div class="renda-tabs" style="margin-bottom:22px">
