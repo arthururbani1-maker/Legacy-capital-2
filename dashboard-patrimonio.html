@@ -80,87 +80,97 @@
   @media(max-width:640px){.row.kpis{grid-template-columns:1fr}}
 
   /* ============= SIDEBAR ============= */
-  /* ── Sidebar premium ───────────────────────────────────────── */
-  .sidebar{width:252px;min-width:252px;height:100vh;background:#FAFBFC;display:flex;flex-direction:column;overflow:hidden;min-height:0;border-right:1px solid #E9ECF0;transition:width .22s cubic-bezier(.4,0,.2,1),min-width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:relative;z-index:50}
-  .sidebar.collapsed{width:64px;min-width:64px}
-  .sb-logo-area{padding:0 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid #E9ECF0;flex-shrink:0;height:62px}
-  .sb-logo{width:33px;height:33px;min-width:33px;border-radius:9px;background:linear-gradient(135deg,#3B82F6,#6366F1);display:grid;place-items:center;color:#fff;font-family:'Manrope',system-ui;font-weight:800;font-size:12px;letter-spacing:-.2px;flex-shrink:0}
+  .sidebar{width:248px;min-width:248px;height:100vh;background:#FAFBFC;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #E9ECF0;transition:width .22s cubic-bezier(.4,0,.2,1),min-width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:relative;z-index:50}
+  .sidebar.collapsed{width:56px;min-width:56px}
+
+  /* Logo area — fixo no topo */
+  .sb-logo-area{padding:0 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #E9ECF0;flex-shrink:0;height:58px}
+  .sb-logo{width:32px;height:32px;min-width:32px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#6366F1);display:grid;place-items:center;color:#fff;font-family:'Manrope',system-ui;font-weight:800;font-size:11px;letter-spacing:-.2px;flex-shrink:0}
   .sb-brand{flex:1;min-width:0}
-  .sb-brand .sb-title{font-family:'Manrope',system-ui;font-size:13.5px;font-weight:700;color:#0F172A;letter-spacing:-.25px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sb-brand .sb-sub{font-size:9.5px;color:#94A3B8;margin-top:1.5px;white-space:nowrap;letter-spacing:.2px}
+  .sb-brand .sb-title{font-family:'Manrope',system-ui;font-size:13px;font-weight:700;color:#0F172A;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sb-brand .sb-plan{display:inline-flex;align-items:center;margin-top:3px;font-size:8.5px;font-weight:700;background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(99,102,241,.12));color:#3B82F6;padding:2px 7px;border-radius:99px;letter-spacing:.3px}
   .sidebar.collapsed .sb-brand{display:none}
-  .sb-collapse{width:26px;height:26px;min-width:26px;border-radius:7px;display:grid;place-items:center;color:#CBD5E1;cursor:pointer;transition:.16s;background:none;border:none;flex-shrink:0;padding:0}
+  .sb-collapse{width:24px;height:24px;min-width:24px;border-radius:6px;display:grid;place-items:center;color:#CBD5E1;cursor:pointer;transition:.15s;background:none;border:none;flex-shrink:0;padding:0}
   .sb-collapse:hover{background:#F1F5F9;color:#64748B}
-  .sb-collapse svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
+  .sb-collapse svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
   .sidebar.collapsed .sb-collapse{margin:0 auto}
   .sidebar.collapsed .sb-collapse svg{transform:rotate(180deg)}
 
-  .sb-nav{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 2px 16px 8px;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
-  .sb-nav::-webkit-scrollbar{width:4px}
+  /* Nav — área scrollável */
+  .sb-nav{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:6px 6px 12px;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+  .sb-nav::-webkit-scrollbar{width:3px}
   .sb-nav::-webkit-scrollbar-track{background:transparent}
-  .sb-nav::-webkit-scrollbar-thumb{background:#D1D9E0;border-radius:99px}
+  .sb-nav::-webkit-scrollbar-thumb{background:#DDE3EA;border-radius:99px}
   .sb-nav::-webkit-scrollbar-thumb:hover{background:#94A3B8}
-  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb{background:#2D3E54}
 
-  .sb-section-label{font-size:10px;font-weight:700;color:#B8C4D0;text-transform:uppercase;letter-spacing:.8px;padding:12px 6px 3px;white-space:nowrap}
-  .sidebar.collapsed .sb-section-label{display:none}
+  /* Grupos colapsáveis */
+  .sb-group{margin-bottom:2px}
+  .sb-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 8px 3px;cursor:pointer;user-select:none}
+  .sb-group-hdr:hover .sb-group-chev{opacity:1}
+  .sb-group-label{font-size:9.5px;font-weight:700;color:#B0BCC8;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+  .sb-group-chev{width:12px;height:12px;flex-shrink:0;opacity:.5;transition:opacity .15s,transform .2s}
+  .sb-group-chev svg{width:10px;height:10px;stroke:#94A3B8;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .sb-group.collapsed .sb-group-chev{transform:rotate(-90deg)}
+  .sb-group-items{overflow:hidden;transition:max-height .2s ease,opacity .15s ease;max-height:400px;opacity:1}
+  .sb-group.collapsed .sb-group-items{max-height:0;opacity:0}
+  .sidebar.collapsed .sb-group-hdr{justify-content:center;padding:8px 0 4px}
+  .sidebar.collapsed .sb-group-label,.sidebar.collapsed .sb-group-chev{display:none}
 
-  .sb-item{display:flex;align-items:center;gap:9px;padding:8px 8px 8px 10px;border-radius:8px;color:#64748B;font-size:13px;font-weight:500;cursor:pointer;transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;white-space:nowrap;overflow:hidden;position:relative;margin:1px 0}
-  .sb-item::before{content:'';position:absolute;left:0;top:7px;bottom:7px;width:0;background:#3B82F6;border-radius:0 2px 2px 0;transition:width .14s}
-  .sb-item:hover{background:#F0F4F9;color:#334155}
+  /* Items */
+  .sb-item{display:flex;align-items:center;gap:8px;padding:5px 8px 5px 9px;border-radius:7px;color:#64748B;font-size:12.5px;font-weight:500;cursor:pointer;transition:background .1s,color .1s;border:none;background:none;width:100%;text-align:left;white-space:nowrap;overflow:hidden;position:relative}
+  .sb-item::before{content:'';position:absolute;left:0;top:5px;bottom:5px;width:0;background:#3B82F6;border-radius:0 2px 2px 0;transition:width .12s}
+  .sb-item:hover{background:#EEF3F9;color:#334155}
   .sb-item.active{background:#EBF3FF;color:#1D4ED8;font-weight:600}
-  .sb-item.active::before{width:3px}
-  .sb-item.soon{opacity:.5;cursor:default}
+  .sb-item.active::before{width:2.5px}
+  .sb-item.soon{opacity:.45;cursor:default}
   .sb-item.soon:hover{background:none;color:#64748B}
-  .sidebar.collapsed .sb-item{justify-content:center;padding:9px;overflow:visible}
+  .sidebar.collapsed .sb-item{justify-content:center;padding:8px;overflow:visible}
   .sidebar.collapsed .sb-item::before{display:none}
   .sidebar.collapsed .sb-item:hover .sb-tip{opacity:1;pointer-events:auto}
 
-  .sb-item-ico{width:17px;min-width:17px;height:17px;display:grid;place-items:center;flex-shrink:0;transition:opacity .12s}
-  .sb-item-ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  .sb-item-lbl{flex:1;overflow:hidden;text-overflow:ellipsis}
+  .sb-item-ico{width:16px;min-width:16px;height:16px;display:grid;place-items:center;flex-shrink:0}
+  .sb-item-ico svg{width:13.5px;height:13.5px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .sb-item-lbl{flex:1;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
   .sidebar.collapsed .sb-item-lbl{display:none}
 
-  .sb-badge-new{font-size:8px;font-weight:700;background:rgba(59,130,246,.1);color:#3B82F6;padding:2px 6px;border-radius:99px;line-height:1.4;flex-shrink:0;letter-spacing:.2px}
-  .sb-badge-soon{font-size:8px;font-weight:600;background:rgba(148,163,184,.1);color:#94A3B8;padding:2px 6px;border-radius:99px;line-height:1.4;flex-shrink:0;letter-spacing:.2px}
+  .sb-badge-new{font-size:7.5px;font-weight:700;background:rgba(59,130,246,.1);color:#3B82F6;padding:1.5px 5px;border-radius:99px;line-height:1.5;flex-shrink:0;letter-spacing:.2px}
+  .sb-badge-soon{font-size:7.5px;font-weight:600;background:rgba(148,163,184,.09);color:#94A3B8;padding:1.5px 5px;border-radius:99px;line-height:1.5;flex-shrink:0}
   .sidebar.collapsed .sb-badge-new,.sidebar.collapsed .sb-badge-soon{display:none}
 
   .sb-tip{opacity:0;pointer-events:none;position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:#0F172A;color:#F1F5F9;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap;z-index:200;box-shadow:0 4px 14px rgba(15,23,42,.2);border:1px solid #1E293B;transition:opacity .12s}
   .sb-tip::before{content:'';position:absolute;left:-5px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-right-color:#0F172A}
 
-  .sb-sep{height:1px;background:#EDF0F4;margin:4px 0}
+  .sb-sep{height:1px;background:#EDF0F4;margin:3px 0}
 
-  .sb-footer{padding:10px 8px;border-top:1px solid #EDF0F4;flex-shrink:0}
-  .sb-user{display:flex;align-items:center;gap:9px;padding:8px;border-radius:9px;cursor:pointer;transition:.14s}
-  .sb-user:hover{background:#F0F4F9}
-  .sb-avatar{width:30px;height:30px;min-width:30px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#6366F1);display:grid;place-items:center;font-weight:700;color:#fff;font-size:11px;flex-shrink:0}
+  /* Rodapé — fixo na base */
+  .sb-footer{padding:10px 8px;border-top:1px solid #EDF0F4;flex-shrink:0;background:#FAFBFC}
+  .sb-user{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:.13s}
+  .sb-user:hover{background:#EEF3F9}
+  .sb-avatar{width:30px;height:30px;min-width:30px;border-radius:8px;background:linear-gradient(135deg,#3B82F6,#6366F1);display:grid;place-items:center;font-weight:700;color:#fff;font-size:11px;flex-shrink:0;letter-spacing:-.3px}
   .sb-user-info{flex:1;min-width:0}
   .sb-user-name{font-size:12px;font-weight:600;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sb-user-plan{font-size:9px;color:#94A3B8;display:flex;align-items:center;gap:4px;margin-top:2px}
-  .sb-user-plan .plan-badge{font-size:8px;font-weight:700;background:rgba(59,130,246,.1);color:#3B82F6;padding:1.5px 6px;border-radius:4px;letter-spacing:.3px}
+  .sb-user-email{font-size:10px;color:#94A3B8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .sb-user-plan{display:inline-flex;margin-top:3px;font-size:7.5px;font-weight:700;background:rgba(59,130,246,.1);color:#3B82F6;padding:1.5px 6px;border-radius:99px;letter-spacing:.3px}
   .sidebar.collapsed .sb-user{justify-content:center;padding:8px}
   .sidebar.collapsed .sb-user-info{display:none}
 
-  /* Dark mode sidebar */
+  /* Dark mode */
   :root[data-theme="dark"] .sidebar{background:#0A1020;border-right-color:rgba(255,255,255,.06)}
   :root[data-theme="dark"] .sb-logo-area{border-bottom-color:rgba(255,255,255,.07)}
   :root[data-theme="dark"] .sb-brand .sb-title{color:#F1F5F9}
-  :root[data-theme="dark"] .sb-brand .sb-sub{color:#2D3E54}
-  :root[data-theme="dark"] .sb-collapse{color:#2D3E54}
-  :root[data-theme="dark"] .sb-collapse:hover{background:rgba(255,255,255,.08);color:#64748B}
-  :root[data-theme="dark"] .sb-section-label{color:#1A2840}
+  :root[data-theme="dark"] .sb-brand .sb-plan{background:rgba(59,130,246,.15);color:#60A5FA}
+  :root[data-theme="dark"] .sb-collapse:hover{background:rgba(255,255,255,.07);color:#64748B}
+  :root[data-theme="dark"] .sb-group-label{color:#1E2D40}
   :root[data-theme="dark"] .sb-item{color:#4A6080}
   :root[data-theme="dark"] .sb-item:hover{background:rgba(255,255,255,.06);color:#94A3B8}
-  :root[data-theme="dark"] .sb-item.active{background:rgba(59,130,246,.13);color:#60A5FA}
+  :root[data-theme="dark"] .sb-item.active{background:rgba(59,130,246,.12);color:#60A5FA}
   :root[data-theme="dark"] .sb-item.active::before{background:#60A5FA}
-  :root[data-theme="dark"] .sb-item.soon{opacity:.35}
-  :root[data-theme="dark"] .sb-item.soon:hover{background:none;color:#4A6080}
   :root[data-theme="dark"] .sb-sep{background:rgba(255,255,255,.05)}
-  :root[data-theme="dark"] .sb-footer{border-top-color:rgba(255,255,255,.05)}
+  :root[data-theme="dark"] .sb-footer{border-top-color:rgba(255,255,255,.05);background:#0A1020}
   :root[data-theme="dark"] .sb-user:hover{background:rgba(255,255,255,.06)}
   :root[data-theme="dark"] .sb-user-name{color:#E2E8F0}
-  :root[data-theme="dark"] .sb-user-plan{color:#2D3E54}
-  :root[data-theme="dark"] .sb-user-plan .plan-badge{background:rgba(59,130,246,.15);color:#60A5FA}
+  :root[data-theme="dark"] .sb-user-email{color:#2D3E54}
+  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb{background:#1E2D40}
 
   /* ============= APP MAIN ============= */
   .app-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg)}
@@ -1702,163 +1712,203 @@
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
+
+  <!-- TOPO FIXO -->
   <div class="sb-logo-area">
-    <div class="sb-logo">PA</div>
+    <div class="sb-logo">LC</div>
     <div class="sb-brand">
-      <div class="sb-title">Patrimônio</div>
-      <div class="sb-sub">Gestão Patrimonial</div>
+      <div class="sb-title">Legacy Capital</div>
+      <div class="sb-plan">PREMIUM</div>
     </div>
     <button class="sb-collapse" onclick="toggleSidebar()" title="Recolher menu">
       <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
   </div>
 
+  <!-- MENU CENTRAL (scrollável) -->
   <nav class="sb-nav">
 
-    <!-- ── PATRIMÔNIO ── -->
-    <div class="sb-section-label">Patrimônio</div>
-    <button class="sb-item active" id="sb-dashboard" onclick="showSection('dashboard')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span>
-      <span class="sb-item-lbl">Dashboard</span>
-      <span class="sb-tip">Dashboard</span>
-    </button>
-    <button class="sb-item" id="sb-ativos" onclick="showSection('ativos')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-      <span class="sb-item-lbl">Ativos</span>
-      <span class="sb-tip">Ativos</span>
-    </button>
-    <button class="sb-item" id="sb-calendario" onclick="showSection('calendario')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-      <span class="sb-item-lbl">Calendário</span>
-      <span class="sb-tip">Calendário</span>
-    </button>
-    <button class="sb-item" id="sb-fluxo" onclick="showSection('fluxo')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span>
-      <span class="sb-item-lbl">Fluxo de Caixa</span>
-      <span class="sb-tip">Fluxo de Caixa</span>
-    </button>
+    <!-- GESTÃO PATRIMONIAL -->
+    <div class="sb-group" id="sbg-patrimonio">
+      <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-patrimonio')">
+        <span class="sb-group-label">Gestão Patrimonial</span>
+        <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="sb-group-items">
+        <button class="sb-item active" id="sb-dashboard" onclick="showSection('dashboard')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span>
+          <span class="sb-item-lbl">Dashboard</span>
+          <span class="sb-tip">Dashboard</span>
+        </button>
+        <button class="sb-item" id="sb-ativos" onclick="showSection('ativos')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          <span class="sb-item-lbl">Ativos</span>
+          <span class="sb-tip">Ativos</span>
+        </button>
+        <button class="sb-item" id="sb-calendario" onclick="showSection('calendario')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+          <span class="sb-item-lbl">Calendário</span>
+          <span class="sb-tip">Calendário</span>
+        </button>
+        <button class="sb-item" id="sb-fluxo" onclick="showSection('fluxo')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span>
+          <span class="sb-item-lbl">Fluxo de Caixa</span>
+          <span class="sb-tip">Fluxo de Caixa</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- ── FINANCEIRO ── -->
-    <div class="sb-sep"></div>
-    <div class="sb-section-label">Financeiro</div>
-    <button class="sb-item" id="sb-renda" onclick="showSection('renda')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
-      <span class="sb-item-lbl">Controle de Renda</span>
-      <span class="sb-tip">Controle de Renda</span>
-    </button>
-    <button class="sb-item" id="sb-dividas" onclick="showSection('dividas')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
-      <span class="sb-item-lbl">Dívidas</span>
-      <span class="sb-tip">Dívidas</span>
-    </button>
-    <button class="sb-item" id="sb-relatorios" onclick="showSection('relatorios')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
-      <span class="sb-item-lbl">Relatórios</span>
-      <span class="sb-tip">Relatórios</span>
-    </button>
+    <!-- FINANCEIRO -->
+    <div class="sb-group" id="sbg-financeiro">
+      <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-financeiro')">
+        <span class="sb-group-label">Financeiro</span>
+        <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="sb-group-items">
+        <button class="sb-item" id="sb-renda" onclick="showSection('renda')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          <span class="sb-item-lbl">Controle de Renda</span>
+          <span class="sb-tip">Controle de Renda</span>
+        </button>
+        <button class="sb-item" id="sb-dividas" onclick="showSection('dividas')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+          <span class="sb-item-lbl">Dívidas</span>
+          <span class="sb-tip">Dívidas</span>
+        </button>
+        <button class="sb-item" id="sb-relatorios" onclick="showSection('relatorios')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+          <span class="sb-item-lbl">Relatórios</span>
+          <span class="sb-tip">Relatórios</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- ── PLANEJAMENTO ── -->
-    <div class="sb-sep"></div>
-    <div class="sb-section-label">Planejamento</div>
-    <button class="sb-item soon" onclick="toast('Em breve — Metas financeiras e patrimoniais','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span>
-      <span class="sb-item-lbl">Metas</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Metas — Em breve</span>
-    </button>
-    <button class="sb-item soon" onclick="toast('Em breve — Simulações de cenários financeiros','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
-      <span class="sb-item-lbl">Simulações</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Simulações — Em breve</span>
-    </button>
-    <button class="sb-item soon" onclick="toast('Em breve — Projeções de crescimento patrimonial','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
-      <span class="sb-item-lbl">Projeções</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Projeções — Em breve</span>
-    </button>
+    <!-- OPORTUNIDADES -->
+    <div class="sb-group" id="sbg-oportunidades">
+      <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-oportunidades')">
+        <span class="sb-group-label">Oportunidades</span>
+        <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="sb-group-items">
+        <button class="sb-item" id="sb-leilao" onclick="showSection('leilao')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M15 3l6 6-9.5 9.5-6-6L15 3z"/><path d="M9.5 9.5L3.5 14.5a2 2 0 0 0 0 2.83l3.18 3.18a2 2 0 0 0 2.83 0L15 15"/><line x1="2" y1="22" x2="7" y2="17"/></svg></span>
+          <span class="sb-item-lbl">Calc. Leilão</span>
+          <span class="sb-badge-new">PRO</span>
+          <span class="sb-tip">Calculadora de Leilão</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- ── OPORTUNIDADES ── -->
-    <div class="sb-sep"></div>
-    <div class="sb-section-label">Oportunidades</div>
-    <button class="sb-item" id="sb-leilao" onclick="showSection('leilao')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M15 3l6 6-9.5 9.5-6-6L15 3z"/><path d="M9.5 9.5L3.5 14.5a2 2 0 0 0 0 2.83l3.18 3.18a2 2 0 0 0 2.83 0L15 15"/><line x1="2" y1="22" x2="7" y2="17"/></svg></span>
-      <span class="sb-item-lbl">Calc. Leilão</span>
-      <span class="sb-badge-new">PRO</span>
-      <span class="sb-tip">Calculadora de Leilão</span>
-    </button>
+    <!-- DOCUMENTOS -->
+    <div class="sb-group" id="sbg-documentos">
+      <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-documentos')">
+        <span class="sb-group-label">Documentos</span>
+        <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="sb-group-items">
+        <button class="sb-item" id="sb-comprovantes" onclick="showSection('comprovantes')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          <span class="sb-item-lbl">Comprovantes</span>
+          <span class="sb-tip">Comprovantes</span>
+        </button>
+        <button class="sb-item soon" onclick="toast('Em breve — Arquivos e contratos','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+          <span class="sb-item-lbl">Arquivos</span>
+          <span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Arquivos — Em breve</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- ── DOCUMENTOS ── -->
-    <div class="sb-sep"></div>
-    <div class="sb-section-label">Documentos</div>
-    <button class="sb-item" id="sb-comprovantes" onclick="showSection('comprovantes')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
-      <span class="sb-item-lbl">Comprovantes</span>
-      <span class="sb-tip">Comprovantes</span>
-    </button>
-    <button class="sb-item soon" onclick="toast('Em breve — Arquivos, contratos e documentos','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
-      <span class="sb-item-lbl">Arquivos</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Arquivos — Em breve</span>
-    </button>
+    <!-- PLANEJAMENTO (colapsado por padrão) -->
+    <div class="sb-group collapsed" id="sbg-planejamento">
+      <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-planejamento')">
+        <span class="sb-group-label">Planejamento</span>
+        <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="sb-group-items">
+        <button class="sb-item soon" onclick="toast('Em breve — Metas financeiras','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span>
+          <span class="sb-item-lbl">Metas</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Metas — Em breve</span>
+        </button>
+        <button class="sb-item soon" onclick="toast('Em breve — Simulações','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+          <span class="sb-item-lbl">Simulações</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Simulações — Em breve</span>
+        </button>
+        <button class="sb-item soon" onclick="toast('Em breve — Projeções','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+          <span class="sb-item-lbl">Projeções</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Projeções — Em breve</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- ── INTELIGÊNCIA ── -->
-    <div class="sb-sep"></div>
-    <div class="sb-section-label">Inteligência</div>
-    <button class="sb-item soon" onclick="toast('Em breve — Assistente IA patrimonial','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7 7 7 0 0 1-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26A7 7 0 0 1 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span>
-      <span class="sb-item-lbl">Assistente IA</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Assistente IA — Em breve</span>
-    </button>
-    <button class="sb-item soon" onclick="toast('Em breve — Insights automáticos do seu patrimônio','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
-      <span class="sb-item-lbl">Insights</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Insights — Em breve</span>
-    </button>
-    <button class="sb-item soon" onclick="toast('Em breve — Recomendações personalizadas','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="sb-item-lbl">Recomendações</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Recomendações — Em breve</span>
-    </button>
+    <!-- INTELIGÊNCIA (colapsado por padrão) -->
+    <div class="sb-group collapsed" id="sbg-inteligencia">
+      <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-inteligencia')">
+        <span class="sb-group-label">Inteligência</span>
+        <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="sb-group-items">
+        <button class="sb-item soon" onclick="toast('Em breve — Assistente IA','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7 7 7 0 0 1-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26A7 7 0 0 1 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span>
+          <span class="sb-item-lbl">Assistente IA</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Assistente IA — Em breve</span>
+        </button>
+        <button class="sb-item soon" onclick="toast('Em breve — Insights','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+          <span class="sb-item-lbl">Insights</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Insights — Em breve</span>
+        </button>
+        <button class="sb-item soon" onclick="toast('Em breve — Recomendações','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+          <span class="sb-item-lbl">Recomendações</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Recomendações — Em breve</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- ── CONFIGURAÇÕES ── -->
-    <div class="sb-sep"></div>
-    <div class="sb-section-label">Configurações</div>
-    <button class="sb-item soon" onclick="toast('Em breve — Perfil e conta','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-      <span class="sb-item-lbl">Perfil</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Perfil — Em breve</span>
-    </button>
-    <button class="sb-item soon" onclick="toast('Em breve — Preferências do sistema','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-      <span class="sb-item-lbl">Preferências</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Preferências — Em breve</span>
-    </button>
-    <button class="sb-item soon" onclick="toast('Em breve — Segurança e privacidade','info')">
-      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-      <span class="sb-item-lbl">Segurança</span>
-      <span class="sb-badge-soon">Breve</span>
-      <span class="sb-tip">Segurança — Em breve</span>
-    </button>
+    <!-- CONFIGURAÇÕES (colapsado por padrão) -->
+    <div class="sb-group collapsed" id="sbg-config">
+      <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-config')">
+        <span class="sb-group-label">Configurações</span>
+        <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="sb-group-items">
+        <button class="sb-item soon" onclick="toast('Em breve — Perfil','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="sb-item-lbl">Perfil</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Perfil — Em breve</span>
+        </button>
+        <button class="sb-item soon" onclick="toast('Em breve — Preferências','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          <span class="sb-item-lbl">Preferências</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Preferências — Em breve</span>
+        </button>
+        <button class="sb-item soon" onclick="toast('Em breve — Segurança','info')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="sb-item-lbl">Segurança</span><span class="sb-badge-soon">Breve</span>
+          <span class="sb-tip">Segurança — Em breve</span>
+        </button>
+      </div>
+    </div>
 
   </nav>
 
+  <!-- RODAPÉ FIXO -->
   <div class="sb-footer">
     <div class="sb-user">
-      <div class="sb-avatar">U</div>
+      <div class="sb-avatar">AU</div>
       <div class="sb-user-info">
-        <div class="sb-user-name">Urbani</div>
-        <div class="sb-user-plan"><span class="plan-badge">PREMIUM</span></div>
+        <div class="sb-user-name">Arthur Urbani</div>
+        <div class="sb-user-email">arthur.urbani1@gmail.com</div>
+        <div class="sb-user-plan">PREMIUM</div>
       </div>
     </div>
   </div>
+
 </aside>
 
 <!-- APP MAIN -->
@@ -8655,7 +8705,7 @@
   // SERVICE WORKER REGISTRATION
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      const swVer = '1.6.0';
+      const swVer = '1.7.0';
       navigator.serviceWorker.register('service-worker.js?v='+swVer).then(reg=>{
         reg.update();
 
@@ -10948,6 +10998,12 @@
     if(name === 'leilao')  setTimeout(()=>{ if(typeof initLeilaoSection==='function') initLeilaoSection(); }, 60);
     // Close mobile sidebar
     closeSidebar();
+  }
+
+  function toggleSbGroup(id){
+    const g = document.getElementById(id);
+    if(!g) return;
+    g.classList.toggle('collapsed');
   }
 
   function toggleSidebar(){
