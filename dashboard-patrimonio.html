@@ -1525,6 +1525,64 @@
   .lc-section{background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:16px}
   .lc-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
   .lc-section-title span{font-size:14px}
+  /* ════════ Leilão · redesign SaaS (Linear/Stripe) — escopo #sec-leilao ════════ */
+  #sec-leilao{--lcx-accent:#2563EB;--lcx-accent-soft:#EFF4FF}
+  :root[data-theme="dark"] #sec-leilao{--lcx-accent:#60A5FA;--lcx-accent-soft:rgba(96,165,250,.13)}
+  #sec-leilao .lcx-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  #sec-leilao .lcx-header-main{display:flex;align-items:center;gap:14px}
+  #sec-leilao .lcx-header-ico{width:46px;height:46px;border-radius:13px;background:var(--lcx-accent-soft);color:var(--lcx-accent);display:grid;place-items:center;flex-shrink:0}
+  #sec-leilao .lcx-header-ico svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  #sec-leilao .lcx-h2{font-family:'Inter',system-ui;font-size:18.5px;font-weight:700;letter-spacing:-.4px;color:var(--ink);margin:0}
+  #sec-leilao .lcx-sub{font-size:12.5px;color:var(--muted);margin:2px 0 0}
+  #sec-leilao .lcx-btn-primary{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;background:var(--lcx-accent);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+  #sec-leilao .lcx-btn-primary:hover{filter:brightness(1.08)}
+  #sec-leilao .lcx-btn-primary svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  #sec-leilao .lcx-btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;background:var(--bg-elev);color:var(--ink-2);border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+  #sec-leilao .lcx-btn-ghost:hover{background:var(--bg-soft);border-color:var(--line-2)}
+  #sec-leilao .lcx-btn-ghost svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  #sec-leilao .lcx-steps{display:flex;align-items:center;gap:6px;margin-bottom:22px;flex-wrap:wrap}
+  #sec-leilao .lcx-step{display:inline-flex;align-items:center;gap:9px;padding:8px 15px;background:transparent;border:1px solid var(--line);border-radius:99px;cursor:pointer;font-family:inherit;transition:.15s}
+  #sec-leilao .lcx-step:hover{background:var(--bg-soft)}
+  #sec-leilao .lcx-step-n{width:22px;height:22px;border-radius:50%;background:var(--bg-soft);color:var(--muted);display:grid;place-items:center;font-size:11.5px;font-weight:700;flex-shrink:0;transition:.15s}
+  #sec-leilao .lcx-step-t{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+  #sec-leilao .lcx-step.active{border-color:var(--lcx-accent);background:var(--lcx-accent-soft)}
+  #sec-leilao .lcx-step.active .lcx-step-n{background:var(--lcx-accent);color:#fff}
+  #sec-leilao .lcx-step.active .lcx-step-t{color:var(--lcx-accent)}
+  #sec-leilao .lcx-step.done .lcx-step-n{background:var(--accent-2);color:#fff}
+  #sec-leilao .lcx-step.done .lcx-step-t{color:var(--ink-2)}
+  #sec-leilao .lcx-step-line{flex:1;min-width:10px;height:1px;background:var(--line)}
+  @media(max-width:720px){#sec-leilao .lcx-step-line{display:none}#sec-leilao .lcx-step-t{display:none}#sec-leilao .lcx-step{padding:8px}}
+  #sec-leilao .lcx-pane{display:none;animation:lcxfade .26s ease}
+  #sec-leilao .lcx-pane.active{display:block}
+  @keyframes lcxfade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  #sec-leilao .lcx-card{background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 1px 2px rgba(15,23,42,.03);transition:box-shadow .2s,border-color .2s}
+  #sec-leilao .lcx-card:hover{box-shadow:0 4px 18px rgba(15,23,42,.06)}
+  #sec-leilao .lcx-card-title{font-family:'Inter',system-ui;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;letter-spacing:-.2px}
+  #sec-leilao .lcx-card-desc{font-size:12px;color:var(--muted);margin-bottom:18px}
+  #sec-leilao .lcx-grid{display:grid;gap:14px}
+  #sec-leilao .lcx-grid.c2{grid-template-columns:1fr 1fr}
+  #sec-leilao .lcx-grid.c3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:680px){#sec-leilao .lcx-grid.c2,#sec-leilao .lcx-grid.c3{grid-template-columns:1fr}}
+  #sec-leilao .lcx-f{display:flex;flex-direction:column;gap:6px}
+  #sec-leilao .lcx-f label{font-size:11.5px;font-weight:600;color:var(--ink-2)}
+  #sec-leilao .lcx-f .hint{font-weight:400;color:var(--muted)}
+  #sec-leilao .lcx-f input{padding:11px 13px;background:var(--bg-soft);border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink);outline:none;font-family:inherit;transition:.15s;width:100%}
+  #sec-leilao .lcx-f input:focus{border-color:var(--lcx-accent);background:var(--bg-elev);box-shadow:0 0 0 3px var(--lcx-accent-soft)}
+  #sec-leilao .lcx-f input.money{font-weight:700}
+  :root[data-theme="dark"] #sec-leilao .lcx-f input{background:#0D1524;border-color:#1F2433}
+  #sec-leilao .lcx-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+  @media(max-width:900px){#sec-leilao .lcx-kpis{grid-template-columns:repeat(2,1fr)}}
+  #sec-leilao .lcx-kpi{background:var(--bg-elev);border:1px solid var(--line);border-radius:14px;padding:16px}
+  #sec-leilao .lcx-kpi-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:9px}
+  #sec-leilao .lcx-kpi-val{font-family:'Inter',system-ui;font-size:20px;font-weight:800;letter-spacing:-.6px;color:var(--ink)}
+  #sec-leilao .lcx-viab{display:flex;align-items:center;gap:13px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--bg-elev);margin-bottom:16px}
+  #sec-leilao .lcx-viab-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;background:var(--muted)}
+  #sec-leilao .lcx-viab-label{font-size:15px;font-weight:800;font-family:'Inter',system-ui;color:var(--ink);letter-spacing:-.2px}
+  #sec-leilao .lcx-viab-sub{font-size:12px;color:var(--muted);margin-top:1px}
+  #sec-leilao .lcx-result-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  @media(max-width:860px){#sec-leilao .lcx-result-grid{grid-template-columns:1fr}}
+  #sec-leilao .lcx-chart-wrap{position:relative;height:230px}
+  #sec-leilao .lcx-nav{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
   .lc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .lc-grid.col2{grid-template-columns:repeat(2,1fr)}
   .lc-grid.col4{grid-template-columns:repeat(4,1fr)}
@@ -2975,125 +3033,65 @@
     </div>
 
     <!-- ── Tab: CALCULADORA ── -->
-    <div class="renda-pane active" id="lp-calc">
+        <div class="renda-pane active" id="lp-calc">
 
-      <div style="display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start">
-
-        <!-- LEFT: Formulário essencial -->
-        <div>
-
-          <!-- Identificação -->
-          <div class="lc-section" style="padding:18px 20px">
-            <div class="lc-section-title" style="margin-bottom:12px"><span>🚗</span> Veículo</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 80px 110px;gap:10px">
-              <div class="lc-field"><label>Marca</label><input id="lc_marca" placeholder="Toyota…" oninput="leilaoAutoCalc()"></div>
-              <div class="lc-field"><label>Modelo</label><input id="lc_modelo" placeholder="Corolla…" oninput="leilaoAutoCalc()"></div>
-              <div class="lc-field"><label>Ano</label><input id="lc_ano" type="number" placeholder="2024" oninput="leilaoAutoCalc()"></div>
-              <div class="lc-field"><label>KM</label><input id="lc_km" type="number" placeholder="120000" min="0" oninput="leilaoAutoCalc()"></div>
-            </div>
-            <div style="margin-top:10px">
-              <div class="lc-field"><label>Referência / Lote (opcional)</label><input id="lc_lote" placeholder="Lote 042 — Leilão Sodré" oninput="leilaoAutoCalc()"></div>
-            </div>
+      <div class="lcx-header">
+        <div class="lcx-header-main">
+          <div class="lcx-header-ico"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01"/></svg></div>
+          <div>
+            <h2 class="lcx-h2">Calculadora Inteligente de Leilão</h2>
+            <p class="lcx-sub">Analise rapidamente a viabilidade financeira de qualquer veículo.</p>
           </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="lcx-btn-ghost" onclick="leilaoLimparForm()">Limpar</button>
+          <button class="lcx-btn-primary" onclick="leilaoSalvarHistorico()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar análise</button>
+        </div>
+      </div>
 
-          <!-- Valores principais -->
-          <div class="lc-section" style="padding:18px 20px">
-            <div class="lc-section-title" style="margin-bottom:12px"><span>💰</span> Valores</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="lc-field highlight">
-                <label>Tabela FIPE <span style="font-weight:400;color:var(--muted)">(referência)</span></label>
-                <input id="lc_fipe" class="money" placeholder="ex: 85.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
-              </div>
-              <div class="lc-field highlight">
-                <label>Preço de Arremate <span style="font-weight:400;color:var(--muted)">(lance)</span></label>
-                <input id="lc_lance" class="money" placeholder="ex: 52.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
-              </div>
+      <div class="lcx-steps">
+        <button class="lcx-step active" id="lcx-step-1" onclick="leilaoStep(1)"><span class="lcx-step-n">1</span><span class="lcx-step-t">Veículo</span></button>
+        <div class="lcx-step-line"></div>
+        <button class="lcx-step" id="lcx-step-2" onclick="leilaoStep(2)"><span class="lcx-step-n">2</span><span class="lcx-step-t">Custos do Leilão</span></button>
+        <div class="lcx-step-line"></div>
+        <button class="lcx-step" id="lcx-step-3" onclick="leilaoStep(3)"><span class="lcx-step-n">3</span><span class="lcx-step-t">Recuperação</span></button>
+        <div class="lcx-step-line"></div>
+        <button class="lcx-step" id="lcx-step-4" onclick="leilaoStep(4)"><span class="lcx-step-n">4</span><span class="lcx-step-t">Resultado</span></button>
+      </div>
+
+      <div id="lcx-body">
+
+        <div class="lcx-pane active" id="lcx-pane-1">
+          <div class="lcx-card">
+            <div class="lcx-card-title">Informações do veículo</div>
+            <div class="lcx-card-desc">Identifique o veículo e a referência de mercado.</div>
+            <div class="lcx-grid c2" style="margin-bottom:14px">
+              <div class="lcx-f"><label>Marca</label><input id="lc_marca" placeholder="Toyota" oninput="leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Modelo</label><input id="lc_modelo" placeholder="Corolla" oninput="leilaoAutoCalc()"></div>
             </div>
-          </div>
-
-          <!-- Custos do leilão -->
-          <div class="lc-section" style="padding:18px 20px">
-            <div class="lc-section-title" style="margin-bottom:12px"><span>🔨</span> Custos do Leilão</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="lc-field">
-                <label>Comissão do Leiloeiro <span style="font-weight:400;color:var(--muted)">(%)</span></label>
-                <input id="lc_comissao_pct" type="number" value="5" min="0" max="50" step="0.5" oninput="leilaoAutoCalc()" style="padding:9px 12px;background:var(--bg-soft);border:1.5px solid var(--line);border-radius:10px;font-size:13px;color:var(--ink);outline:none;font-family:inherit;width:100%">
-              </div>
-              <div class="lc-field">
-                <label>Taxa Administrativa <span style="font-weight:400;color:var(--muted)">(R$)</span></label>
-                <input id="lc_taxa_admin" class="money" placeholder="ex: 1.200" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
-              </div>
+            <div class="lcx-grid c3" style="margin-bottom:14px">
+              <div class="lcx-f"><label>Ano</label><input id="lc_ano" type="number" placeholder="2024" oninput="leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Quilometragem</label><input id="lc_km" type="number" placeholder="120000" min="0" oninput="leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Tabela FIPE <span class="hint">(R$)</span></label><input id="lc_fipe" class="money" placeholder="85.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
             </div>
+            <div class="lcx-f"><label>Referência / Lote <span class="hint">(opcional)</span></label><input id="lc_lote" placeholder="Lote 042 — Leilão Sodré" oninput="leilaoAutoCalc()"></div>
           </div>
-
-          <!-- Custos extras -->
-          <div class="lc-section" style="padding:18px 20px">
-            <div class="lc-section-title" style="margin-bottom:12px"><span>📋</span> Custos Extras</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="lc-field">
-                <label>Documentação <span style="font-weight:400;color:var(--muted)">(IPVA, multas, transfer.)</span></label>
-                <input id="lc_docs_total" class="money" placeholder="ex: 3.500" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
-              </div>
-              <div class="lc-field">
-                <label>Funilaria / Recuperação <span style="font-weight:400;color:var(--muted)">(estimativa)</span></label>
-                <input id="lc_recuperacao_total" class="money" placeholder="ex: 8.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
-              </div>
-            </div>
-          </div>
-
-          <!-- Margem desejada (discreta) -->
-          <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-elev);border:1px solid var(--line);border-radius:12px;margin-bottom:16px">
-            <span style="font-size:14px">🎯</span>
-            <span style="font-size:12px;color:var(--muted);flex:1">Margem mínima desejada</span>
-            <div style="display:flex;align-items:center;gap:6px">
-              <input id="lc_margem_target" type="number" value="20" min="0" max="100" oninput="leilaoAutoCalc()" style="width:58px;padding:6px 8px;background:var(--bg-soft);border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-weight:700;color:var(--ink);outline:none;font-family:inherit;text-align:center">
-              <span style="font-size:13px;font-weight:700;color:var(--muted)">%</span>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="tba primary" onclick="showLeilaoTab('dash');leilaoRenderDashboard()">📊 Ver Análise Completa</button>
-            <button class="tba" onclick="leilaoSalvarHistorico()">💾 Salvar</button>
-            <button class="tba" onclick="leilaoLimparForm()">🗑️ Limpar</button>
-          </div>
-
         </div>
 
-        <!-- RIGHT: Resultado ao vivo -->
-        <div id="leilao_live_result" style="position:sticky;top:20px">
-          <div style="background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;overflow:hidden">
-            <div style="padding:18px 20px 14px;border-bottom:1px solid var(--line)">
-              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Resultado ao Vivo</div>
-              <div id="lcr_verdict" style="font-family:'Manrope',system-ui;font-size:15px;font-weight:800;letter-spacing:-.2px;color:var(--muted)">Preencha os dados →</div>
+        <div class="lcx-pane" id="lcx-pane-2">
+          <div class="lcx-card">
+            <div class="lcx-card-title">Custos do leilão</div>
+            <div class="lcx-card-desc">O lance e as taxas cobradas no arremate.</div>
+            <div class="lcx-grid c2" style="margin-bottom:14px">
+              <div class="lcx-f"><label>Preço de arremate <span class="hint">(lance)</span></label><input id="lc_lance" class="money" placeholder="52.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Comissão do leiloeiro <span class="hint">(%)</span></label><input id="lc_comissao_pct" type="number" value="5" min="0" max="50" step="0.5" oninput="leilaoAutoCalc()"></div>
             </div>
-            <div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11.5px;color:var(--muted)">Custo Total</span>
-                <span id="lcr_custo" style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--ink)">—</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11.5px;color:var(--muted)">Lucro Estimado</span>
-                <span id="lcr_lucro" style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--muted)">—</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11.5px;color:var(--muted)">% da FIPE</span>
-                <span id="lcr_fipe_pct" style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--muted)">—</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11.5px;color:var(--muted)">Rentabilidade</span>
-                <span id="lcr_rentab" style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--muted)">—</span>
-              </div>
-              <div style="height:1px;background:var(--line)"></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:2px 0">
-                <span style="font-size:11.5px;font-weight:700;color:var(--muted)">Lance Máx. Recomendado</span>
-                <span id="lcr_lance_max" style="font-family:'Manrope',system-ui;font-weight:800;font-size:14px;color:var(--gold)">—</span>
-              </div>
+            <div class="lcx-grid c3">
+              <div class="lcx-f"><label>Taxa administrativa <span class="hint">(R$)</span></label><input id="lc_taxa_admin" class="money" placeholder="1.200" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Frete / Remoção <span class="hint">(R$)</span></label><input id="lc_frete" class="money" placeholder="800" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Documentação <span class="hint">(IPVA, multas)</span></label><input id="lc_docs_total" class="money" placeholder="3.500" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
             </div>
-            <!-- Mini breakdown -->
-            <div id="lcr_mini_break" style="padding:0 20px 12px;display:flex;flex-direction:column;gap:6px"></div>
-            <!-- Benchmark suggestion -->
-            <div id="lcr_bmk_suggestion" class="bmk-suggestion" style="margin:0 12px 14px">
+            <div id="lcr_bmk_suggestion" class="bmk-suggestion" style="margin-top:16px">
               <div class="bmk-sug-title" id="lcr_bmk_title">🎯 Sugestão baseada no seu histórico</div>
               <div class="bmk-sug-range" id="lcr_bmk_range">—</div>
               <div class="bmk-sug-sub" id="lcr_bmk_sub">—</div>
@@ -3101,6 +3099,61 @@
           </div>
         </div>
 
+        <div class="lcx-pane" id="lcx-pane-3">
+          <div class="lcx-card">
+            <div class="lcx-card-title">Custos de recuperação</div>
+            <div class="lcx-card-desc">Estimativa do que o veículo precisa para revenda. Deixe em branco se não houver.</div>
+            <div class="lcx-grid c2">
+              <div class="lcx-f"><label>Mecânica <span class="hint">(R$)</span></label><input id="lc_mecanica" class="money" placeholder="0" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Funilaria <span class="hint">(R$)</span></label><input id="lc_funilaria" class="money" placeholder="0" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Pintura <span class="hint">(R$)</span></label><input id="lc_pintura" class="money" placeholder="0" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
+              <div class="lcx-f"><label>Outros gastos <span class="hint">(R$)</span></label><input id="lc_outros" class="money" placeholder="0" oninput="leilaoMoneyInput(this);leilaoAutoCalc()"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lcx-pane" id="lcx-pane-4">
+          <div class="lcx-kpis">
+            <div class="lcx-kpi"><div class="lcx-kpi-label">Investimento total</div><div class="lcx-kpi-val" id="lcx_kpi_invest">—</div></div>
+            <div class="lcx-kpi"><div class="lcx-kpi-label">Lucro estimado</div><div class="lcx-kpi-val" id="lcx_kpi_lucro">—</div></div>
+            <div class="lcx-kpi"><div class="lcx-kpi-label">Margem de lucro</div><div class="lcx-kpi-val" id="lcx_kpi_margem">—</div></div>
+            <div class="lcx-kpi"><div class="lcx-kpi-label">% da FIPE</div><div class="lcx-kpi-val" id="lcx_kpi_fipe">—</div></div>
+            <div class="lcx-kpi"><div class="lcx-kpi-label">ROI</div><div class="lcx-kpi-val" id="lcx_kpi_roi">—</div></div>
+          </div>
+          <div class="lcx-viab">
+            <span class="lcx-viab-dot" id="lcx_viab_dot"></span>
+            <div>
+              <div class="lcx-viab-label" id="lcx_viab_label">Preencha os dados</div>
+              <div class="lcx-viab-sub" id="lcx_viab_sub">Informe FIPE e lance para ver a viabilidade</div>
+            </div>
+          </div>
+          <div class="lcx-result-grid">
+            <div class="lcx-card">
+              <div class="lcx-card-title">Composição do investimento</div>
+              <div class="lcx-card-desc">Para onde vai cada real investido.</div>
+              <div class="lcx-chart-wrap"><canvas id="lcx_chart"></canvas></div>
+            </div>
+            <div class="lcx-card" style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div class="lcx-card-title">Lance máximo recomendado</div>
+                <div class="lcx-card-desc">Maior lance que mantém sua margem alvo.</div>
+                <div style="font-family:\'Inter\',system-ui;font-size:26px;font-weight:800;letter-spacing:-.6px;color:var(--lcx-accent)" id="lcx_lancemax">—</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg-soft);border-radius:10px">
+                <span style="font-size:12px;color:var(--muted);flex:1">Margem mínima desejada</span>
+                <input id="lc_margem_target" type="number" value="20" min="0" max="100" oninput="leilaoAutoCalc()" style="width:56px;padding:6px 8px;background:var(--bg-elev);border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-weight:700;color:var(--ink);outline:none;font-family:inherit;text-align:center">
+                <span style="font-size:13px;font-weight:700;color:var(--muted)">%</span>
+              </div>
+              <button class="lcx-btn-ghost" style="justify-content:center" onclick="showLeilaoTab(\'dash\');leilaoRenderDashboard()"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Ver análise completa</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lcx-nav">
+        <button class="lcx-btn-ghost" id="lcx-prev" style="visibility:hidden" onclick="leilaoStepPrev()">← Voltar</button>
+        <button class="lcx-btn-primary" id="lcx-next" onclick="leilaoStepNext()">Próximo →</button>
       </div>
 
     </div><!-- /lp-calc -->
@@ -11474,7 +11527,7 @@
     const gpct= id => { const el=document.getElementById(id); return parseFloat(el?.value)||0; };
     // Simplified combined fields (new form)
     const docsTotal       = gn('lc_docs_total');
-    const recuperacaoTotal= gn('lc_recuperacao_total');
+    const recuperacaoTotal= gn('lc_mecanica')+gn('lc_funilaria')+gn('lc_pintura')+gn('lc_outros');
     return {
       marca:gv('lc_marca'), modelo:gv('lc_modelo'), ano:gv('lc_ano'), km:gv('lc_km'), lote:gv('lc_lote'),
       // Market
@@ -11482,12 +11535,12 @@
       // Auction
       lance:gn('lc_lance'), comissaoPct:gpct('lc_comissao_pct'),
       taxaAdmin:gn('lc_taxa_admin'), taxaPatio:0,
-      frete:0, guincho:0, outrasTaxas:0,
+      frete:gn('lc_frete'), guincho:0, outrasTaxas:0,
       // Docs (combined)
       ipva:docsTotal, multas:0, licenciamento:0, transferencia:0, despachante:0, laudo:0,
       // Recovery (combined)
-      mecanica:0, funilaria:recuperacaoTotal, pintura:0, pneus:0, revisao:0,
-      higienizacao:0, eletrica:0, lanternagem:0, outrosCustos:0,
+      mecanica:gn('lc_mecanica'), funilaria:gn('lc_funilaria'), pintura:gn('lc_pintura'), pneus:0, revisao:0,
+      higienizacao:0, eletrica:0, lanternagem:0, outrosCustos:gn('lc_outros'),
       // Config (defaults)
       reserva:0, margemTarget:gpct('lc_margem_target')||20,
       // Keep raw combined for display
@@ -11568,7 +11621,64 @@
     const d = leilaoGetFormData();
     saveLeilaoState(d, null, null);
     if(document.getElementById('lcr_verdict')) leilaoRenderLive(d);
+    if(typeof leilaoRenderResultV2==='function') leilaoRenderResultV2(d);
     if(typeof leilaoUpdateBenchmarkSuggestion==='function') leilaoUpdateBenchmarkSuggestion();
+  }
+
+  // ── Wizard + resultado premium (redesign visual; nao altera calculo) ──
+  let _leilaoStep = 1;
+  function leilaoStep(n){
+    n = Math.max(1, Math.min(4, n)); _leilaoStep = n;
+    for(let i=1;i<=4;i++){
+      const pane=document.getElementById('lcx-pane-'+i), step=document.getElementById('lcx-step-'+i);
+      if(pane) pane.classList.toggle('active', i===n);
+      if(step){ step.classList.toggle('active', i===n); step.classList.toggle('done', i<n); }
+    }
+    const prev=document.getElementById('lcx-prev'), next=document.getElementById('lcx-next');
+    if(prev) prev.style.visibility = n===1?'hidden':'visible';
+    if(next) next.textContent = n===4?'Salvar análise':'Próximo →';
+    if(n===4){ leilaoRenderResultV2(); setTimeout(()=>{ try{ window.dispatchEvent(new Event('resize')); }catch(e){} }, 60); }
+  }
+  function leilaoStepNext(){ if(_leilaoStep>=4){ if(typeof leilaoSalvarHistorico==='function') leilaoSalvarHistorico(); return; } leilaoStep(_leilaoStep+1); }
+  function leilaoStepPrev(){ leilaoStep(_leilaoStep-1); }
+
+  function leilaoRenderResultV2(d){
+    if(!document.getElementById('lcx_kpi_invest')) return;
+    d = d || leilaoGetFormData();
+    const c = leilaoCalc(d);
+    const has = d.lance>0 && d.fipe>0;
+    const money = v => 'R$ '+Math.round(v).toLocaleString('pt-BR');
+    const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+    const col=(id,cc)=>{ const el=document.getElementById(id); if(el) el.style.color=cc; };
+    if(!has){
+      ['lcx_kpi_invest','lcx_kpi_lucro','lcx_kpi_margem','lcx_kpi_fipe','lcx_kpi_roi','lcx_lancemax'].forEach(id=>set(id,'—'));
+      col('lcx_kpi_lucro','var(--ink)');
+      set('lcx_viab_label','Preencha os dados'); col('lcx_viab_label','var(--ink)');
+      set('lcx_viab_sub','Informe FIPE e lance para ver a viabilidade');
+      const dot0=document.getElementById('lcx_viab_dot'); if(dot0) dot0.style.background='var(--muted)';
+      if(window.charts && charts.leilaoComp){ charts.leilaoComp.destroy(); charts.leilaoComp=null; }
+      return;
+    }
+    set('lcx_kpi_invest', money(c.custoTotal));
+    set('lcx_kpi_lucro', (c.lucro>=0?'+':'−')+money(Math.abs(c.lucro))); col('lcx_kpi_lucro', c.lucro>=0?'var(--accent-2)':'var(--danger)');
+    set('lcx_kpi_margem', c.margem.toFixed(1)+'%');
+    set('lcx_kpi_fipe', c.pctFipe.toFixed(1)+'%');
+    set('lcx_kpi_roi', c.rentabilidade.toFixed(1)+'%');
+    set('lcx_lancemax', c.lanceMax>0?money(c.lanceMax):'—');
+    const risk = leilaoRisk(c.pctFipe);
+    set('lcx_viab_label', risk.emoji+' '+risk.label); col('lcx_viab_label', risk.color);
+    set('lcx_viab_sub', 'Custo total equivale a '+c.pctFipe.toFixed(1)+'% da tabela FIPE');
+    const dot=document.getElementById('lcx_viab_dot'); if(dot) dot.style.background=risk.color;
+    leilaoRenderCompChart(c,d);
+  }
+
+  function leilaoRenderCompChart(c,d){
+    const cv=document.getElementById('lcx_chart'); if(!cv||typeof Chart==='undefined'||!window.charts) return;
+    const taxas=(c.comissaoValor||0)+(d.taxaAdmin||0)+(d.frete||0)+(d.taxaPatio||0)+(d.guincho||0)+(d.outrasTaxas||0);
+    const data=[d.lance||0, taxas, c.totalDocs||0, c.totalRecup||0];
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    if(charts.leilaoComp) charts.leilaoComp.destroy();
+    charts.leilaoComp=new Chart(cv,{type:'doughnut',data:{labels:['Lance','Taxas','Documentação','Recuperação'],datasets:[{data,backgroundColor:['#3B82F6','#64748B','#F59E0B','#10B981'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'right',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,color:isDark?'#C8CDD6':'#334155',font:{size:11.5,family:'Inter'}}},tooltip:{callbacks:{label:x=>x.label+': R$ '+Math.round(x.parsed).toLocaleString('pt-BR')}}}}});
   }
 
   // ── Live result panel (right side of calc tab) ────────────────
@@ -11963,7 +12073,7 @@
     sm('lc_lance',d.lance); sv('lc_comissao_pct',d.comissaoPct);
     sm('lc_taxa_admin',d.taxaAdmin); sm('lc_taxa_patio',d.taxaPatio);
     sm('lc_frete',d.frete); sm('lc_guincho',d.guincho); sm('lc_outras_taxas',d.outrasTaxas);
-    sm('lc_docs_total', d._docsTotal||d.ipva||0); sm('lc_recuperacao_total', d._recuperacaoTotal||d.funilaria||0);
+    sm('lc_docs_total', d._docsTotal||d.ipva||0); sm('lc_outros', d.outrosCustos||0);
     sm('lc_transferencia',d.transferencia); sm('lc_despachante',d.despachante); sm('lc_laudo',d.laudo);
     sm('lc_mecanica',d.mecanica); sm('lc_funilaria',d.funilaria); sm('lc_pintura',d.pintura);
     sm('lc_pneus',d.pneus); sm('lc_revisao',d.revisao); sm('lc_higienizacao',d.higienizacao);
