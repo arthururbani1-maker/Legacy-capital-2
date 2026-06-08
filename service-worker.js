@@ -1,7 +1,7 @@
 // =============================================================
 // Patrimônio · Service Worker — Network-First (sempre atualizado)
 // =============================================================
-const CACHE_VERSION = 'v1.7.0';
+const CACHE_VERSION = 'v1.8.0';
 const CACHE_NAME = `patrimonio-${CACHE_VERSION}`;
 
 // INSTALL: ativa imediatamente sem esperar

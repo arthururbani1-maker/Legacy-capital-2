@@ -1699,6 +1699,52 @@
   #lp-benchmark .two-col{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
   @media(max-width:900px){#lp-benchmark .two-col{grid-template-columns:1fr}}
 
+  /* ── Central de Suporte ─────────────────────────────────────── */
+  .sp-hero{text-align:center;padding:40px 20px 32px;max-width:560px;margin:0 auto}
+  .sp-hero-ico{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(99,102,241,.1));border:1px solid rgba(59,130,246,.15);display:grid;place-items:center;margin:0 auto 16px;color:var(--primary)}
+  .sp-hero-ico svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .sp-hero h2{font-family:'Manrope',system-ui;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.4px;margin:0 0 8px}
+  .sp-hero p{font-size:13.5px;color:var(--muted);line-height:1.65;margin:0}
+  .sp-layout{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;max-width:900px;margin:0 auto;padding:0 4px 40px}
+  @media(max-width:860px){.sp-layout{grid-template-columns:1fr}}
+  .sp-card{background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .sp-card-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+  .sp-card-title svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--primary)}
+  .sp-field{margin-bottom:14px}
+  .sp-field label{display:block;font-size:11.5px;font-weight:600;color:var(--ink-2);margin-bottom:5px}
+  .sp-field select,.sp-field input[type=text],.sp-field textarea{width:100%;padding:9px 12px;background:var(--bg-soft);border:1.5px solid var(--line);border-radius:10px;font-size:13px;color:var(--ink);outline:none;font-family:inherit;transition:border-color .15s}
+  .sp-field select:focus,.sp-field input[type=text]:focus,.sp-field textarea:focus{border-color:var(--primary)}
+  .sp-field textarea{resize:vertical;min-height:110px;line-height:1.6}
+  .sp-attach{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-soft);border:1.5px dashed var(--line);border-radius:10px;cursor:pointer;transition:.14s}
+  .sp-attach:hover{border-color:var(--primary);background:rgba(59,130,246,.04)}
+  .sp-attach svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .sp-attach-lbl{font-size:12.5px;color:var(--muted)}
+  .sp-attach-preview{display:none;margin-top:10px}
+  .sp-attach-preview img{max-width:100%;max-height:120px;border-radius:8px;border:1px solid var(--line)}
+  .sp-btn-submit{width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;margin-top:4px}
+  .sp-btn-submit:hover{background:var(--primary-hover)}
+  .sp-success{display:none;text-align:center;padding:32px 24px}
+  .sp-success.show{display:block}
+  .sp-success-ico{font-size:44px;margin-bottom:12px}
+  .sp-success-title{font-family:'Manrope',system-ui;font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
+  .sp-success-msg{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+  .sp-protocol{display:inline-flex;align-items:center;gap:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:8px 16px;font-size:12.5px;font-weight:700;color:var(--primary)}
+  .sp-hist-table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .sp-hist-table th{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .sp-hist-table td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:middle}
+  .sp-hist-table tr:last-child td{border-bottom:none}
+  .sp-hist-table tbody tr:hover td{background:var(--bg-soft)}
+  .sp-status{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+  .sp-status.recebido{background:rgba(59,130,246,.1);color:#2563eb}
+  .sp-status.analise{background:rgba(234,179,8,.1);color:#b45309}
+  .sp-status.resolvido{background:rgba(34,197,94,.1);color:#16a34a}
+  .sp-tipo-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--bg-soft);color:var(--muted)}
+  .sp-empty{text-align:center;padding:32px 20px}
+  .sp-faq-item{padding:12px 0;border-bottom:1px solid var(--line)}
+  .sp-faq-item:last-child{border-bottom:none}
+  .sp-faq-q{font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:4px}
+  .sp-faq-a{font-size:12px;color:var(--muted);line-height:1.55}
+
 </style>
 </head>
 <body>
@@ -1895,6 +1941,16 @@
       </div>
     </div>
 
+    <!-- SUPORTE — sempre visível -->
+    <div style="margin-top:auto;padding-top:8px">
+      <div class="sb-sep"></div>
+      <button class="sb-item" id="sb-suporte" onclick="showSection('suporte')" style="margin-top:4px">
+        <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="sb-item-lbl">Suporte</span>
+        <span class="sb-tip">Central de Suporte</span>
+      </button>
+    </div>
+
   </nav>
 
   <!-- RODAPÉ FIXO -->
@@ -1907,6 +1963,7 @@
         <div class="sb-user-plan">PREMIUM</div>
       </div>
     </div>
+    <div style="text-align:center;font-size:9px;color:#CBD5E1;margin-top:6px;letter-spacing:.3px">v1.7</div>
   </div>
 
 </aside>
@@ -3204,6 +3261,125 @@
     </div><!-- /lp-benchmark -->
 
   </div><!-- /sec-leilao -->
+
+  <!-- ═══ CENTRAL DE SUPORTE ═══ -->
+  <div class="page-sec" id="sec-suporte">
+
+    <!-- Hero -->
+    <div class="sp-hero">
+      <div class="sp-hero-ico">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h2>Como podemos ajudar?</h2>
+      <p>Encontrou algum problema, bug ou possui alguma sugestão de melhoria?<br>Envie uma mensagem para nossa equipe.</p>
+    </div>
+
+    <!-- Layout: formulário + FAQ -->
+    <div class="sp-layout">
+
+      <!-- Formulário -->
+      <div>
+        <div class="sp-card" id="sp_form_card">
+          <div class="sp-card-title">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Nova Solicitação
+          </div>
+
+          <div class="sp-field">
+            <label>Tipo de solicitação</label>
+            <select id="sp_tipo">
+              <option value="">Selecione o tipo...</option>
+              <option value="bug">🐛 Reportar Bug</option>
+              <option value="sugestao">💡 Sugestão de Melhoria</option>
+              <option value="duvida">❓ Dúvida</option>
+              <option value="financeiro">💰 Problema Financeiro</option>
+              <option value="outro">📌 Outro</option>
+            </select>
+          </div>
+
+          <div class="sp-field">
+            <label>Título do problema</label>
+            <input type="text" id="sp_titulo" placeholder="Descreva em poucas palavras...">
+          </div>
+
+          <div class="sp-field">
+            <label>Descrição detalhada</label>
+            <textarea id="sp_descricao" placeholder="Forneça o máximo de detalhes possível: o que aconteceu, em qual tela, quais passos seguiu..."></textarea>
+          </div>
+
+          <div class="sp-field">
+            <label>Captura de tela (opcional)</label>
+            <label class="sp-attach" for="sp_file_input">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span class="sp-attach-lbl" id="sp_attach_lbl">Clique para anexar imagem ou captura de tela</span>
+            </label>
+            <input type="file" id="sp_file_input" accept="image/*" style="display:none" onchange="spHandleFile(this)">
+            <div class="sp-attach-preview" id="sp_attach_preview">
+              <img id="sp_attach_img" src="" alt="preview">
+            </div>
+          </div>
+
+          <button class="sp-btn-submit" onclick="spSubmit()">Enviar Solicitação →</button>
+        </div>
+
+        <!-- Sucesso -->
+        <div class="sp-card sp-success" id="sp_success_card">
+          <div class="sp-success-ico">✅</div>
+          <div class="sp-success-title">Solicitação enviada!</div>
+          <div class="sp-success-msg">Sua solicitação foi enviada com sucesso.<br>Nossa equipe analisará o caso o mais breve possível.</div>
+          <div class="sp-protocol" id="sp_protocol_display">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Protocolo <span id="sp_protocol_num">#LC-000000</span>
+          </div>
+          <button class="tba" style="margin-top:18px" onclick="spNovasolicitacao()">+ Nova Solicitação</button>
+        </div>
+      </div>
+
+      <!-- Coluna direita: histórico + FAQ -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- Histórico -->
+        <div class="sp-card">
+          <div class="sp-card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Minhas Solicitações
+          </div>
+          <div id="sp_hist_wrap">
+            <div class="sp-empty">
+              <div style="font-size:32px;opacity:.2;margin-bottom:8px">💬</div>
+              <div style="font-size:12.5px;color:var(--muted)">Nenhuma solicitação enviada ainda</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ rápido -->
+        <div class="sp-card">
+          <div class="sp-card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Dúvidas Frequentes
+          </div>
+          <div class="sp-faq-item">
+            <div class="sp-faq-q">Meus dados são salvos com segurança?</div>
+            <div class="sp-faq-a">Sim. Todos os dados são armazenados localmente no seu dispositivo via localStorage, sem envio para servidores externos.</div>
+          </div>
+          <div class="sp-faq-item">
+            <div class="sp-faq-q">Como exportar meu patrimônio?</div>
+            <div class="sp-faq-a">Acesse Relatórios → Exportar Dados. Você pode exportar em formato JSON ou PDF.</div>
+          </div>
+          <div class="sp-faq-item">
+            <div class="sp-faq-q">O sistema funciona offline?</div>
+            <div class="sp-faq-a">Sim. Por ser um PWA, após o primeiro acesso o sistema funciona completamente offline.</div>
+          </div>
+          <div class="sp-faq-item">
+            <div class="sp-faq-q">Como sincronizar entre dispositivos?</div>
+            <div class="sp-faq-a">Exporte os dados em Relatórios e importe no outro dispositivo. Sincronização automática está em desenvolvimento.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /sec-suporte -->
 
   </div><!-- /content-area -->
 </div><!-- /app-main -->
@@ -8072,6 +8248,7 @@
     relatorios:   { title:'Relatórios',        sub:'Dossiê, exportação e manutenção de dados' },
     indicar:      { title:'Indique e Ganhe',   sub:'Convide amigos e acumule comissões' },
     leilao:       { title:'Calculadora de Leilão', sub:'Análise inteligente de oportunidades em leilão' },
+    suporte:      { title:'Central de Suporte',    sub:'Reporte bugs, sugestões e dúvidas para nossa equipe' },
   };
   let _currentSection = 'dashboard';
 
@@ -8705,7 +8882,7 @@
   // SERVICE WORKER REGISTRATION
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      const swVer = '1.7.0';
+      const swVer = '1.8.0';
       navigator.serviceWorker.register('service-worker.js?v='+swVer).then(reg=>{
         reg.update();
 
@@ -10995,7 +11172,8 @@
     if(name === 'relatorios') setTimeout(()=>{ if(typeof renderRelatoriosRenda==='function') renderRelatoriosRenda(); }, 60);
     if(name === 'ativos') setTimeout(()=>{ if(typeof renderAssets==='function') renderAssets(); }, 60);
     if(name === 'dividas') setTimeout(()=>{ if(typeof renderDividas==='function') renderDividas(); }, 60);
-    if(name === 'leilao')  setTimeout(()=>{ if(typeof initLeilaoSection==='function') initLeilaoSection(); }, 60);
+    if(name === 'leilao')   setTimeout(()=>{ if(typeof initLeilaoSection==='function') initLeilaoSection(); }, 60);
+    if(name === 'suporte')  setTimeout(()=>{ if(typeof renderSuporteSection==='function') renderSuporteSection(); }, 60);
     // Close mobile sidebar
     closeSidebar();
   }
@@ -11854,6 +12032,109 @@
         leilaoAutoCalc();
       }
     }catch(e){}
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════
+  // CENTRAL DE SUPORTE
+  // ══════════════════════════════════════════════════════════════
+  const SP_KEY = 'patrimonio_suporte_v1';
+
+  function getSuporteItems(){ try{ return JSON.parse(localStorage.getItem(SP_KEY)||'[]'); }catch(e){ return []; } }
+  function saveSuporteItems(arr){ localStorage.setItem(SP_KEY, JSON.stringify(arr)); }
+
+  function spGenerateProtocol(){
+    const d = new Date();
+    const ym = String(d.getFullYear()).slice(-2) + String(d.getMonth()+1).padStart(2,'0');
+    const seq = String((getSuporteItems().length)+1).padStart(3,'0');
+    return `#LC-${ym}${seq}`;
+  }
+
+  function spTipoLabel(tipo){
+    const map={bug:'🐛 Bug',sugestao:'💡 Sugestão',duvida:'❓ Dúvida',financeiro:'💰 Financeiro',outro:'📌 Outro'};
+    return map[tipo]||tipo;
+  }
+
+  function spHandleFile(input){
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('sp_attach_img');
+      const prev = document.getElementById('sp_attach_preview');
+      const lbl  = document.getElementById('sp_attach_lbl');
+      if(img) img.src = e.target.result;
+      if(prev) prev.style.display = 'block';
+      if(lbl) lbl.textContent = file.name;
+      input._b64 = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function spSubmit(){
+    const tipo  = document.getElementById('sp_tipo')?.value||'';
+    const titulo= (document.getElementById('sp_titulo')?.value||'').trim();
+    const desc  = (document.getElementById('sp_descricao')?.value||'').trim();
+    if(!tipo){ toast('Selecione o tipo de solicitação','error'); return; }
+    if(!titulo){ toast('Preencha o título do problema','error'); return; }
+    if(desc.length<10){ toast('Descreva o problema com mais detalhes','error'); return; }
+    const fileInput = document.getElementById('sp_file_input');
+    const protocol = spGenerateProtocol();
+    const item = {
+      id: uid(), protocol, data: new Date().toLocaleDateString('pt-BR'),
+      hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+      tipo, titulo, desc, status:'recebido',
+      img: fileInput?._b64||null
+    };
+    const items = getSuporteItems();
+    items.unshift(item);
+    saveSuporteItems(items);
+    // Show success
+    document.getElementById('sp_form_card').style.display  = 'none';
+    const sc = document.getElementById('sp_success_card');
+    sc.classList.add('show');
+    const pn = document.getElementById('sp_protocol_num');
+    if(pn) pn.textContent = protocol;
+    renderSuporteHistory();
+  }
+
+  function spNovasolicitacao(){
+    ['sp_tipo','sp_titulo','sp_descricao'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    const prev=document.getElementById('sp_attach_preview');
+    const lbl=document.getElementById('sp_attach_lbl');
+    const fi=document.getElementById('sp_file_input');
+    if(prev) prev.style.display='none';
+    if(lbl) lbl.textContent='Clique para anexar imagem ou captura de tela';
+    if(fi){ fi.value=''; fi._b64=null; }
+    document.getElementById('sp_form_card').style.display='';
+    document.getElementById('sp_success_card').classList.remove('show');
+  }
+
+  function renderSuporteHistory(){
+    const wrap = document.getElementById('sp_hist_wrap');
+    if(!wrap) return;
+    const items = getSuporteItems();
+    if(!items.length){
+      wrap.innerHTML=`<div class="sp-empty"><div style="font-size:32px;opacity:.2;margin-bottom:8px">💬</div><div style="font-size:12.5px;color:var(--muted)">Nenhuma solicitação enviada ainda</div></div>`;
+      return;
+    }
+    const statusMap={recebido:'recebido',analise:'analise',resolvido:'resolvido'};
+    const statusLbl={recebido:'Recebido',analise:'Em análise',resolvido:'Resolvido'};
+    wrap.innerHTML=`<table class="sp-hist-table"><thead><tr>
+      <th>Data</th><th>Tipo</th><th>Título</th><th>Status</th>
+    </tr></thead><tbody>${items.map(it=>`<tr>
+      <td style="white-space:nowrap;color:var(--muted)">${it.data}</td>
+      <td><span class="sp-tipo-badge">${spTipoLabel(it.tipo)}</span></td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${it.titulo}">${it.titulo}</td>
+      <td><span class="sp-status ${statusMap[it.status]||'recebido'}">${statusLbl[it.status]||'Recebido'}</span></td>
+    </tr>`).join('')}</tbody></table>`;
+  }
+
+  function renderSuporteSection(){
+    spNovasolicitacao();
+    renderSuporteHistory();
   }
 
   // ══════════════════════════════════════════════════════════════
