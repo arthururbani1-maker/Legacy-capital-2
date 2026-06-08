@@ -81,7 +81,7 @@
 
   /* ============= SIDEBAR ============= */
   /* ── Sidebar premium ───────────────────────────────────────── */
-  .sidebar{width:252px;min-width:252px;height:100vh;background:#FAFBFC;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #E9ECF0;transition:width .22s cubic-bezier(.4,0,.2,1),min-width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:relative;z-index:50}
+  .sidebar{width:252px;min-width:252px;height:100vh;background:#FAFBFC;display:flex;flex-direction:column;overflow:hidden;min-height:0;border-right:1px solid #E9ECF0;transition:width .22s cubic-bezier(.4,0,.2,1),min-width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:relative;z-index:50}
   .sidebar.collapsed{width:64px;min-width:64px}
   .sb-logo-area{padding:0 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid #E9ECF0;flex-shrink:0;height:62px}
   .sb-logo{width:33px;height:33px;min-width:33px;border-radius:9px;background:linear-gradient(135deg,#3B82F6,#6366F1);display:grid;place-items:center;color:#fff;font-family:'Manrope',system-ui;font-weight:800;font-size:12px;letter-spacing:-.2px;flex-shrink:0}
@@ -95,15 +95,12 @@
   .sidebar.collapsed .sb-collapse{margin:0 auto}
   .sidebar.collapsed .sb-collapse svg{transform:rotate(180deg)}
 
-  .sb-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 2px 16px 8px;display:flex;flex-direction:column;scrollbar-width:auto;scrollbar-color:#B0BEC5 #F0F4F8}
-  .sb-nav::-webkit-scrollbar{width:7px}
-  .sb-nav::-webkit-scrollbar-track{background:#F0F4F8;border-radius:99px}
-  .sb-nav::-webkit-scrollbar-thumb{background:#B0BEC5;border-radius:99px;border:1px solid #F0F4F8}
-  .sb-nav::-webkit-scrollbar-thumb:hover{background:#78909C}
-  :root[data-theme="dark"] .sb-nav{scrollbar-color:#2D3E54 #0D1829}
-  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-track{background:#0D1829}
-  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb{background:#2D3E54;border-color:#0D1829}
-  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb:hover{background:#3D5068}
+  .sb-nav{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 2px 16px 8px;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+  .sb-nav::-webkit-scrollbar{width:4px}
+  .sb-nav::-webkit-scrollbar-track{background:transparent}
+  .sb-nav::-webkit-scrollbar-thumb{background:#D1D9E0;border-radius:99px}
+  .sb-nav::-webkit-scrollbar-thumb:hover{background:#94A3B8}
+  :root[data-theme="dark"] .sb-nav::-webkit-scrollbar-thumb{background:#2D3E54}
 
   .sb-section-label{font-size:10px;font-weight:700;color:#B8C4D0;text-transform:uppercase;letter-spacing:.8px;padding:12px 6px 3px;white-space:nowrap}
   .sidebar.collapsed .sb-section-label{display:none}
@@ -8658,7 +8655,7 @@
   // SERVICE WORKER REGISTRATION
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      const swVer = '1.5.0';
+      const swVer = '1.6.0';
       navigator.serviceWorker.register('service-worker.js?v='+swVer).then(reg=>{
         reg.update();
 
