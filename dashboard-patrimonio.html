@@ -3004,9 +3004,17 @@
                 <label>Tabela FIPE <span style="font-weight:400;color:var(--muted)">(referência)</span></label>
                 <input id="lc_fipe" class="money" placeholder="ex: 85.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
               </div>
+              <div class="lc-field">
+                <label>Preço de Mercado <span style="font-weight:400;color:var(--muted)">(quanto vale)</span></label>
+                <input id="lc_mercado" class="money" placeholder="ex: 80.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
+              </div>
               <div class="lc-field highlight">
                 <label>Preço de Arremate <span style="font-weight:400;color:var(--muted)">(lance)</span></label>
                 <input id="lc_lance" class="money" placeholder="ex: 52.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
+              </div>
+              <div class="lc-field highlight">
+                <label>Preço de Venda <span style="font-weight:400;color:var(--muted)">(o lucro se baseia aqui)</span></label>
+                <input id="lc_revenda" class="money" placeholder="ex: 78.000" oninput="leilaoMoneyInput(this);leilaoAutoCalc()">
               </div>
             </div>
           </div>
@@ -3081,8 +3089,12 @@
                 <span id="lcr_fipe_pct" style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--muted)">—</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11.5px;color:var(--muted)">Rentabilidade</span>
+                <span style="font-size:11.5px;color:var(--muted)">Rentabilidade <span style="font-size:10px;color:var(--muted-2)">(s/ custo)</span></span>
                 <span id="lcr_rentab" style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--muted)">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:11.5px;color:var(--muted)">Margem de Lucro <span style="font-size:10px;color:var(--muted-2)">(s/ venda)</span></span>
+                <span id="lcr_margem" style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--muted)">—</span>
               </div>
               <div style="height:1px;background:var(--line)"></div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:2px 0">
@@ -11478,7 +11490,7 @@
     return {
       marca:gv('lc_marca'), modelo:gv('lc_modelo'), ano:gv('lc_ano'), km:gv('lc_km'), lote:gv('lc_lote'),
       // Market
-      fipe:gn('lc_fipe'), revenda:gn('lc_fipe'), mercado:gn('lc_fipe'), // use FIPE as base
+      fipe:gn('lc_fipe'), revenda:gn('lc_revenda'), mercado:gn('lc_mercado'), // lucro = preço de venda (cai p/ mercado, depois FIPE)
       // Auction
       lance:gn('lc_lance'), comissaoPct:gpct('lc_comissao_pct'),
       taxaAdmin:gn('lc_taxa_admin'), taxaPatio:0,
@@ -11587,8 +11599,8 @@
     col('lcr_verdict', hasData ? risk.color : 'var(--muted)');
 
     if(!hasData){
-      ['lcr_custo','lcr_lucro','lcr_fipe_pct','lcr_rentab','lcr_lance_max'].forEach(id=>set(id,'—'));
-      ['lcr_custo','lcr_lucro','lcr_fipe_pct','lcr_rentab'].forEach(id=>col(id,'var(--muted)'));
+      ['lcr_custo','lcr_lucro','lcr_fipe_pct','lcr_rentab','lcr_margem','lcr_lance_max'].forEach(id=>set(id,'—'));
+      ['lcr_custo','lcr_lucro','lcr_fipe_pct','lcr_rentab','lcr_margem'].forEach(id=>col(id,'var(--muted)'));
       const mb = document.getElementById('lcr_mini_break'); if(mb) mb.innerHTML='';
       return;
     }
@@ -11604,6 +11616,9 @@
 
     set('lcr_rentab',   calc.rentabilidade.toFixed(1) + '%');
     col('lcr_rentab',   calc.rentabilidade >= 15 ? 'var(--accent-2)' : calc.rentabilidade >= 5 ? 'var(--gold)' : 'var(--danger)');
+
+    set('lcr_margem',   calc.margem.toFixed(1) + '%');
+    col('lcr_margem',   calc.margem >= 15 ? 'var(--accent-2)' : calc.margem >= 5 ? 'var(--gold)' : 'var(--danger)');
 
     set('lcr_lance_max', calc.lanceMax > 0 ? fmtMoney(calc.lanceMax) : '—');
 
