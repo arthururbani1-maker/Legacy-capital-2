@@ -1941,17 +1941,21 @@
       </div>
     </div>
 
-    <!-- SUPORTE — sempre visível -->
-    <div style="margin-top:auto;padding-top:8px">
-      <div class="sb-sep"></div>
-      <button class="sb-item" id="sb-suporte" onclick="showSection('suporte')" style="margin-top:4px">
-        <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-        <span class="sb-item-lbl">Suporte</span>
-        <span class="sb-tip">Central de Suporte</span>
-      </button>
-    </div>
-
   </nav>
+
+  <!-- SUPORTE — fixo, sempre visível acima do rodapé -->
+  <div style="padding:4px 6px 0;flex-shrink:0;border-top:1px solid #EDF0F4">
+    <button class="sb-item" id="sb-indicar" onclick="showSection('indicar')">
+      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><polyline points="16 11 18 13 22 9"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+      <span class="sb-item-lbl">Indique e Ganhe</span>
+      <span class="sb-tip">Indique e Ganhe</span>
+    </button>
+    <button class="sb-item" id="sb-suporte" onclick="showSection('suporte')">
+      <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+      <span class="sb-item-lbl">Suporte</span>
+      <span class="sb-tip">Central de Suporte</span>
+    </button>
+  </div>
 
   <!-- RODAPÉ FIXO -->
   <div class="sb-footer">
@@ -1963,7 +1967,7 @@
         <div class="sb-user-plan">PREMIUM</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:9px;color:#CBD5E1;margin-top:6px;letter-spacing:.3px">v1.7</div>
+    <div style="text-align:center;font-size:9px;color:#CBD5E1;margin-top:6px;letter-spacing:.3px">v1.9</div>
   </div>
 
 </aside>
@@ -2148,10 +2152,15 @@
           <span class="pill info">3 cenários</span>
         </div>
         <div class="chart-wrap tall"><canvas id="projecao"></canvas></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 6px;flex-wrap:wrap">
+          <label style="font-size:11.5px;color:var(--muted);font-weight:600">Valorização anual esperada</label>
+          <input id="proj_taxa" type="number" value="8" min="0" max="50" step="0.5" oninput="renderProjecao()" style="width:64px;padding:5px 8px;background:var(--bg-soft);border:1.5px solid var(--line);border-radius:8px;font-size:12.5px;font-weight:700;color:var(--ink);text-align:center;outline:none;font-family:inherit">
+          <span style="font-size:11px;color:var(--muted)">% a.a. · sobre patrimônio líquido, com amortização real das dívidas</span>
+        </div>
         <div class="legend">
-          <div class="li"><span class="dot" style="background:#22C55E"></span>Otimista <span class="pct">+22%/ano</span></div>
-          <div class="li"><span class="dot" style="background:#3B82F6"></span>Realista <span class="pct">+14%/ano</span></div>
-          <div class="li"><span class="dot" style="background:#CBD5E1"></span>Conservador <span class="pct">+8%/ano</span></div>
+          <div class="li"><span class="dot" style="background:#22C55E"></span>Otimista <span class="pct" id="proj_pct_otim">—</span></div>
+          <div class="li"><span class="dot" style="background:#3B82F6"></span>Realista <span class="pct" id="proj_pct_real">—</span></div>
+          <div class="li"><span class="dot" style="background:#CBD5E1"></span>Conservador <span class="pct" id="proj_pct_cons">—</span></div>
         </div>
       </div>
     </div>
@@ -2369,10 +2378,11 @@
       </div>
       <div class="modal-b" style="padding:20px 24px;overflow-y:auto">
         <input type="hidden" id="bmk_edit_id">
-        <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:12px;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 80px 100px;gap:12px;margin-bottom:12px">
           <div class="field"><label>Marca</label><input id="bmk_marca" placeholder="Toyota"></div>
           <div class="field"><label>Modelo</label><input id="bmk_modelo" placeholder="Corolla"></div>
           <div class="field"><label>Ano</label><input id="bmk_ano" type="number" placeholder="2019" min="1990" max="2030"></div>
+          <div class="field"><label>KM</label><input id="bmk_km" type="number" placeholder="120000" min="0"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
           <div class="field"><label>Tabela FIPE (R$)</label><input id="bmk_fipe" class="money" placeholder="ex: 65.000" oninput="bmkMoneyFmt(this)"></div>
@@ -2975,10 +2985,11 @@
           <!-- Identificação -->
           <div class="lc-section" style="padding:18px 20px">
             <div class="lc-section-title" style="margin-bottom:12px"><span>🚗</span> Veículo</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 80px 110px;gap:10px">
               <div class="lc-field"><label>Marca</label><input id="lc_marca" placeholder="Toyota…" oninput="leilaoAutoCalc()"></div>
               <div class="lc-field"><label>Modelo</label><input id="lc_modelo" placeholder="Corolla…" oninput="leilaoAutoCalc()"></div>
               <div class="lc-field"><label>Ano</label><input id="lc_ano" type="number" placeholder="2024" oninput="leilaoAutoCalc()"></div>
+              <div class="lc-field"><label>KM</label><input id="lc_km" type="number" placeholder="120000" min="0" oninput="leilaoAutoCalc()"></div>
             </div>
             <div style="margin-top:10px">
               <div class="lc-field"><label>Referência / Lote (opcional)</label><input id="lc_lote" placeholder="Lote 042 — Leilão Sodré" oninput="leilaoAutoCalc()"></div>
@@ -3224,7 +3235,7 @@
         <!-- Left: brands pattern -->
         <div>
           <div class="lc-section" style="padding:18px 20px;margin-bottom:14px">
-            <div class="lc-section-title" style="margin-bottom:14px"><span>📊</span> % FIPE por Marca</div>
+            <div class="lc-section-title" style="margin-bottom:14px"><span>📊</span> % FIPE por Faixa de Preço</div>
             <div id="bmk_brands_list">
               <div style="text-align:center;padding:20px 0">
                 <div style="font-size:28px;opacity:.2;margin-bottom:8px">📊</div>
@@ -5183,12 +5194,25 @@
 
   function renderProjecao(){
     const k = calcKpis();
-    const base = k.total/1000; // em mil
+    // Taxa de valorizacao anual configuravel (default 8%); cenarios = taxa ±4pp
+    const rate  = Math.max(0, parseFloat(document.getElementById('proj_taxa')?.value)||8);
+    const rOtim = rate+4, rReal = rate, rCons = Math.max(0, rate-4);
+    const setPct=(id,r)=>{ const el=document.getElementById(id); if(el) el.textContent='+'+(Math.round(r*10)/10)+'%/ano'; };
+    setPct('proj_pct_otim',rOtim); setPct('proj_pct_real',rReal); setPct('proj_pct_cons',rCons);
+    // Amortizacao real das dividas: consorcios vinculados reduzem o saldo devedor pelas parcelas reais
+    let monthlyPaydown = 0;
+    state.assets.forEach(a=>{ if(typeof isLinkedConsorcio==='function' && isLinkedConsorcio(a)) monthlyPaydown += (a.parcelaMensal||0); });
+    const totalDebt = k.dividas||0;
+    const assets0   = k.total||0; // patrimonio bruto que valoriza
     const years = []; const start = new Date().getFullYear();
     for(let i=0;i<=5;i++) years.push(String(start+i));
-    const otim = years.map((_,i)=>Math.round(base*Math.pow(1.22,i)));
-    const real = years.map((_,i)=>Math.round(base*Math.pow(1.14,i)));
-    const cons = years.map((_,i)=>Math.round(base*Math.pow(1.08,i)));
+    // net(t) = assets*(1+r)^t - dividas_restantes(t)  -> em i=0 vale o liquido atual
+    const proj = r => years.map((_,i)=>{
+      const debtLeft = Math.max(0, totalDebt - monthlyPaydown*12*i);
+      const net = assets0*Math.pow(1+r/100, i) - debtLeft;
+      return Math.round(net/1000); // em mil
+    });
+    const otim = proj(rOtim), real = proj(rReal), cons = proj(rCons);
     if(charts.proj) charts.proj.destroy();
     charts.proj = new Chart(document.getElementById('projecao'),{type:'line',data:{labels:years,datasets:[
       {label:'Otimista',data:otim,borderColor:'#22C55E',backgroundColor:'rgba(34,197,94,.07)',fill:'+1',tension:.35,borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#22C55E'},
@@ -8882,7 +8906,7 @@
   // SERVICE WORKER REGISTRATION
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      const swVer = '1.8.0';
+      const swVer = '1.9.0';
       navigator.serviceWorker.register('service-worker.js?v='+swVer).then(reg=>{
         reg.update();
 
@@ -11452,7 +11476,7 @@
     const docsTotal       = gn('lc_docs_total');
     const recuperacaoTotal= gn('lc_recuperacao_total');
     return {
-      marca:gv('lc_marca'), modelo:gv('lc_modelo'), ano:gv('lc_ano'), lote:gv('lc_lote'),
+      marca:gv('lc_marca'), modelo:gv('lc_modelo'), ano:gv('lc_ano'), km:gv('lc_km'), lote:gv('lc_lote'),
       // Market
       fipe:gn('lc_fipe'), revenda:gn('lc_fipe'), mercado:gn('lc_fipe'), // use FIPE as base
       // Auction
@@ -11785,8 +11809,11 @@
     // Auto-fill form fields from extracted data
     if(extracted.comissao){ const el=document.getElementById('lc_comissao_pct'); if(el) el.value=parseFloat(extracted.comissao).toFixed(1); }
     if(extracted.taxaAdmin){ const v=parseFloat(extracted.taxaAdmin.replace(',','.')); const el=document.getElementById('lc_taxa_admin'); if(el&&v>0) el.value=fmtMoney(v).replace('R$ ',''); }
-    if(extracted.ipva){ const v=parseFloat(extracted.ipva.replace(',','.')); const el=document.getElementById('lc_ipva'); if(el&&v>0) el.value=fmtMoney(v).replace('R$ ',''); }
-    if(extracted.multas){ const v=parseFloat(extracted.multas.replace(',','.')); const el=document.getElementById('lc_multas'); if(el&&v>0) el.value=fmtMoney(v).replace('R$ ',''); }
+    // IPVA + multas + licenciamento entram no campo combinado de Documentação/Débitos
+    { const numBR = x => x ? (parseFloat(String(x).replace(/\./g,'').replace(',','.'))||0) : 0;
+      const totalDocs = numBR(extracted.ipva)+numBR(extracted.multas)+numBR(extracted.licenciamento);
+      const el=document.getElementById('lc_docs_total'); if(el && totalDocs>0) el.value=fmtMoney(totalDocs).replace('R$ ',''); }
+    if(typeof leilaoAutoCalc==='function') leilaoAutoCalc();
 
     const rows = [
       ['Leiloeiro',       extracted.leiloeiro||'—'],
@@ -11936,7 +11963,7 @@
     sm('lc_lance',d.lance); sv('lc_comissao_pct',d.comissaoPct);
     sm('lc_taxa_admin',d.taxaAdmin); sm('lc_taxa_patio',d.taxaPatio);
     sm('lc_frete',d.frete); sm('lc_guincho',d.guincho); sm('lc_outras_taxas',d.outrasTaxas);
-    sm('lc_ipva',d.ipva); sm('lc_multas',d.multas); sm('lc_licenciamento',d.licenciamento);
+    sm('lc_docs_total', d._docsTotal||d.ipva||0); sm('lc_recuperacao_total', d._recuperacaoTotal||d.funilaria||0);
     sm('lc_transferencia',d.transferencia); sm('lc_despachante',d.despachante); sm('lc_laudo',d.laudo);
     sm('lc_mecanica',d.mecanica); sm('lc_funilaria',d.funilaria); sm('lc_pintura',d.pintura);
     sm('lc_pneus',d.pneus); sm('lc_revisao',d.revisao); sm('lc_higienizacao',d.higienizacao);
@@ -12149,9 +12176,52 @@
     localStorage.setItem(BMK_KEY, JSON.stringify(arr));
   }
 
+  // ── Dataset embutido: 24 arremates reais de financeira (base do modelo) ──
+  const BMK_SEED = [
+    {id:'seed-1', seed:true, ano:2011, km:0, fipe:78000, lance:55000, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-2', seed:true, ano:2014, km:160000, fipe:47000, lance:23500, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-3', seed:true, ano:2014, km:160000, fipe:47000, lance:23600, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-4', seed:true, ano:2014, km:0, fipe:80000, lance:59990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-5', seed:true, ano:2014, km:0, fipe:155000, lance:119990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-6', seed:true, ano:2014, km:190000, fipe:73000, lance:37990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-7', seed:true, ano:2014, km:130000, fipe:37500, lance:13500, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-8', seed:true, ano:2015, km:0, fipe:125000, lance:84000, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-9', seed:true, ano:2015, km:106000, fipe:44000, lance:19990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-10', seed:true, ano:2015, km:168000, fipe:41000, lance:21990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-11', seed:true, ano:2015, km:74000, fipe:200000, lance:94900, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-12', seed:true, ano:2016, km:130000, fipe:124000, lance:69990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-13', seed:true, ano:2016, km:220000, fipe:49000, lance:29990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-14', seed:true, ano:2016, km:168000, fipe:85000, lance:46990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-15', seed:true, ano:2016, km:160000, fipe:76000, lance:38990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-16', seed:true, ano:2017, km:180000, fipe:57000, lance:27000, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-17', seed:true, ano:2020, km:58000, fipe:90000, lance:57990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-18', seed:true, ano:2020, km:83000, fipe:75000, lance:41990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-19', seed:true, ano:2020, km:69000, fipe:354000, lance:209990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-20', seed:true, ano:2022, km:73000, fipe:56000, lance:33490, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-21', seed:true, ano:2023, km:41000, fipe:82000, lance:49990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-22', seed:true, ano:2023, km:104000, fipe:65000, lance:41990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-23', seed:true, ano:2024, km:91000, fipe:71000, lance:44990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-24', seed:true, ano:2025, km:29000, fipe:74000, lance:41990, marca:'', modelo:'', custo:0, venda:0},
+    {id:'seed-25', seed:true, ano:2019, km:120000, fipe:132000, lance:69990, marca:'Land Rover', modelo:'Discovery D180 HSE', custo:0, venda:0},
+    {id:'seed-26', seed:true, ano:2018, km:220000, fipe:42000, lance:16990, marca:'Ford', modelo:'Ka Sedan 1.5', custo:0, venda:0},
+    {id:'seed-27', seed:true, ano:2019, km:117000, fipe:172000, lance:99990, marca:'Jaguar', modelo:'E-Pace P250', custo:0, venda:0},
+    {id:'seed-28', seed:true, ano:2013, km:170000, fipe:48000, lance:24800, marca:'Renault', modelo:'Duster 2.0 Aut', custo:0, venda:0},
+    {id:'seed-29', seed:true, ano:2024, km:68000, fipe:74000, lance:49990, marca:'GM', modelo:'Onix Plus LT', custo:0, venda:0},
+    {id:'seed-30', seed:true, ano:2016, km:200000, fipe:88000, lance:48000, marca:'Audi', modelo:'Q3 1.4 TFSI', custo:0, venda:0},
+    {id:'seed-31', seed:true, ano:2013, km:219000, fipe:34500, lance:16990, marca:'VW', modelo:'Voyage 1.6', custo:0, venda:0},
+    {id:'seed-32', seed:true, ano:2010, km:130000, fipe:108000, lance:61990, marca:'Troller', modelo:'T4 3.0', custo:0, venda:0},
+    {id:'seed-33', seed:true, ano:2020, km:0, fipe:24500, lance:12990, marca:'Yamaha', modelo:'MT03 ABS', custo:0, venda:0, tipo:'moto'},
+    {id:'seed-34', seed:true, ano:2017, km:340000, fipe:46000, lance:19500, marca:'GM', modelo:'Prisma 1.0 Joy', custo:0, venda:0},
+    {id:'seed-35', seed:true, ano:2011, km:205000, fipe:29000, lance:14300, marca:'Renault', modelo:'Sandero 1.6', custo:0, venda:0}
+  ].map(e=>({data:'', ...e}));
+  // Combina a base embutida no sistema + registros adicionados pelo usuario
+  function getBmkAllEntries(){
+    return [...BMK_SEED, ...getBmkEntries()];
+  }
+
   // ── Badge ────────────────────────────────────────────────────
   function bmkUpdateBadge(){
-    const n = getBmkEntries().length;
+    const n = getBmkAllEntries().length;
     const el = document.getElementById('bmk-badge');
     if(el){ el.textContent = n; el.style.display = n>0?'':'none'; }
   }
@@ -12179,6 +12249,7 @@
         document.getElementById('bmk_marca').value  = entry.marca||'';
         document.getElementById('bmk_modelo').value = entry.modelo||'';
         document.getElementById('bmk_ano').value    = entry.ano||'';
+        document.getElementById('bmk_km').value     = entry.km||'';
         const fmt = v => v>0 ? Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '';
         document.getElementById('bmk_fipe').value   = fmt(entry.fipe);
         document.getElementById('bmk_lance').value  = fmt(entry.lance);
@@ -12186,7 +12257,7 @@
         document.getElementById('bmk_venda').value  = fmt(entry.venda||0);
       }
     } else {
-      ['bmk_marca','bmk_modelo','bmk_ano','bmk_fipe','bmk_lance','bmk_custo','bmk_venda'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      ['bmk_marca','bmk_modelo','bmk_ano','bmk_km','bmk_fipe','bmk_lance','bmk_custo','bmk_venda'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     }
     bmkUpdateModalPreview();
     m.classList.add('show');
@@ -12223,6 +12294,7 @@
     const marca  = (document.getElementById('bmk_marca')?.value||'').trim();
     const modelo = (document.getElementById('bmk_modelo')?.value||'').trim();
     const ano    = parseInt(document.getElementById('bmk_ano')?.value)||0;
+    const km     = parseInt(document.getElementById('bmk_km')?.value)||0;
     const fipe   = bmkParseMoney(document.getElementById('bmk_fipe'));
     const lance  = bmkParseMoney(document.getElementById('bmk_lance'));
     if(!marca || !modelo || !fipe || !lance){
@@ -12234,9 +12306,9 @@
     const entries = getBmkEntries();
     if(editId){
       const idx = entries.findIndex(e=>e.id===editId);
-      if(idx>=0) entries[idx] = {...entries[idx], marca, modelo, ano, fipe, lance, custo, venda};
+      if(idx>=0) entries[idx] = {...entries[idx], marca, modelo, ano, km, fipe, lance, custo, venda};
     } else {
-      entries.push({ id:uid(), data:new Date().toLocaleDateString('pt-BR'), marca, modelo, ano, fipe, lance, custo, venda });
+      entries.push({ id:uid(), data:new Date().toLocaleDateString('pt-BR'), marca, modelo, ano, km, fipe, lance, custo, venda });
     }
     saveBmkEntries(entries);
     closeBmkModal();
@@ -12370,14 +12442,15 @@
         marca  = words[0]||'Outros';
         modelo = words[1]||'';
       }
-      parsed.push({ marca:marca.charAt(0).toUpperCase()+marca.slice(1).toLowerCase(), modelo:modelo.charAt(0).toUpperCase()+modelo.slice(1).toLowerCase(), ano, fipe, lance, custo:0, venda:0 });
+      let km=0; const kmM=line.match(/([\d.,]+)\s*km\b/i); if(kmM){ km=parseInt(kmM[1].replace(/\D/g,''))||0; if(km>0&&km<1000) km*=1000; }
+      parsed.push({ marca:marca.charAt(0).toUpperCase()+marca.slice(1).toLowerCase(), modelo:modelo.charAt(0).toUpperCase()+modelo.slice(1).toLowerCase(), ano, km, fipe, lance, custo:0, venda:0 });
     }
     return parsed;
   }
 
   // ── Analysis engine ──────────────────────────────────────────
   function bmkAnalyze(){
-    const entries = getBmkEntries();
+    const entries = getBmkAllEntries();
     if(!entries.length) return null;
     const valid = entries.filter(e=>e.fipe>0&&e.lance>0);
     if(!valid.length) return null;
@@ -12401,16 +12474,29 @@
       brands[k].min = Math.min(...brands[k].pcts);
       brands[k].max = Math.max(...brands[k].pcts);
     });
-    return { count:valid.length, avg, median, best, brands };
+    // Padrao por faixa de preco FIPE (dimensao principal do modelo embutido)
+    const FAIXAS = [
+      {nome:'até R$50k', lo:0, hi:50000},
+      {nome:'R$50–80k', lo:50000, hi:80000},
+      {nome:'R$80–130k', lo:80000, hi:130000},
+      {nome:'R$130k+', lo:130000, hi:Infinity},
+    ];
+    const faixas = FAIXAS.map(fx=>{
+      const g = valid.filter(e=>e.fipe>=fx.lo&&e.fipe<fx.hi).map(e=>e.lance/e.fipe*100);
+      if(!g.length) return null;
+      const avgF = g.reduce((a,b)=>a+b,0)/g.length;
+      return { nome:fx.nome, avg:avgF, min:Math.min(...g), max:Math.max(...g), count:g.length };
+    }).filter(Boolean);
+    return { count:valid.length, avg, median, best, brands, faixas };
   }
 
   // ── Suggestion for calculator ────────────────────────────────
-  function bmkGetSuggestion(marca, fipe){
-    const entries = getBmkEntries().filter(e=>e.fipe>0&&e.lance>0);
+  function bmkGetSuggestion(marca, fipe, km){
+    const entries = getBmkAllEntries().filter(e=>e.fipe>0&&e.lance>0);
     if(!entries.length) return null;
     const marcaNorm = (marca||'').toLowerCase().trim();
     // Priority 1: same brand
-    let pool = marcaNorm ? entries.filter(e=>(e.marca||'').toLowerCase().includes(marcaNorm)||marcaNorm.includes((e.marca||'').toLowerCase())) : [];
+    let pool = marcaNorm ? entries.filter(e=>{const m=(e.marca||'').toLowerCase(); return m && (m.includes(marcaNorm)||marcaNorm.includes(m));}) : [];
     let confidence = 'high';
     // Priority 2: similar price range (±40%)
     if(pool.length<3 && fipe>0){
@@ -12423,6 +12509,12 @@
       pool = entries;
       confidence = 'low';
     }
+    // Refino por quilometragem: estreita para comparaveis de KM similar (±60 mil km)
+    let kmNote = '';
+    if(km>0){
+      const kpool = pool.filter(e=>e.km>0 && Math.abs(e.km-km)<=60000);
+      if(kpool.length>=3){ pool = kpool; kmNote = `~${Math.round(km/1000)}k km`; }
+    }
     if(!pool.length) return null;
     const pcts = pool.map(e=>e.lance/e.fipe*100).sort((a,b)=>a-b);
     const avg  = pcts.reduce((a,b)=>a+b,0)/pcts.length;
@@ -12430,7 +12522,7 @@
     const p75  = pcts[Math.ceil(pcts.length*.75)-1]||pcts[pcts.length-1];
     const sugMin = fipe>0 ? fipe*p25/100 : 0;
     const sugMax = fipe>0 ? fipe*p75/100 : 0;
-    return { avg, p25, p75, sugMin, sugMax, count:pool.length, confidence };
+    return { avg, p25, p75, sugMin, sugMax, count:pool.length, confidence, kmNote };
   }
 
   // ── Render section ───────────────────────────────────────────
@@ -12461,17 +12553,17 @@
       wrap.innerHTML='<div style="text-align:center;padding:20px 0"><div style="font-size:28px;opacity:.2;margin-bottom:8px">📊</div><div style="font-size:12px;color:var(--muted)">Adicione compras para ver o padrão</div></div>';
       return;
     }
-    const brands = Object.entries(analysis.brands).sort((a,b)=>a[1].avg-b[1].avg);
-    // max avg for bar scale
-    const maxAvg = Math.max(...brands.map(b=>b[1].avg),100);
-    wrap.innerHTML = brands.map(([name,b])=>{
-      const cls = b.avg<70?'bmk-great':b.avg<80?'bmk-good':b.avg<90?'bmk-med':'bmk-bad';
-      const fillW = Math.round(b.avg/maxAvg*100);
+    const faixas = analysis.faixas||[];
+    if(!faixas.length){ wrap.innerHTML='<div style="text-align:center;padding:20px 0"><div style="font-size:12px;color:var(--muted)">Sem dados suficientes</div></div>'; return; }
+    const maxAvg = Math.max(...faixas.map(f=>f.avg),100);
+    wrap.innerHTML = faixas.map(f=>{
+      const cls = f.avg<55?'bmk-great':f.avg<65?'bmk-good':f.avg<80?'bmk-med':'bmk-bad';
+      const fillW = Math.round(f.avg/maxAvg*100);
       return `<div class="bmk-brand-row">
-        <div class="bmk-brand-name">${name}</div>
+        <div class="bmk-brand-name">${f.nome}</div>
         <div class="bmk-brand-track"><div class="bmk-brand-fill" style="width:${fillW}%"></div></div>
-        <div class="bmk-brand-pct"><span class="bmk-pct-badge ${cls}">${b.avg.toFixed(1)}%</span></div>
-        <div class="bmk-brand-n">${b.count}×</div>
+        <div class="bmk-brand-pct"><span class="bmk-pct-badge ${cls}">${f.avg.toFixed(1)}%</span></div>
+        <div class="bmk-brand-n">${f.count}×</div>
       </div>`;
     }).join('');
   }
@@ -12480,7 +12572,7 @@
     const wrap = document.getElementById('bmk_table_wrap');
     if(!wrap) return;
     const query = (document.getElementById('bmk_search')?.value||'').toLowerCase();
-    let entries = getBmkEntries();
+    let entries = getBmkAllEntries();
     if(query) entries = entries.filter(e=>`${e.marca} ${e.modelo} ${e.ano}`.toLowerCase().includes(query));
     if(!entries.length){
       wrap.innerHTML=`<div class="bmk-empty"><div style="font-size:38px;opacity:.2;margin-bottom:10px">🎯</div><div style="font-size:13px;font-weight:700;color:var(--ink-2)">Nenhuma compra registrada</div><div style="font-size:12px;color:var(--muted);margin:6px auto 16px;max-width:260px">Cadastre suas compras para o sistema aprender seus padrões de arremate.</div><button class="tba primary" onclick="openBmkModal(null)">+ Adicionar primeira compra</button></div>`;
@@ -12490,18 +12582,19 @@
       const pct = e.fipe>0 ? e.lance/e.fipe*100 : 0;
       const cls = pct<70?'bmk-great':pct<80?'bmk-good':pct<90?'bmk-med':'bmk-bad';
       const lucro = e.venda>0 ? e.venda-(e.custo||e.lance) : null;
+      const veic = (e.marca||e.modelo) ? `${e.marca} ${e.modelo}`.trim() : (e.seed?'<span style="color:var(--muted)">Base financeira</span>':'—');
+      const acoes = e.seed
+        ? `<span class="sp-tipo-badge" title="Registro embutido no sistema">base</span>`
+        : `<button class="tba" style="padding:4px 10px;font-size:11px" onclick="openBmkModal('${e.id}')">Editar</button><button class="tba" style="padding:4px 10px;font-size:11px;color:var(--danger);margin-left:4px" onclick="deleteBmkEntry('${e.id}')">✕</button>`;
       return `<tr>
         <td>${e.data||'—'}</td>
-        <td style="font-weight:700">${e.marca} ${e.modelo}</td>
+        <td style="font-weight:700">${veic}</td>
         <td style="text-align:center">${e.ano||'—'}</td>
         <td style="text-align:right">${BRL(e.fipe)}</td>
         <td style="text-align:right">${BRL(e.lance)}</td>
         <td style="text-align:center"><span class="bmk-pct-badge ${cls}">${pct>0?pct.toFixed(1)+'%':'—'}</span></td>
         <td style="text-align:right;font-weight:700;color:${lucro===null?'var(--muted)':lucro>=0?'#16a34a':'#dc2626'}">${lucro===null?'—':(lucro>=0?'+':'')+BRL(lucro)}</td>
-        <td style="white-space:nowrap">
-          <button class="tba" style="padding:4px 10px;font-size:11px" onclick="openBmkModal('${e.id}')">Editar</button>
-          <button class="tba" style="padding:4px 10px;font-size:11px;color:var(--danger);margin-left:4px" onclick="deleteBmkEntry('${e.id}')">✕</button>
-        </td>
+        <td style="white-space:nowrap">${acoes}</td>
       </tr>`;
     }).join('');
     wrap.innerHTML=`<table class="bmk-table"><thead><tr>
@@ -12515,9 +12608,10 @@
   function leilaoUpdateBenchmarkSuggestion(){
     const marca = document.getElementById('lc_marca')?.value||'';
     const fipe  = parseMoney(document.getElementById('lc_fipe')?.value||'')||0;
+    const km    = parseInt((document.getElementById('lc_km')?.value||'').replace(/\D/g,''))||0;
     const box   = document.getElementById('lcr_bmk_suggestion');
     if(!box) return;
-    const sug = bmkGetSuggestion(marca, fipe);
+    const sug = bmkGetSuggestion(marca, fipe, km);
     if(!sug || sug.count===0){ box.classList.remove('show'); return; }
     box.className = `bmk-suggestion show conf-${sug.confidence}`;
     const titleEl = document.getElementById('lcr_bmk_title');
@@ -12526,7 +12620,7 @@
     const src = sug.confidence==='high' ? `${sug.count} compra${sug.count>1?'s':''} da mesma marca`
               : sug.confidence==='medium' ? `${sug.count} compra${sug.count>1?'s':''} na mesma faixa`
               : `${sug.count} compra${sug.count>1?'s':''} no histórico geral`;
-    if(titleEl) titleEl.textContent = `🎯 Padrão histórico (${src})`;
+    if(titleEl) titleEl.textContent = `🎯 Padrão histórico (${src}${sug.kmNote?', '+sug.kmNote:''})`;
     if(rangeEl){
       if(fipe>0 && sug.sugMin>0){
         rangeEl.textContent = `${BRL(sug.sugMin)} – ${BRL(sug.sugMax)}`;
