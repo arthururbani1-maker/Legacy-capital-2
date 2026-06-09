@@ -2803,11 +2803,14 @@
         <div class="field"><label>Nome da meta *</label><input type="text" id="mm_name" placeholder="Ex: Economizar 20% do salário"></div>
         <div class="form-grid">
           <div class="field"><label>Tipo</label>
-            <select id="mm_type"><option value="receita">Meta de Receita</option><option value="economia">Meta de Economia</option><option value="patrimonio">Meta de Patrimônio</option><option value="despesa">Limite de Despesa</option></select>
+            <select id="mm_type" onchange="metaToggleBasis()"><option value="receita">Meta de Receita</option><option value="economia">Meta de Economia</option><option value="patrimonio">Meta de Patrimônio</option><option value="despesa">Limite de Despesa</option></select>
           </div>
           <div class="field"><label>Período</label>
             <select id="mm_period"><option value="mensal">Mensal</option><option value="anual">Anual</option></select>
           </div>
+        </div>
+        <div class="field" id="mm_basis_wrap"><label>Base de cálculo</label>
+          <select id="mm_basis"><option value="liquido">Resultado Líquido (entradas − saídas)</option><option value="bruto">Receita Bruta (somente entradas)</option></select>
         </div>
         <div class="field"><label>Valor alvo (R$) *</label><input type="number" id="mm_target" step="0.01" min="0" placeholder="0,00"></div>
         <div class="field"><label>Emoji / ícone</label><input type="text" id="mm_emoji" placeholder="🎯" maxlength="2"></div>
@@ -9579,6 +9582,12 @@
   function calcExpense(m,y,paid){
     return RS.expenses.filter(e=>{ const d=new Date(e.date+'T12:00'); return d.getMonth()===m&&d.getFullYear()===y&&(paid===undefined?true:e.paid==paid); }).reduce((s,e)=>s+Number(e.value||0),0);
   }
+  function calcIncomeYear(y,statusFilter){
+    return RS.income.filter(i=>{ const d=new Date(i.date+'T12:00'); return d.getFullYear()===y&&(statusFilter?i.status===statusFilter:true); }).reduce((s,i)=>s+Number(i.value||0),0);
+  }
+  function calcExpenseYear(y,paid){
+    return RS.expenses.filter(e=>{ const d=new Date(e.date+'T12:00'); return d.getFullYear()===y&&(paid===undefined?true:e.paid==paid); }).reduce((s,e)=>s+Number(e.value||0),0);
+  }
 
   // ── Saldo carry-forward: soma todos os base balances + received antes de m/y - paid antes de m/y
   function calcSaldoInicial(m, y){
@@ -10120,37 +10129,45 @@
   function renderMetas(){
     const grid=document.getElementById('renda_goals'); if(!grid) return;
     const m=RS.month,y=RS.year;
-    const rec=calcIncome(m,y,'recebido');
-    const exp=calcExpense(m,y,true);
-    const eco=Math.max(0,rec-exp);
+    const recM=calcIncome(m,y,'recebido'), expM=calcExpense(m,y,true);
+    const recA=calcIncomeYear(y,'recebido'), expA=calcExpenseYear(y,true);
     const pat=(typeof state!=='undefined'?state.assets.reduce((s,a)=>s+Number(a.currentValue||0),0):0)+totalAccBalance();
-
-    function getCurrentVal(g){
-      if(g.type==='receita') return rec;
-      if(g.type==='economia') return eco;
-      if(g.type==='patrimonio') return pat;
-      if(g.type==='despesa') return exp;
-      return 0;
-    }
     if(!RS.goals.length){ grid.innerHTML=`<div class="es" style="grid-column:1/-1"><div class="es-ico">🎯</div><div class="es-title">Nenhuma meta criada</div><div class="es-sub">Defina metas de receita, economia e patrimônio para visualizar seu progresso em tempo real.</div><button class="btn" onclick="openMetaModal(null)">+ Nova meta</button></div>`; return; }
     grid.innerHTML=RS.goals.map(g=>{
-      const cur=getCurrentVal(g);
-      const pct=Math.min(100,(cur/g.target)*100);
-      const barColor=pct>=100?'var(--accent)':pct>=60?'var(--gold)':'var(--info)';
-      const falta=Math.max(0,g.target-cur);
+      const anual = g.period==='anual';
+      const entradas = anual?recA:recM;
+      const saidas   = anual?expA:expM;
+      const liquido  = entradas - saidas;
+      const basis = g.basis || 'liquido';
+      let cur, isResult=false;
+      if(g.type==='patrimonio') cur=pat;
+      else if(g.type==='despesa') cur=saidas;
+      else { isResult=true; cur = basis==='bruto' ? entradas : liquido; }
+      const pctRaw = g.target>0 ? (cur/g.target)*100 : 0;
+      const pct = Math.max(0, Math.min(100, pctRaw));
+      const barColor = pct>=100?'var(--accent)':pct>=60?'var(--gold)':'var(--info)';
+      const falta = Math.max(0, g.target-cur);
+      const breakdown = isResult ? `
+        <div style="display:flex;flex-direction:column;gap:6px;margin:12px 0 2px;padding-top:11px;border-top:1px solid var(--line)">
+          <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:var(--muted)">Entradas</span><span style="font-weight:700;color:var(--accent-2)">${fmtMoney(entradas)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:var(--muted)">Saídas</span><span style="font-weight:700;color:var(--danger)">− ${fmtMoney(saidas)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-top:6px;border-top:1px dashed var(--line)"><span style="font-weight:700;color:var(--ink-2)">${basis==='bruto'?'Receita bruta':'Resultado líquido'}</span><span style="font-weight:800;color:var(--ink)">${fmtMoney(cur)}</span></div>
+        </div>` : '';
+      const tag = isResult ? (basis==='bruto'?' · Bruto':' · Líquido') : (g.type==='patrimonio'?' · Patrimônio':g.type==='despesa'?' · Limite':'');
       return `<div class="goal-card">
         <div class="gc-head">
           <div class="gc-title">${g.emoji||'🎯'} ${g.name}</div>
-          <div class="gc-period">${g.period==='mensal'?'Mensal':'Anual'}</div>
+          <div class="gc-period">${anual?'Anual':'Mensal'}${tag}</div>
         </div>
         <div class="gc-vals">
           <div class="gc-current">${fmtMoney(cur)}</div>
           <div class="gc-target">meta: ${fmtMoney(g.target)}</div>
         </div>
         <div class="gc-bar"><i style="width:${pct}%;background:${barColor}"></i></div>
+        ${breakdown}
         <div class="gc-foot">
-          <span class="gc-pct">${pct.toFixed(0)}%</span>
-          <span>${pct>=100?'✅ Meta atingida!':'Falta '+fmtMoney(falta)}</span>
+          <span class="gc-pct">${Math.round(pctRaw)}%</span>
+          <span>${cur>=g.target?'✅ Meta atingida!':'Falta '+fmtMoney(falta)}</span>
           <button class="rta" style="width:22px;height:22px" onclick="openMetaModal('${g.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
         </div>
       </div>`;
@@ -10433,6 +10450,11 @@
   }
 
   /* ---- Meta Modal ---- */
+  function metaToggleBasis(){
+    const t=document.getElementById('mm_type')?.value;
+    const w=document.getElementById('mm_basis_wrap');
+    if(w) w.style.display=(t==='receita'||t==='economia')?'':'none';
+  }
   function openMetaModal(id){
     document.getElementById('mm_id').value=id||'';
     document.getElementById('metaModalTitle').textContent=id?'Editar Meta':'Nova Meta';
@@ -10443,6 +10465,8 @@
     document.getElementById('mm_period').value=g?g.period:'mensal';
     document.getElementById('mm_target').value=g?g.target:'';
     document.getElementById('mm_emoji').value=g?g.emoji:'🎯';
+    document.getElementById('mm_basis').value=g?(g.basis||'liquido'):'liquido';
+    if(typeof metaToggleBasis==='function') metaToggleBasis();
     document.getElementById('metaModal').classList.add('show');
   }
   function closeMetaModal(){ document.getElementById('metaModal').classList.remove('show'); }
@@ -10451,7 +10475,7 @@
     const name=document.getElementById('mm_name').value.trim();
     const target=parseFloat(document.getElementById('mm_target').value)||0;
     if(!name||!target){ toast('Preencha nome e valor alvo','warn'); return; }
-    const g={id:id||uid(),name,type:document.getElementById('mm_type').value,period:document.getElementById('mm_period').value,target,emoji:document.getElementById('mm_emoji').value||'🎯'};
+    const g={id:id||uid(),name,type:document.getElementById('mm_type').value,period:document.getElementById('mm_period').value,target,emoji:document.getElementById('mm_emoji').value||'🎯',basis:document.getElementById('mm_basis')?.value||'liquido'};
     if(id){ const idx=RS.goals.findIndex(x=>x.id===id); if(idx>=0) RS.goals[idx]=g; }
     else RS.goals.push(g);
     saveRS(); closeMetaModal(); renderMetas(); toast('Meta salva!','success');
