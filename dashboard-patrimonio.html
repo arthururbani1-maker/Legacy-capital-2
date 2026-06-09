@@ -3120,6 +3120,9 @@
     <!-- ── Tab: ANÁLISE / DASHBOARD ── -->
     <div class="renda-pane" id="lp-dash">
 
+      <!-- Análise inteligente de mercado -->
+      <div id="leilao_smart_report"></div>
+
       <!-- Analysis banner -->
       <div id="leilao_analysis_banner"></div>
 
@@ -11646,10 +11649,129 @@
   }
 
   // ── Render dashboard / analysis tab ──────────────────────────
+  // ── Análise Inteligente de Mercado e Precificação ──
+  function leilaoSmartMetrics(){
+    const d = leilaoGetFormData();
+    const c = leilaoCalc(d);
+    const fipe = d.fipe||0;
+    const mercado = d.mercado>0 ? d.mercado : fipe;
+    const venda = d.revenda>0 ? d.revenda : 0;
+    const lance = d.lance||0;
+    const pctArremateFipe = fipe>0 ? lance/fipe*100 : 0;
+    const pctVsMercado = (mercado>0 && venda>0) ? (venda-mercado)/mercado*100 : 0;
+    return { d, c, fipe, mercado, venda, lance, pctArremateFipe, pctVsMercado,
+             custoTotal:c.custoTotal, lucro:c.lucro, margem:c.margem, roi:c.rentabilidade,
+             mercadoInformado: d.mercado>0 };
+  }
+  function leilaoClassify(m){
+    const GREEN={cls:'otimo',emoji:'🟢',label:'Excelente oportunidade',tone:'#16A34A',reasons:['Compra abaixo do mercado','Alta margem de lucro','Boa liquidez de venda']};
+    const YELLOW={cls:'bom',emoji:'🟡',label:'Boa oportunidade',tone:'#10B981',reasons:['Margem saudável','Risco moderado']};
+    const ORANGE={cls:'medio',emoji:'🟠',label:'Atenção',tone:'#F59E0B',reasons:['Margem reduzida','Pouca diferença para o mercado']};
+    const RED={cls:'nao',emoji:'🔴',label:'Alto risco',tone:'#DC2626',reasons:['Lucro baixo ou negativo','Exposição elevada','Pouco espaço para negociação']};
+    if(m.lucro<=0 || m.margem<3) return RED;
+    let tier = m.margem>=18 ? 3 : m.margem>=10 ? 2 : 1;
+    if(m.pctArremateFipe<=60 && m.margem>=12 && tier<3) tier++;
+    if(m.pctVsMercado>=12) tier-=2; else if(m.pctVsMercado>=5) tier-=1;
+    if(tier>=3) return GREEN;
+    if(tier===2) return YELLOW;
+    if(tier===1) return ORANGE;
+    return RED;
+  }
+  function leilaoPosicionamento(m){
+    if(!(m.venda>0)) return '';
+    const p=m.pctVsMercado, abs=Math.abs(p).toFixed(1);
+    if(p<=-3) return `Seu preço de venda está <b>${abs}% abaixo</b> da média de mercado. Isso tende a aumentar a velocidade de venda, porém reduz sua margem de lucro.`;
+    if(p<3)   return `Seu preço de venda está <b>alinhado com a média de mercado</b> (${p>=0?'+':''}${p.toFixed(1)}%), proporcionando equilíbrio entre rentabilidade e competitividade.`;
+    return `Seu preço de venda está <b>${abs}% acima</b> do mercado. O veículo pode demorar mais para ser vendido, exigindo diferenciais como baixa quilometragem, histórico de manutenção ou excelente estado de conservação.`;
+  }
+  function leilaoParecer(m){
+    const P=[];
+    if(m.pctArremateFipe>0){
+      if(m.pctArremateFipe<=65) P.push(`Este veículo foi adquirido por <b>${m.pctArremateFipe.toFixed(0)}% da FIPE</b>, apresentando uma excelente margem de segurança na compra.`);
+      else if(m.pctArremateFipe<=80) P.push(`O arremate saiu por <b>${m.pctArremateFipe.toFixed(0)}% da FIPE</b>, uma margem de segurança razoável.`);
+      else P.push(`O arremate representa <b>${m.pctArremateFipe.toFixed(0)}% da FIPE</b>, deixando pouca margem de segurança na compra.`);
+    }
+    if(m.lucro>0){
+      if(m.margem>=20) P.push(`Mesmo considerando custos de regularização e recuperação, a operação tem potencial de lucro acima da média (margem de ${m.margem.toFixed(1)}%).`);
+      else if(m.margem>=10) P.push(`Após os custos de regularização e recuperação, a operação mantém uma margem saudável de ${m.margem.toFixed(1)}%.`);
+      else P.push(`Após todos os custos, a margem fica apertada (${m.margem.toFixed(1)}%), exigindo atenção na precificação.`);
+    } else {
+      P.push(`Nos números atuais, a operação não apresenta lucro — recomenda-se renegociar o lance ou revisar os custos antes de avançar.`);
+    }
+    if(m.venda>0){
+      if(m.pctVsMercado<=-3) P.push(`O preço de venda está abaixo do mercado, favorecendo a velocidade de giro do estoque.`);
+      else if(m.pctVsMercado<3) P.push(`O preço de venda sugerido está competitivo em relação ao mercado e oferece boa velocidade de giro.`);
+      else P.push(`O preço de venda pretendido está acima da média do mercado; recomenda-se reavaliar a estratégia de precificação para aumentar a liquidez e reduzir o tempo de estoque.`);
+    }
+    return P.join(' ');
+  }
+  function leilaoCenarioVenda(m,mult){
+    const v=m.venda*mult, lucro=v-m.custoTotal;
+    return {v, lucro, margem:v>0?lucro/v*100:0, roi:m.custoTotal>0?lucro/m.custoTotal*100:0};
+  }
+  function leilaoRenderSmartReport(){
+    const el=document.getElementById('leilao_smart_report'); if(!el) return;
+    const m=leilaoSmartMetrics();
+    if(!(m.fipe>0 && m.lance>0)){
+      el.innerHTML='<div class="lc-section" style="text-align:center;padding:32px"><div style="font-size:32px;opacity:.25;margin-bottom:8px">🧠</div><div style="font-size:13px;font-weight:700;color:var(--ink-2)">Análise inteligente de mercado</div><div style="font-size:12px;color:var(--muted);margin:6px auto 0;max-width:360px">Preencha FIPE, Preço de Arremate e Preço de Venda na Calculadora para gerar a análise estratégica.</div></div>';
+      return;
+    }
+    const cl=leilaoClassify(m), pos=leilaoPosicionamento(m), fmt=fmtMoney;
+    const pctTxt=m.venda>0?`${m.pctVsMercado>=0?'+':''}${m.pctVsMercado.toFixed(1)}%`:'—';
+    const c=mult=>leilaoCenarioVenda(m,mult);
+    const cons=c(0.95), real=c(1.0), otim=c(1.05);
+    const scCard=(t,sx,ac)=>`<div style="background:var(--bg-elev);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
+      <div style="font-size:11px;font-weight:700;color:${ac};text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">${t}</div>
+      <div style="font-size:10.5px;color:var(--muted)">Venda</div><div style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--ink);margin-bottom:8px">${fmt(sx.v)}</div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px"><span style="color:var(--muted)">Lucro</span><span style="font-weight:700;color:${sx.lucro>=0?'var(--accent-2)':'var(--danger)'}">${fmt(sx.lucro)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px"><span style="color:var(--muted)">Margem</span><span style="font-weight:700;color:var(--ink-2)">${sx.margem.toFixed(1)}%</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:var(--muted)">ROI</span><span style="font-weight:700;color:var(--ink-2)">${sx.roi.toFixed(1)}%</span></div></div>`;
+    const vrow=(lb,vl)=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span style="font-size:12px;color:var(--muted)">${lb}</span><span style="font-size:12.5px;font-weight:700;color:var(--ink)">${vl}</span></div>`;
+    const kmTxt=m.d.km?Number(String(m.d.km).replace(/\D/g,'')||0).toLocaleString('pt-BR')+' km':'—';
+    el.innerHTML=`
+      <div class="lc-section" style="margin-bottom:16px">
+        <div class="lc-section-title" style="margin-bottom:14px"><span>🧠</span> Análise Inteligente de Mercado</div>
+        <div class="leilao-analysis ${cl.cls}" style="margin-bottom:16px">
+          <div class="la-badge">${cl.emoji}</div>
+          <div class="la-body">
+            <div class="la-title" style="color:${cl.tone}">${cl.label}</div>
+            <div class="la-text" style="margin-top:4px">${cl.reasons.join(' · ')}</div>
+            ${pos?`<div class="la-text" style="margin-top:8px">${pos}</div>`:''}
+            ${!m.mercadoInformado?`<div style="font-size:11px;color:var(--muted);margin-top:8px">ℹ️ Preço de mercado não informado — usando a FIPE como referência. Preencha "Preço de Mercado" para um posicionamento mais preciso.</div>`:''}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 28px">
+          ${vrow('Ano do veículo', m.d.ano||'—')}
+          ${vrow('Quilometragem', kmTxt)}
+          ${vrow('Arremate sobre FIPE', m.pctArremateFipe.toFixed(1)+'%')}
+          ${vrow('Investimento total', fmt(m.custoTotal))}
+          ${vrow('Preço de venda', m.venda>0?fmt(m.venda):'—')}
+          ${vrow('Diferença p/ mercado', pctTxt)}
+          ${vrow('Lucro estimado', fmt(m.lucro))}
+          ${vrow('Margem de lucro', m.margem.toFixed(1)+'%')}
+          ${vrow('ROI (retorno s/ custo)', m.roi.toFixed(1)+'%')}
+          ${vrow('Espaço de negociação', m.lucro>0?fmt(m.lucro):'R$ 0,00')}
+        </div>
+      </div>
+      <div class="lc-section" style="margin-bottom:16px">
+        <div class="lc-section-title" style="margin-bottom:14px"><span>⚡</span> Simulação de Cenários <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;font-size:11px">· venda ±5%</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+          ${scCard('Conservador −5%',cons,'#EF4444')}
+          ${scCard('Realista',real,'#3B82F6')}
+          ${scCard('Otimista +5%',otim,'#22C55E')}
+        </div>
+      </div>
+      <div class="lc-section">
+        <div class="lc-section-title" style="margin-bottom:12px"><span>📝</span> Parecer Final</div>
+        <div style="font-size:13px;color:var(--ink-2);line-height:1.7">${leilaoParecer(m)}</div>
+      </div>`;
+  }
+
   function leilaoRenderDashboard(){
     const d    = leilaoGetFormData();
     const calc = leilaoCalc(d);
     const risk = leilaoRisk(calc.pctFipe);
+    if(typeof leilaoRenderSmartReport==='function') leilaoRenderSmartReport();
 
     // ── Analysis banner
     const banEl = document.getElementById('leilao_analysis_banner');
