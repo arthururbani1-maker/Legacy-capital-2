@@ -11623,7 +11623,8 @@
     set('lcr_margem',   calc.margem.toFixed(1) + '%');
     col('lcr_margem',   calc.margem >= 15 ? 'var(--accent-2)' : calc.margem >= 5 ? 'var(--gold)' : 'var(--danger)');
 
-    set('lcr_lance_max', calc.lanceMax > 0 ? fmtMoney(calc.lanceMax) : '—');
+    const _teto = (typeof leilaoLanceTeto==='function') ? leilaoLanceTeto(d, calc).teto : calc.lanceMax;
+    set('lcr_lance_max', _teto > 0 ? fmtMoney(_teto) : '—');
 
     // Mini breakdown bars
     const mb = document.getElementById('lcr_mini_break');
@@ -11650,6 +11651,19 @@
 
   // ── Render dashboard / analysis tab ──────────────────────────
   // ── Análise Inteligente de Mercado e Precificação ──
+  function leilaoLanceTeto(d, c){
+    const fipe=d.fipe||0;
+    let dataMin=0,dataMax=0,dataAvg=0,dataAvgPct=0,bmk=null;
+    if(typeof bmkGetSuggestion==='function' && fipe>0){
+      const km=parseInt(String(d.km||'').replace(/\D/g,''))||0;
+      bmk=bmkGetSuggestion(d.marca, fipe, km);
+      if(bmk){ dataMin=bmk.sugMin||0; dataMax=bmk.sugMax||0; dataAvgPct=bmk.avg||0; dataAvg=fipe*dataAvgPct/100; }
+    }
+    const margemMax = c.lanceMax>0 ? c.lanceMax : 0;
+    let teto = margemMax;
+    if(dataMax>0) teto = margemMax>0 ? Math.min(margemMax, dataMax) : dataMax;
+    return { teto, dataMin, dataMax, dataAvg, dataAvgPct, margemMax, bmk };
+  }
   function leilaoSmartMetrics(){
     const d = leilaoGetFormData();
     const c = leilaoCalc(d);
@@ -11659,29 +11673,40 @@
     const lance = d.lance||0;
     const pctArremateFipe = fipe>0 ? lance/fipe*100 : 0;
     const pctVsMercado = (mercado>0 && venda>0) ? (venda-mercado)/mercado*100 : 0;
+    const t = leilaoLanceTeto(d, c);
+    const overData = t.dataMax>0 && lance>t.dataMax ? (lance-t.dataMax)/t.dataMax*100 : 0;
+    const overTeto = t.teto>0 && lance>t.teto ? (lance-t.teto)/t.teto*100 : 0;
     return { d, c, fipe, mercado, venda, lance, pctArremateFipe, pctVsMercado,
              custoTotal:c.custoTotal, lucro:c.lucro, margem:c.margem, roi:c.rentabilidade,
-             mercadoInformado: d.mercado>0, lanceMax:c.lanceMax, margemTarget:d.margemTarget||20 };
+             mercadoInformado: d.mercado>0, lanceMax:c.lanceMax, margemTarget:d.margemTarget||20,
+             dataMin:t.dataMin, dataMax:t.dataMax, dataAvg:t.dataAvg, dataAvgPct:t.dataAvgPct,
+             teto:t.teto, margemMax:t.margemMax, bmk:t.bmk, overData, overTeto };
   }
   function leilaoClassify(m){
-    const GREEN={cls:'otimo',emoji:'🟢',label:'Excelente oportunidade',tone:'#16A34A',reasons:['Compra abaixo do mercado','Alta margem de lucro','Boa liquidez de venda']};
-    const YELLOW={cls:'bom',emoji:'🟡',label:'Boa oportunidade',tone:'#10B981',reasons:['Margem saudável','Risco moderado']};
-    const ORANGE={cls:'medio',emoji:'🟠',label:'Atenção',tone:'#F59E0B',reasons:['Margem reduzida','Pouca diferença para o mercado']};
-    const RED={cls:'nao',emoji:'🔴',label:'Alto risco',tone:'#DC2626',reasons:['Lucro baixo ou negativo','Exposição elevada','Pouco espaço para negociação']};
+    const GREEN={cls:'otimo',emoji:'🟢',label:'Excelente oportunidade',tone:'#16A34A',reasons:['Lance abaixo do padrão de arremate','Boa margem de lucro','Boa liquidez de venda']};
+    const YELLOW={cls:'bom',emoji:'🟡',label:'Boa oportunidade',tone:'#10B981',reasons:['Lance dentro do padrão de mercado','Margem saudável']};
+    const ORANGE={cls:'medio',emoji:'🟠',label:'Atenção',tone:'#F59E0B',reasons:['Lance no limite do padrão','Margem reduzida']};
+    const RED={cls:'nao',emoji:'🔴',label:'Alto risco',tone:'#DC2626',reasons:['Lucro baixo ou lance acima do mercado real','Exposição elevada','Pouco espaço para negociação']};
     if(m.lucro<=0 || m.margem<3) return RED;
-    let tier = m.margem>=18 ? 3 : m.margem>=10 ? 2 : 1;
-    if(m.pctArremateFipe<=60 && m.margem>=12 && tier<3) tier++;
+    let tier;
+    if(m.dataMax>0){
+      // Ancorado nos dados reais de arremate (% FIPE por faixa/KM)
+      if(m.lance <= m.dataMin) tier=3;
+      else if(m.lance <= m.dataMax) tier=2;
+      else tier=1;
+      if(m.overData>=15) tier=Math.min(tier,1);
+      if(m.overData>=30) tier=0;
+    } else {
+      tier = m.margem>=18 ? 3 : m.margem>=10 ? 2 : 1;
+    }
+    if(m.margem<8) tier=Math.min(tier,1); else if(m.margem<12 && tier===3) tier=2;
     if(m.pctVsMercado>=12) tier-=2; else if(m.pctVsMercado>=5) tier-=1;
-    // Coerência: se o lance ultrapassa o máximo recomendado p/ a margem alvo, não pode ser excelente/boa
-    if(m.lanceMax>0 && m.lance>m.lanceMax){
-      const over=(m.lance-m.lanceMax)/m.lanceMax*100;
-      // acima do teto recomendado nunca é 'excelente'; bem acima cai para atenção/risco
+    if(m.margemMax>0 && m.lance>m.margemMax){
+      const over=(m.lance-m.margemMax)/m.margemMax*100;
       tier = over>=20 ? 0 : over>=8 ? Math.min(tier,1) : Math.min(tier,2);
     }
-    if(tier>=3) return GREEN;
-    if(tier===2) return YELLOW;
-    if(tier===1) return ORANGE;
-    return RED;
+    tier=Math.max(0,Math.min(3,tier));
+    return [RED,ORANGE,YELLOW,GREEN][tier];
   }
   function leilaoPosicionamento(m){
     if(!(m.venda>0)) return '';
@@ -11692,6 +11717,11 @@
   }
   function leilaoParecer(m){
     const P=[];
+    if(m.dataMax>0){
+      if(m.lance<=m.dataMin) P.push(`Comparado aos dados reais de arremate de veículos semelhantes (faixa de ${fmtMoney(m.dataMin)} a ${fmtMoney(m.dataMax)}), o lance ficou <b>abaixo do padrão de mercado</b> — uma compra acima da média.`);
+      else if(m.lance<=m.dataMax) P.push(`O lance está <b>dentro do padrão real de arremate</b> para este perfil de veículo (${fmtMoney(m.dataMin)} a ${fmtMoney(m.dataMax)}).`);
+      else P.push(`O lance está <b>acima do padrão real de arremate</b> de veículos como este (que costuma ir até ${fmtMoney(m.dataMax)}), reduzindo a margem de segurança da compra.`);
+    }
     if(m.pctArremateFipe>0){
       if(m.pctArremateFipe<=65) P.push(`Este veículo foi adquirido por <b>${m.pctArremateFipe.toFixed(0)}% da FIPE</b>, apresentando uma excelente margem de segurança na compra.`);
       else if(m.pctArremateFipe<=80) P.push(`O arremate saiu por <b>${m.pctArremateFipe.toFixed(0)}% da FIPE</b>, uma margem de segurança razoável.`);
@@ -11727,7 +11757,7 @@
       return;
     }
     const cl=leilaoClassify(m), pos=leilaoPosicionamento(m), fmt=fmtMoney;
-    const overMax=(m.lanceMax>0 && m.lance>m.lanceMax)?(m.lance-m.lanceMax)/m.lanceMax*100:0;
+    const temData=m.dataMax>0;
     const pctTxt=m.venda>0?`${m.pctVsMercado>=0?'+':''}${m.pctVsMercado.toFixed(1)}%`:'—';
     const c=mult=>leilaoCenarioVenda(m,mult);
     const cons=c(0.95), real=c(1.0), otim=c(1.05);
@@ -11751,11 +11781,21 @@
             ${!m.mercadoInformado?`<div style="font-size:11px;color:var(--muted);margin-top:8px">ℹ️ Preço de mercado não informado — usando a FIPE como referência. Preencha "Preço de Mercado" para um posicionamento mais preciso.</div>`:''}
           </div>
         </div>
-        ${overMax>0?`<div style="display:flex;gap:10px;align-items:flex-start;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 14px;margin-bottom:16px"><span style="font-size:16px">⚠️</span><div style="font-size:12.5px;color:var(--ink-2);line-height:1.55">Seu lance de <b>${fmt(m.lance)}</b> está <b>${overMax.toFixed(1)}% acima</b> do lance máximo recomendado (<b>${fmt(m.lanceMax)}</b>) para a sua margem alvo de ${m.margemTarget.toFixed(0)}%. Acima desse teto, a operação não atinge a margem que você definiu.</div></div>`:''}
+        ${temData?`<div style="background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">🎯 Lance recomendado — ancorado em dados reais de arremate</div>
+          <div style="display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start">
+            <div><div style="font-size:10.5px;color:var(--muted)">Faixa típica (P25–P75)</div><div style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--ink)">${fmt(m.dataMin)} – ${fmt(m.dataMax)}</div></div>
+            <div><div style="font-size:10.5px;color:var(--muted)">Teto recomendado</div><div style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:#2563EB">${fmt(m.teto)}</div></div>
+            <div><div style="font-size:10.5px;color:var(--muted)">% FIPE médio (dados)</div><div style="font-family:'Manrope',system-ui;font-weight:800;font-size:15px;color:var(--ink)">${m.dataAvgPct.toFixed(1)}%</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px">Esse teto vem do que veículos como este são realmente arrematados — <b>aumentar o preço de venda ou de mercado não eleva esse limite</b>.</div>
+        </div>`:''}
+        ${m.overTeto>0?`<div style="display:flex;gap:10px;align-items:flex-start;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 14px;margin-bottom:16px"><span style="font-size:16px">⚠️</span><div style="font-size:12.5px;color:var(--ink-2);line-height:1.55">Seu lance de <b>${fmt(m.lance)}</b> está <b>${m.overTeto.toFixed(1)}% acima</b> do teto recomendado (<b>${fmt(m.teto)}</b>)${(m.dataMax>0 && m.lance>m.dataMax)?` e acima do padrão de arremate de veículos como este (até <b>${fmt(m.dataMax)}</b>)`:''}. Pagar acima disso reduz a margem e a segurança da operação.</div></div>`:''}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 28px">
           ${vrow('Ano do veículo', m.d.ano||'—')}
           ${vrow('Quilometragem', kmTxt)}
           ${vrow('Arremate sobre FIPE', m.pctArremateFipe.toFixed(1)+'%')}
+          ${m.dataMax>0?vrow('Faixa de arremate (dados)', fmt(m.dataMin)+' – '+fmt(m.dataMax)):''}
           ${vrow('Investimento total', fmt(m.custoTotal))}
           ${vrow('Preço de venda', m.venda>0?fmt(m.venda):'—')}
           ${vrow('Diferença p/ mercado', pctTxt)}
