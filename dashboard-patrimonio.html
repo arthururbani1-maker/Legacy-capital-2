@@ -11687,20 +11687,23 @@
     const YELLOW={cls:'bom',emoji:'🟡',label:'Boa oportunidade',tone:'#10B981',reasons:['Lance dentro do padrão de mercado','Margem saudável']};
     const ORANGE={cls:'medio',emoji:'🟠',label:'Atenção',tone:'#F59E0B',reasons:['Lance no limite do padrão','Margem reduzida']};
     const RED={cls:'nao',emoji:'🔴',label:'Alto risco',tone:'#DC2626',reasons:['Lucro baixo ou lance acima do mercado real','Exposição elevada','Pouco espaço para negociação']};
-    if(m.lucro<=0 || m.margem<3) return RED;
-    let tier;
+    if(m.lucro<=0) return RED;
+    // Margem mínima exigida sobe com o capital investido (risco/exposição maiores em ticket alto)
+    const adj = m.custoTotal>200000 ? 6 : m.custoTotal>100000 ? 3 : 0;
+    // Tier pela margem, ajustado ao risco de leilão e ao capital
+    const marginTier = m.margem >= 20+adj ? 3 : m.margem >= 14+adj ? 2 : m.margem >= 10+adj ? 1 : 0;
+    // Tier pela posição do lance vs dados reais de arremate
+    let dataTier = 3;
     if(m.dataMax>0){
-      // Ancorado nos dados reais de arremate (% FIPE por faixa/KM)
-      if(m.lance <= m.dataMin) tier=3;
-      else if(m.lance <= m.dataMax) tier=2;
-      else tier=1;
-      if(m.overData>=15) tier=Math.min(tier,1);
-      if(m.overData>=30) tier=0;
-    } else {
-      tier = m.margem>=18 ? 3 : m.margem>=10 ? 2 : 1;
+      if(m.lance <= m.dataMin) dataTier=3;
+      else if(m.lance <= m.dataMax) dataTier=2;
+      else dataTier = m.overData>=15 ? 0 : 1;
     }
-    if(m.margem<8) tier=Math.min(tier,1); else if(m.margem<12 && tier===3) tier=2;
+    // Precisa ser bom nos DOIS: margem adequada E compra bem posicionada
+    let tier = Math.min(marginTier, dataTier);
+    // Liquidez: preço de venda acima do mercado atrasa o giro
     if(m.pctVsMercado>=12) tier-=2; else if(m.pctVsMercado>=5) tier-=1;
+    // Teto da margem alvo
     if(m.margemMax>0 && m.lance>m.margemMax){
       const over=(m.lance-m.margemMax)/m.margemMax*100;
       tier = over>=20 ? 0 : over>=8 ? Math.min(tier,1) : Math.min(tier,2);
@@ -11728,9 +11731,10 @@
       else P.push(`O arremate representa <b>${m.pctArremateFipe.toFixed(0)}% da FIPE</b>, deixando pouca margem de segurança na compra.`);
     }
     if(m.lucro>0){
-      if(m.margem>=20) P.push(`Mesmo considerando custos de regularização e recuperação, a operação tem potencial de lucro acima da média (margem de ${m.margem.toFixed(1)}%).`);
-      else if(m.margem>=10) P.push(`Após os custos de regularização e recuperação, a operação mantém uma margem saudável de ${m.margem.toFixed(1)}%.`);
-      else P.push(`Após todos os custos, a margem fica apertada (${m.margem.toFixed(1)}%), exigindo atenção na precificação.`);
+      const adj = m.custoTotal>200000 ? 6 : m.custoTotal>100000 ? 3 : 0;
+      if(m.margem>=20+adj) P.push(`Mesmo com custos de regularização e recuperação, a margem de ${m.margem.toFixed(1)}% é forte para o nível de risco de um veículo de leilão.`);
+      else if(m.margem>=14+adj) P.push(`A margem de ${m.margem.toFixed(1)}% é adequada ao risco de leilão e ao capital envolvido.`);
+      else P.push(`A margem de ${m.margem.toFixed(1)}% é apertada para um veículo de leilão${m.custoTotal>100000?` desse valor (${fmtMoney(m.custoTotal)} investidos)`:''}: o retorno não compensa bem o risco de avarias, débitos e o capital imobilizado. Recomenda-se exigir uma margem maior ou renegociar o lance.`);
     } else {
       P.push(`Nos números atuais, a operação não apresenta lucro — recomenda-se renegociar o lance ou revisar os custos antes de avançar.`);
     }
