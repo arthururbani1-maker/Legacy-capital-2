@@ -11661,7 +11661,7 @@
     const pctVsMercado = (mercado>0 && venda>0) ? (venda-mercado)/mercado*100 : 0;
     return { d, c, fipe, mercado, venda, lance, pctArremateFipe, pctVsMercado,
              custoTotal:c.custoTotal, lucro:c.lucro, margem:c.margem, roi:c.rentabilidade,
-             mercadoInformado: d.mercado>0 };
+             mercadoInformado: d.mercado>0, lanceMax:c.lanceMax, margemTarget:d.margemTarget||20 };
   }
   function leilaoClassify(m){
     const GREEN={cls:'otimo',emoji:'🟢',label:'Excelente oportunidade',tone:'#16A34A',reasons:['Compra abaixo do mercado','Alta margem de lucro','Boa liquidez de venda']};
@@ -11672,6 +11672,12 @@
     let tier = m.margem>=18 ? 3 : m.margem>=10 ? 2 : 1;
     if(m.pctArremateFipe<=60 && m.margem>=12 && tier<3) tier++;
     if(m.pctVsMercado>=12) tier-=2; else if(m.pctVsMercado>=5) tier-=1;
+    // Coerência: se o lance ultrapassa o máximo recomendado p/ a margem alvo, não pode ser excelente/boa
+    if(m.lanceMax>0 && m.lance>m.lanceMax){
+      const over=(m.lance-m.lanceMax)/m.lanceMax*100;
+      // acima do teto recomendado nunca é 'excelente'; bem acima cai para atenção/risco
+      tier = over>=20 ? 0 : over>=8 ? Math.min(tier,1) : Math.min(tier,2);
+    }
     if(tier>=3) return GREEN;
     if(tier===2) return YELLOW;
     if(tier===1) return ORANGE;
@@ -11698,6 +11704,10 @@
     } else {
       P.push(`Nos números atuais, a operação não apresenta lucro — recomenda-se renegociar o lance ou revisar os custos antes de avançar.`);
     }
+    if(m.lanceMax>0 && m.lance>m.lanceMax){
+      const over=(m.lance-m.lanceMax)/m.lanceMax*100;
+      P.push(`Vale destacar que o lance está <b>${over.toFixed(0)}% acima do lance máximo recomendado</b> (${fmtMoney(m.lanceMax)}) para a margem alvo de ${(m.margemTarget||20).toFixed(0)}%, o que puxa a rentabilidade abaixo da meta definida.`);
+    }
     if(m.venda>0){
       if(m.pctVsMercado<=-3) P.push(`O preço de venda está abaixo do mercado, favorecendo a velocidade de giro do estoque.`);
       else if(m.pctVsMercado<3) P.push(`O preço de venda sugerido está competitivo em relação ao mercado e oferece boa velocidade de giro.`);
@@ -11717,6 +11727,7 @@
       return;
     }
     const cl=leilaoClassify(m), pos=leilaoPosicionamento(m), fmt=fmtMoney;
+    const overMax=(m.lanceMax>0 && m.lance>m.lanceMax)?(m.lance-m.lanceMax)/m.lanceMax*100:0;
     const pctTxt=m.venda>0?`${m.pctVsMercado>=0?'+':''}${m.pctVsMercado.toFixed(1)}%`:'—';
     const c=mult=>leilaoCenarioVenda(m,mult);
     const cons=c(0.95), real=c(1.0), otim=c(1.05);
@@ -11740,6 +11751,7 @@
             ${!m.mercadoInformado?`<div style="font-size:11px;color:var(--muted);margin-top:8px">ℹ️ Preço de mercado não informado — usando a FIPE como referência. Preencha "Preço de Mercado" para um posicionamento mais preciso.</div>`:''}
           </div>
         </div>
+        ${overMax>0?`<div style="display:flex;gap:10px;align-items:flex-start;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px 14px;margin-bottom:16px"><span style="font-size:16px">⚠️</span><div style="font-size:12.5px;color:var(--ink-2);line-height:1.55">Seu lance de <b>${fmt(m.lance)}</b> está <b>${overMax.toFixed(1)}% acima</b> do lance máximo recomendado (<b>${fmt(m.lanceMax)}</b>) para a sua margem alvo de ${m.margemTarget.toFixed(0)}%. Acima desse teto, a operação não atinge a margem que você definiu.</div></div>`:''}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 28px">
           ${vrow('Ano do veículo', m.d.ano||'—')}
           ${vrow('Quilometragem', kmTxt)}
