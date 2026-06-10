@@ -1183,6 +1183,19 @@
   .cc-fatura{font-size:18px;font-weight:800;letter-spacing:-.5px}
   .cc-info{font-size:10px;opacity:.8;text-align:right}
   .cc-info span{display:block}
+  .credit-card{min-height:160px;border-radius:16px}
+  .credit-card .cc-chip{width:30px;height:22px;border-radius:5px;background:linear-gradient(135deg,#f6db94,#cfa241);position:relative;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+  .credit-card .cc-chip::after{content:'';position:absolute;inset:5px 6px;border:1px solid rgba(0,0,0,.18);border-radius:2px}
+  .credit-card .cc-name-row{margin-top:11px}
+  .credit-card .cc-nome{font-size:15px;font-weight:800;letter-spacing:-.2px;margin:0}
+  .credit-card .cc-banco{font-size:10.5px;opacity:.82;margin-top:1px}
+  .credit-card .cc-limit{margin-top:13px}
+  .credit-card .cc-lim-head{display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:6px}
+  .credit-card .cc-status{background:rgba(255,255,255,.2);padding:2px 9px;border-radius:99px;font-weight:700;font-size:10px}
+  .credit-card .cc-lim-bar{height:6px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden;margin:0}
+  .credit-card .cc-lim-fill{height:100%;border-radius:99px;transition:width .5s}
+  .credit-card .cc-lim-foot{display:flex;justify-content:space-between;font-size:10px;opacity:.88;margin-top:6px}
+  .credit-card .cc-lbl{font-size:9px;opacity:.72;margin-bottom:1px;text-transform:uppercase;letter-spacing:.5px}
 
   /* Lançamentos cartão */
   .lancamentos-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -2499,6 +2512,10 @@
           <input type="text" id="cc_nome" placeholder="Ex: Nubank Mastercard">
         </div>
         <div class="fg-field">
+          <label>Banco / Instituição</label>
+          <input type="text" id="cc_banco" placeholder="Ex: Nubank">
+        </div>
+        <div class="fg-field">
           <label>Bandeira</label>
           <select id="cc_bandeira">
             <option value="Visa">Visa</option>
@@ -2511,6 +2528,10 @@
         <div class="fg-field">
           <label>Limite total (R$)</label>
           <input type="text" id="cc_limite" placeholder="R$ 0,00">
+        </div>
+        <div class="fg-field">
+          <label>Limite já utilizado (R$) <span style="font-weight:400;color:var(--muted);font-size:10px">opcional</span></label>
+          <input type="text" id="cc_usado" placeholder="R$ 0,00">
         </div>
         <div class="fg-field">
           <label>Dia de vencimento *</label>
@@ -10619,7 +10640,8 @@
   // Retorna o saldo pendente total de um cartão (todas as compras não quitadas)
   // Cada lançamento: saldo = (totalParcelas - parcelasPagas) × valorParcela
   function calcCartaoLimiteUtilizado(cartaoId){
-    return (state.cartaoLancamentos||[])
+    const base = ((state.cartoes||[]).find(c=>c.id===cartaoId)||{}).usadoInicial || 0;
+    return base + (state.cartaoLancamentos||[])
       .filter(l => l.cartaoId === cartaoId)
       .reduce((s, l) => {
         const pagas    = l.parcelasPagas || 0;
@@ -10872,36 +10894,30 @@
       const limiteDisp = Math.max(0, limiteTotal - limiteUtilizado);
       const pct = limiteTotal>0 ? Math.min(limiteUtilizado/limiteTotal*100,100) : 0;
       const pctColor = pct>80?'#ef4444':pct>50?'#f59e0b':'rgba(255,255,255,.75)';
+      const stInfo = pct>80?['🔴','No limite','#ef4444'] : pct>50?['🟡','Atenção','#f59e0b'] : ['🟢','Saudável','#22c55e'];
       const isSelected=_selectedCartaoId===c.id;
       // Parcelas pendentes neste cartão
       const totalLancs = (state.cartaoLancamentos||[]).filter(l=>l.cartaoId===c.id).length;
       return `<div class="credit-card${isSelected?' selected':''}" style="background:linear-gradient(135deg,${c.cor||'#4F46E5'},${adjustColor(c.cor||'#4F46E5',40)})" onclick="selectCartao('${c.id}')">
         <div class="cc-top">
-          <div class="cc-bandeira">${c.bandeira||'Mastercard'}</div>
+          <div style="display:flex;align-items:center;gap:9px"><span class="cc-chip"></span><div class="cc-bandeira">${c.bandeira||'Mastercard'}</div></div>
           <div class="cc-actions">
             <button class="cc-btn" onclick="event.stopPropagation();openCartaoModal('${c.id}')" title="Editar">✎</button>
             <button class="cc-btn" onclick="event.stopPropagation();deleteCartao('${c.id}')" title="Excluir">✕</button>
           </div>
         </div>
-        <div class="cc-limit">
+        <div class="cc-name-row">
           <div class="cc-nome">${c.nome}</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-            <span style="font-size:9px;opacity:.7">Limite utilizado</span>
-            <span style="font-size:9px;opacity:.85;font-weight:700">${pct.toFixed(0)}%</span>
-          </div>
-          <div class="cc-lim-bar"><div class="cc-lim-fill" style="width:${pct}%;background:${pctColor}"></div></div>
+          ${c.banco?`<div class="cc-banco">${c.banco}</div>`:''}
+        </div>
+        <div class="cc-limit">
+          <div class="cc-lim-head"><span class="cc-status">${stInfo[0]} ${stInfo[1]}</span><span style="font-weight:800">${pct.toFixed(0)}%</span></div>
+          <div class="cc-lim-bar"><div class="cc-lim-fill" style="width:${pct}%;background:${stInfo[2]}"></div></div>
+          <div class="cc-lim-foot"><span>Usado ${BRL(limiteUtilizado)}</span><span>Disp. ${BRL(limiteDisp)}</span></div>
         </div>
         <div class="cc-bottom">
-          <div>
-            <div style="font-size:9px;opacity:.7;margin-bottom:1px">Fatura este mês</div>
-            <div class="cc-fatura">${BRL(fatura)}</div>
-          </div>
-          <div class="cc-info" style="text-align:right">
-            <span style="font-weight:700;opacity:1">Disp. ${BRL(limiteDisp)}</span>
-            <span>Usado ${BRL(limiteUtilizado)}</span>
-            <span>Total ${BRL(limiteTotal)} · Venc. dia ${c.diaVencimento||'—'}</span>
-            <span>${totalLancs} lançamento(s)</span>
-          </div>
+          <div><div class="cc-lbl">Fatura do mês</div><div class="cc-fatura">${BRL(fatura)}</div></div>
+          <div class="cc-info" style="text-align:right"><span>Limite ${BRL(limiteTotal)}</span><span>Venc. dia ${c.diaVencimento||'—'}</span><span>${totalLancs} lançamento(s)</span></div>
         </div>
       </div>`;
     }).join('');
@@ -11096,8 +11112,10 @@
     const c = id ? (state.cartoes||[]).find(x=>x.id===id) : null;
     document.getElementById('cartaoModalTitle').textContent = id?'Editar Cartão':'Novo Cartão de Crédito';
     document.getElementById('cc_nome').value = c?.nome||'';
+    document.getElementById('cc_banco').value = c?.banco||'';
     document.getElementById('cc_bandeira').value = c?.bandeira||'Mastercard';
     document.getElementById('cc_limite').value = c ? fmtMoney(c.limite||0) : '';
+    document.getElementById('cc_usado').value = (c&&c.usadoInicial) ? fmtMoney(c.usadoInicial) : '';
     document.getElementById('cc_vencimento').value = c?.diaVencimento||'';
     document.getElementById('cc_fechamento').value = c?.diaFechamento||'';
     _selectedCcCor = c?.cor||'#4F46E5';
@@ -11118,8 +11136,10 @@
     const obj={
       id: _editingCartaoId||'cc_'+uid(),
       nome,
+      banco: document.getElementById('cc_banco').value.trim(),
       bandeira: document.getElementById('cc_bandeira').value,
       limite: parseMoney(document.getElementById('cc_limite').value)||0,
+      usadoInicial: parseMoney(document.getElementById('cc_usado').value)||0,
       diaVencimento: parseInt(document.getElementById('cc_vencimento').value)||10,
       diaFechamento: parseInt(document.getElementById('cc_fechamento').value)||3,
       cor: _selectedCcCor
