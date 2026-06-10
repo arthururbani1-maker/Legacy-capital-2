@@ -1867,16 +1867,16 @@
     </div>
 
     <!-- PLANEJAMENTO (colapsado por padrão) -->
-    <div class="sb-group collapsed" id="sbg-planejamento">
+    <div class="sb-group" id="sbg-planejamento">
       <div class="sb-group-hdr" onclick="toggleSbGroup('sbg-planejamento')">
         <span class="sb-group-label">Planejamento</span>
         <span class="sb-group-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <div class="sb-group-items">
-        <button class="sb-item soon" onclick="toast('Em breve — Metas financeiras','info')">
+        <button class="sb-item" id="sb-metas" onclick="showSection('metas')">
           <span class="sb-item-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg></span>
-          <span class="sb-item-lbl">Metas</span><span class="sb-badge-soon">Breve</span>
-          <span class="sb-tip">Metas — Em breve</span>
+          <span class="sb-item-lbl">Metas</span>
+          <span class="sb-tip">Metas e Objetivos</span>
         </button>
         <button class="sb-item soon" onclick="toast('Em breve — Simulações','info')">
           <span class="sb-item-ico"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
@@ -2193,7 +2193,6 @@
       <button class="renda-tab-btn" id="rtab-saidas" onclick="showRendaTab('saidas')">🔴 Saídas <span class="renda-tab-badge" id="rtb-cnt-sai">0</span></button>
       <button class="renda-tab-btn" id="rtab-rendaview" onclick="showRendaTab('rendaview')">💰 Renda</button>
       <button class="renda-tab-btn" id="rtab-contas" onclick="showRendaTab('contas')">🏦 Contas</button>
-      <button class="renda-tab-btn" id="rtab-metas" onclick="showRendaTab('metas')">🎯 Metas</button>
     </div>
 
     <!-- TAB: DASHBOARD -->
@@ -2266,15 +2265,16 @@
     </div>
 
     <!-- TAB: METAS -->
-    <div class="renda-pane" id="rp-metas">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="font-size:13px;color:var(--muted)">Defina metas mensais ou anuais de receita, economia e patrimônio.</div>
-        <button class="tba primary" onclick="openMetaModal(null)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="tba-txt">Nova meta</span></button>
-      </div>
-      <div class="goals-grid" id="renda_goals"></div>
-    </div>
-
   </div><!-- /sec-renda -->
+
+  <!-- ═══ METAS (Planejamento) ═══ -->
+  <div class="page-sec" id="sec-metas">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--muted);max-width:560px">Defina metas mensais ou anuais. O progresso é calculado pelo seu <b>resultado líquido</b> (entradas − saídas) da Conta Corrente, atualizado em tempo real.</div>
+      <button class="tba primary" onclick="openMetaModal(null)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="tba-txt">Nova meta</span></button>
+    </div>
+    <div class="goals-grid" id="renda_goals"></div>
+  </div><!-- /sec-metas -->
 
   <!-- ═══ DÍVIDAS ═══ -->
   <div class="page-sec" id="sec-dividas">
@@ -8284,7 +8284,8 @@
     ativos:       { title:'Meus Ativos',       sub:'Imóveis, consórcios, leilões e investimentos' },
     calendario:   { title:'Calendário',        sub:'Parcelas, custos e contas recorrentes' },
     fluxo:        { title:'Fluxo de Caixa',    sub:'Projeção de compromissos e cenários futuros' },
-    renda:        { title:'Controle de Renda', sub:'Entradas, saídas, metas e controle de fluxo' },
+    renda:        { title:'Controle de Renda', sub:'Entradas, saídas, contas e fluxo financeiro' },
+    metas:        { title:'Metas e Objetivos', sub:'Acompanhe suas metas pelo resultado líquido real' },
     dividas:      { title:'Dívidas',           sub:'Cartões, empréstimos e despesas fixas' },
     comprovantes: { title:'Comprovantes',      sub:'Leitor inteligente de boletos e recibos' },
     relatorios:   { title:'Relatórios',        sub:'Dossiê, exportação e manutenção de dados' },
@@ -9751,7 +9752,6 @@
     if(name==='saidas') renderRendaTable('expense');
     if(name==='rendaview') renderRendaView();
     if(name==='contas') renderContas();
-    if(name==='metas') renderMetas();
   }
 
   /* ---- Main render ---- */
@@ -11230,6 +11230,7 @@
     // Lazy render for section-specific content
     if(name === 'fluxo') setTimeout(()=>{ if(typeof renderFluxo==='function') renderFluxo(); if(typeof renderProjecao==='function') renderProjecao(); window.dispatchEvent(new Event('resize')); }, 80);
     if(name === 'indicar') renderIndicar();
+    if(name === 'metas') setTimeout(()=>{ if(typeof renderMetas==='function') renderMetas(); }, 60);
     if(name === 'calendario') setTimeout(()=>{ if(typeof renderCalendar==='function') renderCalendar(); }, 60);
     if(name === 'renda') setTimeout(()=>{ if(typeof renderRendaSection==='function') renderRendaSection(); }, 60);
     if(name === 'relatorios') setTimeout(()=>{ if(typeof renderRelatoriosRenda==='function') renderRelatoriosRenda(); }, 60);
