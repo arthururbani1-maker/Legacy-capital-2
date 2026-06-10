@@ -10511,6 +10511,7 @@
       RS.expenses=RS.expenses.filter(e=>e.id!==id);
     }
     saveRS(); closeRendaModal(); toast('Excluído','success'); renderRendaSection();
+    if(typeof renderDividas==='function' && document.getElementById('div_cartoes_list')) renderDividas();
   }
 
   function duplicateRendaEntry(type,id){
@@ -11219,10 +11220,41 @@
     saveState(); closeLancamentoModal(); renderDividas();
     toast(`✅ Compra de ${BRL(valor)} registrada${totalParcelas>1?` em ${totalParcelas}x de ${BRL(valorParcela)}`:''}`, 'success');
   }
+  function _lancRemoverSaidaVinculada(l){
+    if(!l) return;
+    if(l.rendaExpenseId){ RS.expenses=(RS.expenses||[]).filter(e=>e.id!==l.rendaExpenseId); }
+    RS.expenses=(RS.expenses||[]).filter(e=>e.cartaoLancId!==l.id);
+  }
   function deleteLancamento(id){
-    if(!confirm('Confirmar exclusão do lançamento?')) return;
-    state.cartaoLancamentos=(state.cartaoLancamentos||[]).filter(x=>x.id!==id);
-    saveState(); renderDividas(); toast('Lançamento excluído','success');
+    const l=(state.cartaoLancamentos||[]).find(x=>x.id===id);
+    if(!l){ if(confirm('Confirmar exclusão do lançamento?')){ state.cartaoLancamentos=(state.cartaoLancamentos||[]).filter(x=>x.id!==id); saveState(); renderDividas(); } return; }
+    const total=l.totalParcelas||1;
+    if(total>1){
+      if(!confirm(`Esta compra é parcelada em ${total}x. Deseja excluir?`)) return;
+      const tudo=confirm(`Excluir TODAS as ${total} parcelas e a saída vinculada no Controle de Renda?\n\nOK = excluir a compra inteira\nCancelar = excluir apenas 1 parcela (passa para ${total-1}x)`);
+      if(tudo){
+        _lancRemoverSaidaVinculada(l);
+        state.cartaoLancamentos=(state.cartaoLancamentos||[]).filter(x=>x.id!==id);
+        toast('Compra parcelada e saída vinculada excluídas','success');
+      } else {
+        const novoTotal=total-1;
+        l.totalParcelas=novoTotal;
+        l.valor=Math.max(0,(l.valor||0)-(l.valorParcela||0));
+        if((l.parcelasPagas||0)>novoTotal) l.parcelasPagas=novoTotal;
+        l.parcelaAtual=Math.min((l.parcelasPagas||0)+1,novoTotal);
+        const exp=(RS.expenses||[]).find(e=>e.id===l.rendaExpenseId || e.cartaoLancId===l.id);
+        if(exp){ exp.value=l.valor; if(exp.cartaoParcelas!=null) exp.cartaoParcelas=novoTotal; }
+        toast(`1 parcela removida · compra agora ${novoTotal}x`,'success');
+      }
+    } else {
+      if(!confirm('Excluir este lançamento e a saída vinculada no Controle de Renda?')) return;
+      _lancRemoverSaidaVinculada(l);
+      state.cartaoLancamentos=(state.cartaoLancamentos||[]).filter(x=>x.id!==id);
+      toast('Lançamento e saída vinculada excluídos','success');
+    }
+    saveState(); saveRS();
+    renderDividas();
+    if(typeof renderRendaSection==='function') renderRendaSection();
   }
 
   // Marca a próxima parcela como paga — libera valorParcela do limite
