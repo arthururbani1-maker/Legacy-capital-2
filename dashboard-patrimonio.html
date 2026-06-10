@@ -345,6 +345,16 @@
   .goal-card .gc-bar i{display:block;height:100%;border-radius:999px;transition:.5s ease}
   .goal-card .gc-foot{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
   .goal-card .gc-pct{font-weight:800;color:var(--accent-2)}
+  .metas-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .mkpi{background:var(--bg-elev);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+  .mkpi-lbl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+  .mkpi-val{font-family:'Manrope',system-ui;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.5px}
+  .mkpi-sub{font-size:11px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .goal-card .gc-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+  .goal-card .gc-status.ad{background:rgba(34,197,94,.12);color:#16a34a}
+  .goal-card .gc-status.ok{background:rgba(245,158,11,.13);color:#b45309}
+  .goal-card .gc-status.at{background:rgba(239,68,68,.12);color:#dc2626}
+  .goal-card.done{background:linear-gradient(135deg,rgba(34,197,94,.09),rgba(16,185,129,.05));border-color:rgba(34,197,94,.32)}
 
   /* Income control specific */
   .ric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:20px}
@@ -2269,9 +2279,14 @@
 
   <!-- ═══ METAS (Planejamento) ═══ -->
   <div class="page-sec" id="sec-metas">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px">
-      <div style="font-size:13px;color:var(--muted);max-width:560px">Defina metas mensais ou anuais. O progresso é calculado pelo seu <b>resultado líquido</b> (entradas − saídas) da Conta Corrente, atualizado em tempo real.</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="font-size:13px;color:var(--muted);max-width:520px">Acompanhe sua evolução pelo <b>resultado líquido</b> (entradas − saídas) da Conta Corrente, em tempo real.</div>
       <button class="tba primary" onclick="openMetaModal(null)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="tba-txt">Nova meta</span></button>
+    </div>
+    <div id="metas_kpis" style="margin-bottom:18px"></div>
+    <div id="metas_chart_card" class="card" style="padding:20px;margin-bottom:18px;display:none">
+      <div class="card-h"><div><h3>Evolução do Resultado Líquido</h3><div class="sub">Acumulado real × ritmo ideal · <span id="metas_chart_year"></span></div></div></div>
+      <div class="chart-wrap"><canvas id="metas_chart"></canvas></div>
     </div>
     <div class="goals-grid" id="renda_goals"></div>
   </div><!-- /sec-metas -->
@@ -2814,6 +2829,7 @@
         </div>
         <div class="field"><label>Valor alvo (R$) *</label><input type="number" id="mm_target" step="0.01" min="0" placeholder="0,00"></div>
         <div class="field"><label>Emoji / ícone</label><input type="text" id="mm_emoji" placeholder="🎯" maxlength="2"></div>
+        <div class="field"><label>Prazo <span style="font-weight:400;color:var(--muted)">(opcional)</span></label><input type="month" id="mm_deadline"></div>
       </div>
       <div class="modal-f">
         <button class="btn danger" id="mm_delete_btn" style="display:none" onclick="deleteMetaEntry()">Excluir</button>
@@ -10128,48 +10144,135 @@
   /* ---- Goals ---- */
   function renderMetas(){
     const grid=document.getElementById('renda_goals'); if(!grid) return;
-    const m=RS.month,y=RS.year;
+    const kpiEl=document.getElementById('metas_kpis');
+    const chartCard=document.getElementById('metas_chart_card');
+    const m=RS.month, y=RS.year;
+    const isCY=(new Date().getFullYear()===y);
+    const curMonthIdx=isCY?new Date().getMonth():11;
+    const monthsElapsed=curMonthIdx+1;
     const recM=calcIncome(m,y,'recebido'), expM=calcExpense(m,y,true);
     const recA=calcIncomeYear(y,'recebido'), expA=calcExpenseYear(y,true);
     const pat=(typeof state!=='undefined'?state.assets.reduce((s,a)=>s+Number(a.currentValue||0),0):0)+totalAccBalance();
-    if(!RS.goals.length){ grid.innerHTML=`<div class="es" style="grid-column:1/-1"><div class="es-ico">🎯</div><div class="es-title">Nenhuma meta criada</div><div class="es-sub">Defina metas de receita, economia e patrimônio para visualizar seu progresso em tempo real.</div><button class="btn" onclick="openMetaModal(null)">+ Nova meta</button></div>`; return; }
-    grid.innerHTML=RS.goals.map(g=>{
-      const anual = g.period==='anual';
-      const entradas = anual?recA:recM;
-      const saidas   = anual?expA:expM;
-      const liquido  = entradas - saidas;
-      const basis = g.basis || 'liquido';
-      let cur, isResult=false;
+    const MES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    if(!RS.goals.length){
+      if(kpiEl) kpiEl.innerHTML='';
+      if(chartCard) chartCard.style.display='none';
+      grid.innerHTML=`<div class="es" style="grid-column:1/-1"><div class="es-ico">🎯</div><div class="es-title">Nenhuma meta criada</div><div class="es-sub">Crie sua primeira meta — reserva de emergência, entrada do imóvel, liberdade financeira — e acompanhe sua evolução em tempo real.</div><button class="btn primary" onclick="openMetaModal(null)">+ Nova meta</button></div>`;
+      return;
+    }
+    const metrics=RS.goals.map(g=>{
+      const anual=g.period==='anual';
+      const entradas=anual?recA:recM, saidas=anual?expA:expM, liquido=entradas-saidas;
+      const basis=g.basis||'liquido';
+      let cur,isResult=false;
       if(g.type==='patrimonio') cur=pat;
       else if(g.type==='despesa') cur=saidas;
-      else { isResult=true; cur = basis==='bruto' ? entradas : liquido; }
-      const pctRaw = g.target>0 ? (cur/g.target)*100 : 0;
-      const pct = Math.max(0, Math.min(100, pctRaw));
-      const barColor = pct>=100?'var(--accent)':pct>=60?'var(--gold)':'var(--info)';
-      const falta = Math.max(0, g.target-cur);
-      const breakdown = isResult ? `
-        <div style="display:flex;flex-direction:column;gap:6px;margin:12px 0 2px;padding-top:11px;border-top:1px solid var(--line)">
-          <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:var(--muted)">Entradas</span><span style="font-weight:700;color:var(--accent-2)">${fmtMoney(entradas)}</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:var(--muted)">Saídas</span><span style="font-weight:700;color:var(--danger)">− ${fmtMoney(saidas)}</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;padding-top:6px;border-top:1px dashed var(--line)"><span style="font-weight:700;color:var(--ink-2)">${basis==='bruto'?'Receita bruta':'Resultado líquido'}</span><span style="font-weight:800;color:var(--ink)">${fmtMoney(cur)}</span></div>
-        </div>` : '';
-      const tag = isResult ? (basis==='bruto'?' · Bruto':' · Líquido') : (g.type==='patrimonio'?' · Patrimônio':g.type==='despesa'?' · Limite':'');
+      else { isResult=true; cur=basis==='bruto'?entradas:liquido; }
+      const pctRaw=g.target>0?cur/g.target*100:0;
+      const pct=Math.max(0,Math.min(100,pctRaw));
+      const falta=Math.max(0,g.target-cur);
+      const mElapsed=anual?monthsElapsed:1;
+      const rate=mElapsed>0?cur/mElapsed:cur;
+      let prazoTxt='',monthsToDeadline=null,expectedPct=null;
+      if(g.deadline){
+        const p=g.deadline.split('-'); const dy=+p[0], dm=+p[1]||1;
+        prazoTxt=(MES[dm-1]||'')+' de '+dy;
+        const now=new Date(); const dl=new Date(dy,dm-1,1);
+        monthsToDeadline=Math.max(0,(dl.getFullYear()-now.getFullYear())*12+(dl.getMonth()-now.getMonth()));
+        const totalWin=monthsToDeadline+monthsElapsed;
+        expectedPct=totalWin>0?monthsElapsed/totalWin*100:null;
+      } else if(anual){ prazoTxt='Dez de '+y; expectedPct=monthsElapsed/12*100; monthsToDeadline=Math.max(0,12-monthsElapsed); }
+      const projMeses=(rate>0&&falta>0)?Math.ceil(falta/rate):(falta<=0?0:null);
+      const neededPerMonth=(monthsToDeadline&&monthsToDeadline>0&&falta>0)?falta/monthsToDeadline:null;
+      let status='ok';
+      if(pctRaw>=100) status='done';
+      else if(expectedPct!=null){ status = pctRaw>=expectedPct+8?'ad':pctRaw>=expectedPct-8?'ok':'at'; }
+      else { status = pctRaw>=60?'ad':pctRaw>=30?'ok':'at'; }
+      return {g,anual,entradas,saidas,isResult,cur,pctRaw,pct,falta,rate,prazoTxt,monthsToDeadline,expectedPct,projMeses,neededPerMonth,status};
+    });
+    // KPIs
+    const ativas=metrics.filter(x=>x.pctRaw<100).length;
+    const valorTotal=metrics.reduce((s,x)=>s+x.g.target,0);
+    const acumulado=metrics.reduce((s,x)=>s+Math.min(x.cur,x.g.target),0);
+    const pctMedio=metrics.length?metrics.reduce((s,x)=>s+x.pct,0)/metrics.length:0;
+    const proxima=metrics.filter(x=>x.pctRaw<100).sort((a,b)=>b.pctRaw-a.pctRaw)[0];
+    if(kpiEl){
+      const kc=(lbl,val,sub)=>`<div class="mkpi"><div class="mkpi-lbl">${lbl}</div><div class="mkpi-val">${val}</div>${sub?`<div class="mkpi-sub">${sub}</div>`:''}</div>`;
+      kpiEl.innerHTML=`<div class="metas-kpis">
+        ${kc('Metas ativas', ativas, metrics.length+' no total')}
+        ${kc('Valor total', fmtMoney(valorTotal), 'soma das metas')}
+        ${kc('Já conquistado', fmtMoney(acumulado), 'acumulado')}
+        ${kc('Conclusão média', Math.round(pctMedio)+'%', 'progresso geral')}
+        ${kc('Mais próxima', proxima?Math.round(proxima.pctRaw)+'%':'—', proxima?proxima.g.name:'todas concluídas 🎉')}
+      </div>`;
+    }
+    // Gráfico de evolução
+    if(chartCard && typeof Chart!=='undefined'){
+      const refTarget=metrics.filter(x=>x.anual).reduce((s,x)=>s+x.g.target,0) || Math.max.apply(null,metrics.map(x=>x.g.target));
+      const cum=[]; let acc=0;
+      for(let mo=0;mo<12;mo++){
+        if(mo<=curMonthIdx){
+          const inc=RS.income.filter(i=>{const d=new Date(i.date+'T12:00');return d.getFullYear()===y&&d.getMonth()===mo&&i.status==='recebido';}).reduce((s,i)=>s+Number(i.value||0),0);
+          const exp=RS.expenses.filter(e=>{const d=new Date(e.date+'T12:00');return d.getFullYear()===y&&d.getMonth()===mo&&e.paid;}).reduce((s,e)=>s+Number(e.value||0),0);
+          acc+=inc-exp; cum.push(Math.round(acc));
+        } else cum.push(null);
+      }
+      const ideal=Array.from({length:12},(_,i)=>Math.round(refTarget*(i+1)/12));
+      chartCard.style.display='';
+      const yEl=document.getElementById('metas_chart_year'); if(yEl) yEl.textContent=String(y);
+      const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+      if(charts.metas) charts.metas.destroy();
+      charts.metas=new Chart(document.getElementById('metas_chart'),{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],datasets:[
+        {label:'Progresso real',data:cum,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:.3,borderWidth:2.5,pointRadius:3,spanGaps:false},
+        {label:'Meta ideal',data:ideal,borderColor:'#94A3B8',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false,tension:0}
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,usePointStyle:true,color:isDark?'#C8CDD6':'#334155',font:{size:11.5}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y!=null?fmtMoney(c.parsed.y):'—')}}},scales:{y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:isDark?'#8B92A0':'#64748B'},grid:{color:isDark?'#1F2433':'#F1F5F9'}},x:{grid:{display:false},ticks:{color:isDark?'#8B92A0':'#64748B'}}}}});
+    }
+    // Cards
+    const MOTIV=pct=> pct>=100?'🏆 Conquistada!' : pct>=75?'🔥 Quase lá — falta pouco!' : pct>=50?'💪 Metade do caminho!' : pct>=25?'🚀 Bom começo, siga firme!' : '🌱 Primeiros passos';
+    const STAT={ad:['🟢','Adiantado','ad'],ok:['🟡','No planejado','ok'],at:['🔴','Atrasado','at'],done:['🏆','Concluída','ad']};
+    const editBtn=id=>`<button class="rta" style="width:22px;height:22px" onclick="openMetaModal('${id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
+    grid.innerHTML=metrics.map(x=>{
+      const g=x.g;
+      if(x.pctRaw>=100){
+        return `<div class="goal-card done">
+          <div style="text-align:center;padding:8px 0 4px">
+            <div style="font-size:36px">🏆</div>
+            <div style="font-size:14px;font-weight:800;color:var(--ink);margin-top:6px">${g.emoji||''} ${g.name}</div>
+            <div style="font-size:12px;color:var(--accent-2);font-weight:700;margin-top:3px">Meta concluída!</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:7px">${fmtMoney(x.cur)} de ${fmtMoney(g.target)}${x.prazoTxt?' · prazo '+x.prazoTxt:''}</div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px">${editBtn(g.id)}</div>
+        </div>`;
+      }
+      const barColor=x.status==='at'?'var(--danger)':x.status==='ad'?'var(--accent)':'var(--gold)';
+      const st=STAT[x.status];
+      let projTxt='';
+      if(x.status==='at'&&x.neededPerMonth){ projTxt=`Para bater o prazo: ~<b>${fmtMoney(x.neededPerMonth)}/mês</b>`; }
+      else if(x.projMeses!=null&&x.projMeses>0){ const mm=x.projMeses; const t=mm>=12?`${Math.floor(mm/12)} ano${Math.floor(mm/12)>1?'s':''}${mm%12?' e '+(mm%12)+' m':''}`:`${mm} ${mm>1?'meses':'mês'}`; projTxt=`No ritmo atual: meta em <b>${t}</b>`; }
+      const breakdown=x.isResult?`
+        <div style="display:flex;flex-direction:column;gap:5px;margin:10px 0 2px;padding-top:10px;border-top:1px solid var(--line)">
+          <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Entradas</span><span style="font-weight:700;color:var(--accent-2)">${fmtMoney(x.entradas)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Saídas</span><span style="font-weight:700;color:var(--danger)">− ${fmtMoney(x.saidas)}</span></div>
+        </div>`:'';
       return `<div class="goal-card">
         <div class="gc-head">
           <div class="gc-title">${g.emoji||'🎯'} ${g.name}</div>
-          <div class="gc-period">${anual?'Anual':'Mensal'}${tag}</div>
+          <span class="gc-status ${st[2]}">${st[0]} ${st[1]}</span>
         </div>
         <div class="gc-vals">
-          <div class="gc-current">${fmtMoney(cur)}</div>
+          <div class="gc-current">${fmtMoney(x.cur)}</div>
           <div class="gc-target">meta: ${fmtMoney(g.target)}</div>
         </div>
-        <div class="gc-bar"><i style="width:${pct}%;background:${barColor}"></i></div>
-        ${breakdown}
+        <div class="gc-bar"><i style="width:${x.pct}%;background:${barColor}"></i></div>
         <div class="gc-foot">
-          <span class="gc-pct">${Math.round(pctRaw)}%</span>
-          <span>${cur>=g.target?'✅ Meta atingida!':'Falta '+fmtMoney(falta)}</span>
-          <button class="rta" style="width:22px;height:22px" onclick="openMetaModal('${g.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <span class="gc-pct" style="color:${barColor}">${Math.round(x.pctRaw)}%</span>
+          <span>Faltam ${fmtMoney(x.falta)}</span>
         </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">${MOTIV(x.pctRaw)}</div>
+        ${x.prazoTxt?`<div style="font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Prazo: ${x.prazoTxt}</div>`:''}
+        ${projTxt?`<div style="font-size:11px;color:var(--ink-2);margin-top:7px;background:var(--bg-soft);border-radius:8px;padding:7px 10px">📈 ${projTxt}</div>`:''}
+        ${breakdown}
+        <div style="display:flex;justify-content:flex-end;margin-top:8px">${editBtn(g.id)}</div>
       </div>`;
     }).join('');
   }
@@ -10466,6 +10569,7 @@
     document.getElementById('mm_target').value=g?g.target:'';
     document.getElementById('mm_emoji').value=g?g.emoji:'🎯';
     document.getElementById('mm_basis').value=g?(g.basis||'liquido'):'liquido';
+    document.getElementById('mm_deadline').value=g?(g.deadline||''):'';
     if(typeof metaToggleBasis==='function') metaToggleBasis();
     document.getElementById('metaModal').classList.add('show');
   }
@@ -10475,7 +10579,7 @@
     const name=document.getElementById('mm_name').value.trim();
     const target=parseFloat(document.getElementById('mm_target').value)||0;
     if(!name||!target){ toast('Preencha nome e valor alvo','warn'); return; }
-    const g={id:id||uid(),name,type:document.getElementById('mm_type').value,period:document.getElementById('mm_period').value,target,emoji:document.getElementById('mm_emoji').value||'🎯',basis:document.getElementById('mm_basis')?.value||'liquido'};
+    const g={id:id||uid(),name,type:document.getElementById('mm_type').value,period:document.getElementById('mm_period').value,target,emoji:document.getElementById('mm_emoji').value||'🎯',basis:document.getElementById('mm_basis')?.value||'liquido',deadline:document.getElementById('mm_deadline')?.value||''};
     if(id){ const idx=RS.goals.findIndex(x=>x.id===id); if(idx>=0) RS.goals[idx]=g; }
     else RS.goals.push(g);
     saveRS(); closeMetaModal(); renderMetas(); toast('Meta salva!','success');
