@@ -365,12 +365,6 @@
   .metas-done-hdr:hover{background:var(--bg-soft)}
   .metas-done-list{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;padding:0 16px 16px}
   .metas-done-item{display:flex;align-items:center;gap:10px;background:var(--bg-soft);border-radius:10px;padding:9px 12px}
-  .metas-filters{display:flex;flex-wrap:wrap;gap:8px}
-  .mfilter{font-size:11.5px;font-weight:600;color:var(--muted);background:var(--bg-elev);border:1px solid var(--line);border-radius:99px;padding:6px 13px;cursor:pointer;transition:.14s}
-  .mfilter:hover{background:var(--bg-soft)}
-  .mfilter.active{background:var(--primary);border-color:var(--primary);color:#fff}
-  .goal-card .gc-cat{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:var(--bg-soft);border:1px solid var(--line);padding:2px 7px;border-radius:6px;white-space:nowrap}
-  .goal-card .gc-dates{font-size:10.5px;color:var(--muted);display:flex;gap:10px;margin-top:8px}
 
   /* Income control specific */
   .ric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:20px}
@@ -2296,12 +2290,16 @@
   <!-- ═══ METAS (Planejamento) ═══ -->
   <div class="page-sec" id="sec-metas">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px">
-      <div style="font-size:13px;color:var(--muted);max-width:520px">Cada meta é um projeto independente. Acompanhe o progresso individual de cada objetivo.</div>
+      <div style="font-size:13px;color:var(--muted);max-width:520px">Acompanhe sua evolução pelo <b>resultado líquido</b> (entradas − saídas) da Conta Corrente, em tempo real.</div>
       <button class="tba primary" onclick="openMetaModal(null)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="tba-txt">Nova meta</span></button>
     </div>
-    <div id="metas_kpis" style="margin-bottom:16px"></div>
-    <div id="metas_filters" class="metas-filters" style="margin-bottom:16px"></div>
+    <div id="metas_kpis" style="margin-bottom:18px"></div>
+    <div id="metas_chart_card" class="card" style="padding:20px;margin-bottom:18px;display:none">
+      <div class="card-h"><div><h3>Evolução do Resultado Líquido</h3><div class="sub">Acumulado real × ritmo ideal · <span id="metas_chart_year"></span></div></div></div>
+      <div class="chart-wrap"><canvas id="metas_chart"></canvas></div>
+    </div>
     <div class="goals-grid" id="renda_goals"></div>
+    <div id="metas_done" style="margin-top:18px"></div>
   </div><!-- /sec-metas -->
 
   <!-- ═══ DÍVIDAS ═══ -->
@@ -2828,43 +2826,21 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="mm_id">
-        <div class="field"><label>Nome da meta *</label><input type="text" id="mm_name" placeholder="Ex: Reserva de emergência"></div>
+        <div class="field"><label>Nome da meta *</label><input type="text" id="mm_name" placeholder="Ex: Economizar 20% do salário"></div>
         <div class="form-grid">
-          <div class="field"><label>Categoria</label>
-            <select id="mm_category" onchange="metaModalFields()">
-              <option value="financeira">💰 Financeira (juntar valor)</option>
-              <option value="receita">📈 Receita (faturamento)</option>
-              <option value="reducao">📉 Redução de custos</option>
-              <option value="patrimonial">🏛️ Patrimonial</option>
-              <option value="custom">🎯 Personalizada</option>
-            </select>
+          <div class="field"><label>Tipo</label>
+            <select id="mm_type" onchange="metaToggleBasis()"><option value="receita">Meta de Receita</option><option value="economia">Meta de Economia</option><option value="patrimonio">Meta de Patrimônio</option><option value="despesa">Limite de Despesa</option></select>
           </div>
-          <div class="field"><label>Emoji</label><input type="text" id="mm_emoji" placeholder="🎯" maxlength="2"></div>
+          <div class="field"><label>Período</label>
+            <select id="mm_period"><option value="mensal">Mensal</option><option value="anual">Anual</option></select>
+          </div>
         </div>
-        <div class="field"><label>Vincular a <span style="font-weight:400;color:var(--muted);font-size:11px">— se vinculada, atualiza sozinha</span></label>
-          <select id="mm_link" onchange="metaModalFields()">
-            <option value="none">Nenhum — atualizo manualmente</option>
-            <option value="conta">🏦 Conta Corrente (saldo)</option>
-            <option value="renda">💰 Controle de Renda (resultado)</option>
-            <option value="fluxo">📊 Fluxo de Caixa</option>
-            <option value="patrimonio">🏛️ Patrimônio líquido</option>
-            <option value="dividas">💳 Dívidas (saldo devedor)</option>
-          </select>
+        <div class="field" id="mm_basis_wrap"><label>Base de cálculo</label>
+          <select id="mm_basis"><option value="liquido">Resultado Líquido (entradas − saídas)</option><option value="bruto">Receita Bruta (somente entradas)</option></select>
         </div>
-        <div class="form-grid" id="mm_period_wrap" style="display:none">
-          <div class="field"><label>Período</label><select id="mm_period"><option value="anual">Anual</option><option value="mensal">Mensal</option></select></div>
-          <div class="field"><label>Base</label><select id="mm_basis"><option value="liquido">Líquido</option><option value="bruto">Bruto</option></select></div>
-        </div>
-        <div class="field" id="mm_target_wrap"><label>Objetivo final (R$) *</label><input type="number" id="mm_target" step="0.01" min="0" placeholder="100.000"></div>
-        <div class="form-grid" id="mm_reducao_wrap" style="display:none">
-          <div class="field"><label>Gasto atual hoje (R$)</label><input type="number" id="mm_base" step="0.01" min="0" placeholder="10.000"></div>
-          <div class="field"><label>Gasto alvo (R$)</label><input type="number" id="mm_targetval" step="0.01" min="0" placeholder="7.000"></div>
-        </div>
-        <div class="field" id="mm_manual_wrap" style="display:none"><label id="mm_manual_lbl">Valor atual (R$)</label><input type="number" id="mm_manual" step="0.01" min="0" placeholder="0,00"></div>
-        <div class="form-grid">
-          <div class="field"><label>Data de início</label><input type="date" id="mm_start"></div>
-          <div class="field"><label>Data limite</label><input type="month" id="mm_deadline"></div>
-        </div>
+        <div class="field"><label>Valor alvo (R$) *</label><input type="number" id="mm_target" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="field"><label>Emoji / ícone</label><input type="text" id="mm_emoji" placeholder="🎯" maxlength="2"></div>
+        <div class="field"><label>Prazo <span style="font-weight:400;color:var(--muted)">(opcional)</span></label><input type="month" id="mm_deadline"></div>
       </div>
       <div class="modal-f">
         <button class="btn danger" id="mm_delete_btn" style="display:none" onclick="deleteMetaEntry()">Excluir</button>
@@ -10177,7 +10153,7 @@
   }
 
   /* ---- Goals ---- */
-  let _metaExpanded=new Set(), _metaDoneOpen=false, _metaFilter='todas';
+  let _metaExpanded=new Set(), _metaDoneOpen=false;
   function metaCardToggle(id,ev){
     if(ev){ if(ev.target.closest && ev.target.closest('.rta')) return; ev.stopPropagation(); }
     if(_metaExpanded.has(id)) _metaExpanded.delete(id); else _metaExpanded.add(id);
@@ -10187,82 +10163,155 @@
   function renderMetas(){
     const grid=document.getElementById('renda_goals'); if(!grid) return;
     const kpiEl=document.getElementById('metas_kpis');
-    const filtEl=document.getElementById('metas_filters');
-    const MESN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const CATLBL={financeira:'Financeira',receita:'Receita',reducao:'Redução',patrimonial:'Patrimonial',custom:'Personalizada'};
-    const LINKLBL={none:'Manual',conta:'Conta Corrente',renda:'Controle de Renda',fluxo:'Fluxo de Caixa',patrimonio:'Patrimônio',dividas:'Dívidas'};
-    const fmtD=d=>{ if(!d) return '—'; const p=String(d).split('-'); if(p.length>=3) return p[2]+'/'+p[1]+'/'+p[0]; if(p.length===2) return MESN[(+p[1])-1]+'/'+p[0]; return d; };
+    const chartCard=document.getElementById('metas_chart_card');
+    const m=RS.month, y=RS.year;
+    const isCY=(new Date().getFullYear()===y);
+    const curMonthIdx=isCY?new Date().getMonth():11;
+    const monthsElapsed=curMonthIdx+1;
+    const recM=calcIncome(m,y,'recebido'), expM=calcExpense(m,y,true);
+    const recA=calcIncomeYear(y,'recebido'), expA=calcExpenseYear(y,true);
+    const pat=(typeof state!=='undefined'?state.assets.reduce((s,a)=>s+Number(a.currentValue||0),0):0)+totalAccBalance();
+    const MES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     if(!RS.goals.length){
-      if(kpiEl) kpiEl.innerHTML=''; if(filtEl) filtEl.innerHTML='';
-      grid.innerHTML=`<div class="es" style="grid-column:1/-1;padding:30px;text-align:center"><div style="font-size:30px">🎯</div><div class="es-title" style="margin-top:6px">Nenhuma meta criada</div><div class="es-sub">Cada meta é um projeto independente. Crie seu primeiro objetivo.</div><button class="btn primary" onclick="openMetaModal(null)">+ Nova meta</button></div>`;
+      if(kpiEl) kpiEl.innerHTML='';
+      if(chartCard) chartCard.style.display='none';
+      grid.innerHTML=`<div class="es" style="grid-column:1/-1"><div class="es-ico">🎯</div><div class="es-title">Nenhuma meta criada</div><div class="es-sub">Crie sua primeira meta — reserva de emergência, entrada do imóvel, liberdade financeira — e acompanhe sua evolução em tempo real.</div><button class="btn primary" onclick="openMetaModal(null)">+ Nova meta</button></div>`;
       return;
     }
-    const items=RS.goals.map(g=>{
-      const c=metaComputeCurrent(g);
-      const progress=c.progress, pct=Math.max(0,Math.min(100,progress));
-      const status=metaStatus(g,progress);
-      return {g,c,progress,pct,status,cat:c.cat,link:c.link};
+    const metrics=RS.goals.map(g=>{
+      const anual=g.period==='anual';
+      const entradas=anual?recA:recM, saidas=anual?expA:expM, liquido=entradas-saidas;
+      const basis=g.basis||'liquido';
+      let cur,isResult=false;
+      if(g.type==='patrimonio') cur=pat;
+      else if(g.type==='despesa') cur=saidas;
+      else { isResult=true; cur=basis==='bruto'?entradas:liquido; }
+      const pctRaw=g.target>0?cur/g.target*100:0;
+      const pct=Math.max(0,Math.min(100,pctRaw));
+      const falta=Math.max(0,g.target-cur);
+      const mElapsed=anual?monthsElapsed:1;
+      const rate=mElapsed>0?cur/mElapsed:cur;
+      let prazoTxt='',monthsToDeadline=null,expectedPct=null;
+      if(g.deadline){
+        const p=g.deadline.split('-'); const dy=+p[0], dm=+p[1]||1;
+        prazoTxt=(MES[dm-1]||'')+' de '+dy;
+        const now=new Date(); const dl=new Date(dy,dm-1,1);
+        monthsToDeadline=Math.max(0,(dl.getFullYear()-now.getFullYear())*12+(dl.getMonth()-now.getMonth()));
+        const totalWin=monthsToDeadline+monthsElapsed;
+        expectedPct=totalWin>0?monthsElapsed/totalWin*100:null;
+      } else if(anual){ prazoTxt='Dez de '+y; expectedPct=monthsElapsed/12*100; monthsToDeadline=Math.max(0,12-monthsElapsed); }
+      const projMeses=(rate>0&&falta>0)?Math.ceil(falta/rate):(falta<=0?0:null);
+      const neededPerMonth=(monthsToDeadline&&monthsToDeadline>0&&falta>0)?falta/monthsToDeadline:null;
+      let status='ok';
+      if(pctRaw>=100) status='done';
+      else if(expectedPct!=null){ status = pctRaw>=expectedPct+8?'ad':pctRaw>=expectedPct-8?'ok':'at'; }
+      else { status = pctRaw>=60?'ad':pctRaw>=30?'ok':'at'; }
+      return {g,anual,entradas,saidas,isResult,cur,pctRaw,pct,falta,rate,prazoTxt,monthsToDeadline,expectedPct,projMeses,neededPerMonth,status};
     });
-    const ativas=items.filter(x=>x.progress<100).length;
-    const concl=items.filter(x=>x.progress>=100).length;
-    const atras=items.filter(x=>x.status==='at').length;
-    const prox=items.filter(x=>x.progress>=75&&x.progress<100).length;
+    // KPIs
+    const ativas=metrics.filter(x=>x.pctRaw<100).length;
+    const valorTotal=metrics.reduce((s,x)=>s+x.g.target,0);
+    const acumulado=metrics.reduce((s,x)=>s+Math.min(x.cur,x.g.target),0);
+    const pctMedio=metrics.length?metrics.reduce((s,x)=>s+x.pct,0)/metrics.length:0;
+    const proxima=metrics.filter(x=>x.pctRaw<100).sort((a,b)=>b.pctRaw-a.pctRaw)[0];
     if(kpiEl){
-      const kc=(lbl,val,clr)=>`<div class="mkpi"><div class="mkpi-lbl">${lbl}</div><div class="mkpi-val" style="color:${clr||'var(--ink)'}">${val}</div></div>`;
+      const kc=(lbl,val,sub)=>`<div class="mkpi"><div class="mkpi-lbl">${lbl}</div><div class="mkpi-val">${val}</div>${sub?`<div class="mkpi-sub">${sub}</div>`:''}</div>`;
       kpiEl.innerHTML=`<div class="metas-kpis">
-        ${kc('Metas ativas',ativas)}
-        ${kc('Concluídas',concl,'var(--accent-2)')}
-        ${kc('Atrasadas',atras,atras>0?'var(--danger)':'var(--ink)')}
-        ${kc('Próximas da conclusão',prox,prox>0?'var(--gold)':'var(--ink)')}
+        ${kc('Metas ativas', ativas, metrics.length+' no total')}
+        ${kc('Valor total', fmtMoney(valorTotal), 'soma das metas')}
+        ${kc('Já conquistado', fmtMoney(acumulado), 'acumulado')}
+        ${kc('Conclusão média', Math.round(pctMedio)+'%', 'progresso geral')}
+        ${kc('Mais próxima', proxima?Math.round(proxima.pctRaw)+'%':'—', proxima?proxima.g.name:'todas concluídas 🎉')}
       </div>`;
     }
-    if(filtEl){
-      const F=[['todas','Todas'],['financeira','Financeiras'],['patrimonial','Patrimoniais'],['receita','Receita'],['reducao','Redução'],['andamento','Em andamento'],['concluidas','Concluídas']];
-      filtEl.innerHTML=F.map(([k,l])=>`<button class="mfilter${_metaFilter===k?' active':''}" onclick="setMetaFilter('${k}')">${l}</button>`).join('');
+    // Gráfico de evolução
+    if(chartCard && typeof Chart!=='undefined'){
+      const refTarget=metrics.filter(x=>x.anual).reduce((s,x)=>s+x.g.target,0) || Math.max.apply(null,metrics.map(x=>x.g.target));
+      const cum=[]; let acc=0;
+      for(let mo=0;mo<12;mo++){
+        if(mo<=curMonthIdx){
+          const inc=RS.income.filter(i=>{const d=new Date(i.date+'T12:00');return d.getFullYear()===y&&d.getMonth()===mo&&i.status==='recebido';}).reduce((s,i)=>s+Number(i.value||0),0);
+          const exp=RS.expenses.filter(e=>{const d=new Date(e.date+'T12:00');return d.getFullYear()===y&&d.getMonth()===mo&&e.paid;}).reduce((s,e)=>s+Number(e.value||0),0);
+          acc+=inc-exp; cum.push(Math.round(acc));
+        } else cum.push(null);
+      }
+      const ideal=Array.from({length:12},(_,i)=>Math.round(refTarget*(i+1)/12));
+      chartCard.style.display='';
+      const yEl=document.getElementById('metas_chart_year'); if(yEl) yEl.textContent=String(y);
+      const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+      if(charts.metas) charts.metas.destroy();
+      charts.metas=new Chart(document.getElementById('metas_chart'),{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],datasets:[
+        {label:'Progresso real',data:cum,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:.3,borderWidth:2.5,pointRadius:3,spanGaps:false},
+        {label:'Meta ideal',data:ideal,borderColor:'#94A3B8',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false,tension:0}
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,usePointStyle:true,color:isDark?'#C8CDD6':'#334155',font:{size:11.5}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y!=null?fmtMoney(c.parsed.y):'—')}}},scales:{y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:isDark?'#8B92A0':'#64748B'},grid:{color:isDark?'#1F2433':'#F1F5F9'}},x:{grid:{display:false},ticks:{color:isDark?'#8B92A0':'#64748B'}}}}});
     }
-    let view=items;
-    if(_metaFilter==='andamento') view=items.filter(x=>x.progress<100);
-    else if(_metaFilter==='concluidas') view=items.filter(x=>x.progress>=100);
-    else if(['financeira','patrimonial','receita','reducao'].indexOf(_metaFilter)>=0) view=items.filter(x=>x.cat===_metaFilter);
-    if(!view.length){ grid.innerHTML=`<div class="es" style="grid-column:1/-1;padding:24px;text-align:center"><div class="es-sub">Nenhuma meta neste filtro.</div></div>`; return; }
-    const STAT={ad:['🟢','No prazo','ad'],ok:['🟡','Atenção','ok'],at:['🔴','Atrasada','at'],done:['🏆','Concluída','ad']};
+    // Cards — compacto por padrão, expande ao clicar
+    const MOTIV=pct=> pct>=100?'🏆 Conquistada!' : pct>=75?'🔥 Quase lá — falta pouco!' : pct>=50?'💪 Metade do caminho!' : pct>=25?'🚀 Bom começo, siga firme!' : '🌱 Primeiros passos';
+    const STAT={ad:['🟢','Adiantado','ad'],ok:['🟡','No planejado','ok'],at:['🔴','Atrasado','at'],done:['🏆','Concluída','ad']};
     const editBtn=id=>`<button class="rta" style="width:22px;height:22px" onclick="openMetaModal('${id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
-    grid.innerHTML=view.map(x=>{
-      const g=x.g, st=STAT[x.status];
-      const done=x.progress>=100;
-      const barColor=done?'var(--accent)':x.status==='at'?'var(--danger)':x.status==='ad'?'var(--accent)':'var(--gold)';
-      const isReducao=x.cat==='reducao';
-      const objetivo=isReducao?`${fmtMoney(x.c.target)} <span style="font-size:10px;color:var(--muted)">(de ${fmtMoney(x.c.base)})</span>`:fmtMoney(x.c.target);
-      const exp=_metaExpanded.has(g.id)?' expanded':'';
-      const manualBtn=x.link==='none'?`<button class="rta" style="width:auto;height:24px;padding:0 10px;font-size:11px;font-weight:700" onclick="metaUpdateValue('${g.id}',event)">Atualizar valor</button>`:'';
-      return `<div class="goal-card${exp}" id="mcard-${g.id}" onclick="metaCardToggle('${g.id}',event)">
-        <div class="gc-head">
-          <div style="flex:1;min-width:0">
-            <div class="gc-title" style="overflow:hidden;text-overflow:ellipsis">${g.emoji||'🎯'} ${g.name}</div>
-            <span class="gc-cat" style="margin-top:5px;display:inline-block">${CATLBL[x.cat]||'Meta'}</span>
+    const active=metrics.filter(x=>x.pctRaw<100);
+    const done=metrics.filter(x=>x.pctRaw>=100);
+    if(!active.length){
+      grid.innerHTML=`<div class="es" style="grid-column:1/-1;padding:28px;text-align:center"><div style="font-size:30px">🎉</div><div class="es-title" style="margin-top:6px">Todas as metas concluídas!</div><div class="es-sub">Que tal definir um novo objetivo?</div><button class="btn primary" onclick="openMetaModal(null)">+ Nova meta</button></div>`;
+    } else {
+      grid.innerHTML=active.map(x=>{
+        const g=x.g;
+        const barColor=x.status==='at'?'var(--danger)':x.status==='ad'?'var(--accent)':'var(--gold)';
+        const st=STAT[x.status];
+        let projTxt='';
+        if(x.status==='at'&&x.neededPerMonth){ projTxt=`Para bater o prazo: ~<b>${fmtMoney(x.neededPerMonth)}/mês</b>`; }
+        else if(x.projMeses!=null&&x.projMeses>0){ const mm=x.projMeses; const t=mm>=12?`${Math.floor(mm/12)} ano${Math.floor(mm/12)>1?'s':''}${mm%12?' e '+(mm%12)+' m':''}`:`${mm} ${mm>1?'meses':'mês'}`; projTxt=`No ritmo atual: meta em <b>${t}</b>`; }
+        const breakdown=x.isResult?`
+          <div style="display:flex;flex-direction:column;gap:5px;margin:10px 0 2px;padding-top:10px;border-top:1px solid var(--line)">
+            <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Entradas</span><span style="font-weight:700;color:var(--accent-2)">${fmtMoney(x.entradas)}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Saídas</span><span style="font-weight:700;color:var(--danger)">− ${fmtMoney(x.saidas)}</span></div>
+          </div>`:'';
+        const exp=_metaExpanded.has(g.id)?' expanded':'';
+        return `<div class="goal-card${exp}" id="mcard-${g.id}" onclick="metaCardToggle('${g.id}',event)">
+          <div class="gc-head">
+            <div class="gc-title">${g.emoji||'🎯'} ${g.name}</div>
+            <span class="gc-status ${st[2]}">${st[0]} ${st[1]}</span>
           </div>
-          <span class="gc-status ${st[2]}">${st[0]} ${st[1]}</span>
-        </div>
-        <div class="gc-vals">
-          <div class="gc-current">${fmtMoney(x.c.atual)}</div>
-          <div class="gc-target">de ${objetivo}</div>
-        </div>
-        <div class="gc-bar"><i style="width:${x.pct}%;background:${barColor}"></i></div>
-        <div class="gc-foot">
-          <span class="gc-pct" style="color:${barColor}">${Math.round(x.progress)}%</span>
-          <span>${done?'✅ Concluída':(isReducao?'Reduzir até '+fmtMoney(x.c.target):'Faltam '+fmtMoney(Math.max(0,x.c.target-x.c.atual)))}</span>
-        </div>
-        <div class="gc-details">
-          <div class="gc-dates">
-            <span>📅 Início: <b>${fmtD(g.startDate)}</b></span>
-            <span>🏁 Limite: <b>${fmtD(g.deadline)}</b></span>
+          <div class="gc-vals">
+            <div class="gc-current">${fmtMoney(x.cur)}</div>
+            <div class="gc-target">meta: ${fmtMoney(g.target)}</div>
           </div>
-          <div style="font-size:11px;color:var(--muted);margin-top:7px">Atualização: ${LINKLBL[x.link]||'Manual'}${x.link==='none'?' — você atualiza':' — automática'}</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">${manualBtn||'<span></span>'}${editBtn(g.id)}</div>
-        </div>
-        <div class="gc-expand-hint">detalhes ▾</div>
-      </div>`;
-    }).join('');
+          <div class="gc-bar"><i style="width:${x.pct}%;background:${barColor}"></i></div>
+          <div class="gc-foot">
+            <span class="gc-pct" style="color:${barColor}">${Math.round(x.pctRaw)}%</span>
+            <span>Faltam ${fmtMoney(x.falta)}</span>
+          </div>
+          <div class="gc-details">
+            <div style="font-size:11px;color:var(--muted);margin-top:8px">${MOTIV(x.pctRaw)}</div>
+            ${x.prazoTxt?`<div style="font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Prazo: ${x.prazoTxt}</div>`:''}
+            ${projTxt?`<div style="font-size:11px;color:var(--ink-2);margin-top:7px;background:var(--bg-soft);border-radius:8px;padding:7px 10px">📈 ${projTxt}</div>`:''}
+            ${breakdown}
+            <div style="display:flex;justify-content:flex-end;margin-top:8px">${editBtn(g.id)}</div>
+          </div>
+          <div class="gc-expand-hint">detalhes ▾</div>
+        </div>`;
+      }).join('');
+    }
+    const doneEl=document.getElementById('metas_done');
+    if(doneEl){
+      if(!done.length){ doneEl.innerHTML=''; }
+      else {
+        const open=_metaDoneOpen;
+        doneEl.innerHTML=`<div class="metas-done-wrap">
+          <div class="metas-done-hdr" onclick="metaToggleDone()">
+            <span style="font-weight:700;font-size:12.5px;color:var(--ink-2)">🏆 Metas concluídas (${done.length})</span>
+            <span style="font-size:11px;color:var(--muted)">${open?'recolher ▴':'ver ▾'}</span>
+          </div>
+          <div class="metas-done-list" style="display:${open?'grid':'none'}">
+            ${done.map(x=>`<div class="metas-done-item">
+              <span style="font-size:16px">🏆</span>
+              <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.g.emoji||''} ${x.g.name}</div><div style="font-size:11px;color:var(--accent-2)">Concluída · ${fmtMoney(x.g.target)}</div></div>
+              ${editBtn(x.g.id)}
+            </div>`).join('')}
+          </div>
+        </div>`;
+      }
+    }
   }
 
   /* ---- Renda Modal ---- */
@@ -10541,108 +10590,35 @@
   }
 
   /* ---- Meta Modal ---- */
-  function metaModalFields(){
-    const cat=document.getElementById('mm_category')?.value||'financeira';
-    const link=document.getElementById('mm_link')?.value||'none';
-    const show=(id,b)=>{const e=document.getElementById(id); if(e) e.style.display=b?'':'none';};
-    const isReducao=cat==='reducao';
-    show('mm_reducao_wrap', isReducao);
-    show('mm_target_wrap', !isReducao);
-    show('mm_period_wrap', (link==='renda'||link==='fluxo'));
-    show('mm_manual_wrap', link==='none');
-    const lbl=document.getElementById('mm_manual_lbl'); if(lbl) lbl.textContent=isReducao?'Gasto atual (R$)':'Valor atual (R$)';
+  function metaToggleBasis(){
+    const t=document.getElementById('mm_type')?.value;
+    const w=document.getElementById('mm_basis_wrap');
+    if(w) w.style.display=(t==='receita'||t==='economia')?'':'none';
   }
-  function metaNormCat(g){ return g.category || ({receita:'receita',economia:'financeira',patrimonio:'patrimonial',despesa:'reducao'}[g.type]||'financeira'); }
-  function metaNormLink(g){ if(g.link) return g.link; const c=metaNormCat(g); return c==='patrimonial'?'patrimonio':'renda'; }
-  function metaComputeCurrent(g){
-    const cat=metaNormCat(g), link=metaNormLink(g);
-    const m=RS.month,y=RS.year;
-    const anual=(g.period||'anual')!=='mensal';
-    const rendaE=anual?calcIncomeYear(y,'recebido'):calcIncome(m,y,'recebido');
-    const rendaS=anual?calcExpenseYear(y,true):calcExpense(m,y,true);
-    if(cat==='reducao'){
-      const base=Number(g.baseValue!=null?g.baseValue:g.target||0), alvo=Number(g.targetValue!=null?g.targetValue:0);
-      let atual;
-      if(link==='none') atual=Number(g.manualValue||0);
-      else if(link==='dividas') atual=(typeof calcDividasKpis==='function'?(calcDividasKpis().totalDividas||0):0);
-      else atual=rendaS;
-      const denom=base-alvo;
-      let progress=denom!==0?(base-atual)/denom*100:(atual<=alvo?100:0);
-      return {atual,target:alvo,base,progress:Math.max(0,progress),cat,link};
-    }
-    let atual=0, target=Number(g.target||0);
-    if(link==='none') atual=Number(g.manualValue||0);
-    else if(link==='conta') atual=(typeof totalAccBalance==='function'?totalAccBalance():0);
-    else if(link==='patrimonio') atual=(typeof calcKpis==='function'?(calcKpis().liquido||0):0);
-    else if(link==='dividas') atual=(typeof calcDividasKpis==='function'?(calcDividasKpis().totalDividas||0):0);
-    else atual = cat==='receita' ? rendaE : ((g.basis==='bruto')?rendaE:(rendaE-rendaS));
-    const progress=target>0?atual/target*100:0;
-    return {atual,target,progress:Math.max(0,progress),cat,link};
-  }
-  function metaStatus(g, progress){
-    if(progress>=100) return 'done';
-    const startD=g.startDate?new Date(g.startDate+'T12:00'):null;
-    let dl=null; if(g.deadline){const p=g.deadline.split('-'); dl=new Date(+p[0],(+p[1]||1)-1,1);}
-    if(startD&&dl&&dl>startD){
-      const now=new Date(); const total=dl-startD; const elapsed=Math.max(0,now-startD);
-      const expected=total>0?elapsed/total*100:0;
-      if(progress>=expected-2) return 'ad';
-      if(progress>=expected-15) return 'ok';
-      return 'at';
-    }
-    if(dl){ const now=new Date(); const ml=(dl.getFullYear()-now.getFullYear())*12+(dl.getMonth()-now.getMonth()); if(ml<0) return 'at'; }
-    return progress>=60?'ad':progress>=30?'ok':'at';
-  }
-  function metaUpdateValue(id, ev){
-    if(ev) ev.stopPropagation();
-    const g=RS.goals.find(x=>x.id===id); if(!g) return;
-    const label=metaNormCat(g)==='reducao'?'Gasto atual (R$):':'Valor atual (R$):';
-    const v=prompt(label, g.manualValue||0);
-    if(v===null) return;
-    g.manualValue=parseFloat(String(v).replace(/\./g,'').replace(',','.'))||0;
-    saveRS(); renderMetas(); toast('Valor atualizado','success');
-  }
-  function setMetaFilter(f){ _metaFilter=f; renderMetas(); }
   function openMetaModal(id){
     document.getElementById('mm_id').value=id||'';
     document.getElementById('metaModalTitle').textContent=id?'Editar Meta':'Nova Meta';
     document.getElementById('mm_delete_btn').style.display=id?'':'none';
     const g=id?RS.goals.find(x=>x.id===id):null;
-    const gv=(k,d)=>g&&g[k]!=null?g[k]:d;
-    document.getElementById('mm_name').value=gv('name','');
-    document.getElementById('mm_category').value=g?metaNormCat(g):'financeira';
-    document.getElementById('mm_emoji').value=gv('emoji','🎯');
-    document.getElementById('mm_link').value=g?metaNormLink(g):'none';
-    document.getElementById('mm_period').value=gv('period','anual');
-    document.getElementById('mm_basis').value=gv('basis','liquido');
-    document.getElementById('mm_target').value=g&&g.target?g.target:'';
-    document.getElementById('mm_base').value=gv('baseValue','');
-    document.getElementById('mm_targetval').value=gv('targetValue','');
-    document.getElementById('mm_manual').value=gv('manualValue','');
-    document.getElementById('mm_start').value=gv('startDate','');
-    document.getElementById('mm_deadline').value=gv('deadline','');
-    metaModalFields();
+    document.getElementById('mm_name').value=g?g.name:'';
+    document.getElementById('mm_type').value=g?g.type:'receita';
+    document.getElementById('mm_period').value=g?g.period:'mensal';
+    document.getElementById('mm_target').value=g?g.target:'';
+    document.getElementById('mm_emoji').value=g?g.emoji:'🎯';
+    document.getElementById('mm_basis').value=g?(g.basis||'liquido'):'liquido';
+    document.getElementById('mm_deadline').value=g?(g.deadline||''):'';
+    if(typeof metaToggleBasis==='function') metaToggleBasis();
     document.getElementById('metaModal').classList.add('show');
   }
   function closeMetaModal(){ document.getElementById('metaModal').classList.remove('show'); }
   function saveMetaEntry(){
     const id=document.getElementById('mm_id').value;
     const name=document.getElementById('mm_name').value.trim();
-    const category=document.getElementById('mm_category').value;
-    const link=document.getElementById('mm_link').value;
-    const num=el=>{const e=document.getElementById(el); return e?parseFloat(e.value)||0:0;};
-    if(!name){ toast('Preencha o nome da meta','warn'); return; }
-    const g={ id:id||uid(), name, category, link,
-      emoji:document.getElementById('mm_emoji').value||'🎯',
-      period:document.getElementById('mm_period').value||'anual',
-      basis:document.getElementById('mm_basis').value||'liquido',
-      startDate:document.getElementById('mm_start').value||'',
-      deadline:document.getElementById('mm_deadline').value||'',
-      target:num('mm_target'), baseValue:num('mm_base'), targetValue:num('mm_targetval'), manualValue:num('mm_manual') };
-    if(category==='reducao'){ if(!g.baseValue||!g.targetValue){ toast('Preencha gasto atual e gasto alvo','warn'); return; } }
-    else if(!g.target){ toast('Preencha o objetivo final','warn'); return; }
-    if(id){ const idx=RS.goals.findIndex(x=>x.id===id); if(idx>=0){ g.createdAt=RS.goals[idx].createdAt; RS.goals[idx]=g; } }
-    else { g.createdAt=new Date().toISOString(); RS.goals.push(g); }
+    const target=parseFloat(document.getElementById('mm_target').value)||0;
+    if(!name||!target){ toast('Preencha nome e valor alvo','warn'); return; }
+    const g={id:id||uid(),name,type:document.getElementById('mm_type').value,period:document.getElementById('mm_period').value,target,emoji:document.getElementById('mm_emoji').value||'🎯',basis:document.getElementById('mm_basis')?.value||'liquido',deadline:document.getElementById('mm_deadline')?.value||''};
+    if(id){ const idx=RS.goals.findIndex(x=>x.id===id); if(idx>=0) RS.goals[idx]=g; }
+    else RS.goals.push(g);
     saveRS(); closeMetaModal(); renderMetas(); toast('Meta salva!','success');
   }
   function deleteMetaEntry(){
