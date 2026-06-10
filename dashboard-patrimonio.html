@@ -355,6 +355,16 @@
   .goal-card .gc-status.ok{background:rgba(245,158,11,.13);color:#b45309}
   .goal-card .gc-status.at{background:rgba(239,68,68,.12);color:#dc2626}
   .goal-card.done{background:linear-gradient(135deg,rgba(34,197,94,.09),rgba(16,185,129,.05));border-color:rgba(34,197,94,.32)}
+  .goal-card{cursor:pointer}
+  .goal-card .gc-details{display:none}
+  .goal-card.expanded .gc-details{display:block}
+  .goal-card .gc-expand-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:10px;letter-spacing:.3px;user-select:none}
+  .goal-card.expanded .gc-expand-hint{display:none}
+  .metas-done-wrap{background:var(--bg-elev);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .metas-done-hdr{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;cursor:pointer}
+  .metas-done-hdr:hover{background:var(--bg-soft)}
+  .metas-done-list{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;padding:0 16px 16px}
+  .metas-done-item{display:flex;align-items:center;gap:10px;background:var(--bg-soft);border-radius:10px;padding:9px 12px}
 
   /* Income control specific */
   .ric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:20px}
@@ -2289,6 +2299,7 @@
       <div class="chart-wrap"><canvas id="metas_chart"></canvas></div>
     </div>
     <div class="goals-grid" id="renda_goals"></div>
+    <div id="metas_done" style="margin-top:18px"></div>
   </div><!-- /sec-metas -->
 
   <!-- ═══ DÍVIDAS ═══ -->
@@ -10142,6 +10153,13 @@
   }
 
   /* ---- Goals ---- */
+  let _metaExpanded=new Set(), _metaDoneOpen=false;
+  function metaCardToggle(id,ev){
+    if(ev){ if(ev.target.closest && ev.target.closest('.rta')) return; ev.stopPropagation(); }
+    if(_metaExpanded.has(id)) _metaExpanded.delete(id); else _metaExpanded.add(id);
+    const el=document.getElementById('mcard-'+id); if(el) el.classList.toggle('expanded');
+  }
+  function metaToggleDone(){ _metaDoneOpen=!_metaDoneOpen; renderMetas(); }
   function renderMetas(){
     const grid=document.getElementById('renda_goals'); if(!grid) return;
     const kpiEl=document.getElementById('metas_kpis');
@@ -10227,54 +10245,73 @@
         {label:'Meta ideal',data:ideal,borderColor:'#94A3B8',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false,tension:0}
       ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,usePointStyle:true,color:isDark?'#C8CDD6':'#334155',font:{size:11.5}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y!=null?fmtMoney(c.parsed.y):'—')}}},scales:{y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:isDark?'#8B92A0':'#64748B'},grid:{color:isDark?'#1F2433':'#F1F5F9'}},x:{grid:{display:false},ticks:{color:isDark?'#8B92A0':'#64748B'}}}}});
     }
-    // Cards
+    // Cards — compacto por padrão, expande ao clicar
     const MOTIV=pct=> pct>=100?'🏆 Conquistada!' : pct>=75?'🔥 Quase lá — falta pouco!' : pct>=50?'💪 Metade do caminho!' : pct>=25?'🚀 Bom começo, siga firme!' : '🌱 Primeiros passos';
     const STAT={ad:['🟢','Adiantado','ad'],ok:['🟡','No planejado','ok'],at:['🔴','Atrasado','at'],done:['🏆','Concluída','ad']};
     const editBtn=id=>`<button class="rta" style="width:22px;height:22px" onclick="openMetaModal('${id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`;
-    grid.innerHTML=metrics.map(x=>{
-      const g=x.g;
-      if(x.pctRaw>=100){
-        return `<div class="goal-card done">
-          <div style="text-align:center;padding:8px 0 4px">
-            <div style="font-size:36px">🏆</div>
-            <div style="font-size:14px;font-weight:800;color:var(--ink);margin-top:6px">${g.emoji||''} ${g.name}</div>
-            <div style="font-size:12px;color:var(--accent-2);font-weight:700;margin-top:3px">Meta concluída!</div>
-            <div style="font-size:11.5px;color:var(--muted);margin-top:7px">${fmtMoney(x.cur)} de ${fmtMoney(g.target)}${x.prazoTxt?' · prazo '+x.prazoTxt:''}</div>
+    const active=metrics.filter(x=>x.pctRaw<100);
+    const done=metrics.filter(x=>x.pctRaw>=100);
+    if(!active.length){
+      grid.innerHTML=`<div class="es" style="grid-column:1/-1;padding:28px;text-align:center"><div style="font-size:30px">🎉</div><div class="es-title" style="margin-top:6px">Todas as metas concluídas!</div><div class="es-sub">Que tal definir um novo objetivo?</div><button class="btn primary" onclick="openMetaModal(null)">+ Nova meta</button></div>`;
+    } else {
+      grid.innerHTML=active.map(x=>{
+        const g=x.g;
+        const barColor=x.status==='at'?'var(--danger)':x.status==='ad'?'var(--accent)':'var(--gold)';
+        const st=STAT[x.status];
+        let projTxt='';
+        if(x.status==='at'&&x.neededPerMonth){ projTxt=`Para bater o prazo: ~<b>${fmtMoney(x.neededPerMonth)}/mês</b>`; }
+        else if(x.projMeses!=null&&x.projMeses>0){ const mm=x.projMeses; const t=mm>=12?`${Math.floor(mm/12)} ano${Math.floor(mm/12)>1?'s':''}${mm%12?' e '+(mm%12)+' m':''}`:`${mm} ${mm>1?'meses':'mês'}`; projTxt=`No ritmo atual: meta em <b>${t}</b>`; }
+        const breakdown=x.isResult?`
+          <div style="display:flex;flex-direction:column;gap:5px;margin:10px 0 2px;padding-top:10px;border-top:1px solid var(--line)">
+            <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Entradas</span><span style="font-weight:700;color:var(--accent-2)">${fmtMoney(x.entradas)}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Saídas</span><span style="font-weight:700;color:var(--danger)">− ${fmtMoney(x.saidas)}</span></div>
+          </div>`:'';
+        const exp=_metaExpanded.has(g.id)?' expanded':'';
+        return `<div class="goal-card${exp}" id="mcard-${g.id}" onclick="metaCardToggle('${g.id}',event)">
+          <div class="gc-head">
+            <div class="gc-title">${g.emoji||'🎯'} ${g.name}</div>
+            <span class="gc-status ${st[2]}">${st[0]} ${st[1]}</span>
           </div>
-          <div style="display:flex;justify-content:flex-end;margin-top:6px">${editBtn(g.id)}</div>
+          <div class="gc-vals">
+            <div class="gc-current">${fmtMoney(x.cur)}</div>
+            <div class="gc-target">meta: ${fmtMoney(g.target)}</div>
+          </div>
+          <div class="gc-bar"><i style="width:${x.pct}%;background:${barColor}"></i></div>
+          <div class="gc-foot">
+            <span class="gc-pct" style="color:${barColor}">${Math.round(x.pctRaw)}%</span>
+            <span>Faltam ${fmtMoney(x.falta)}</span>
+          </div>
+          <div class="gc-details">
+            <div style="font-size:11px;color:var(--muted);margin-top:8px">${MOTIV(x.pctRaw)}</div>
+            ${x.prazoTxt?`<div style="font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Prazo: ${x.prazoTxt}</div>`:''}
+            ${projTxt?`<div style="font-size:11px;color:var(--ink-2);margin-top:7px;background:var(--bg-soft);border-radius:8px;padding:7px 10px">📈 ${projTxt}</div>`:''}
+            ${breakdown}
+            <div style="display:flex;justify-content:flex-end;margin-top:8px">${editBtn(g.id)}</div>
+          </div>
+          <div class="gc-expand-hint">detalhes ▾</div>
+        </div>`;
+      }).join('');
+    }
+    const doneEl=document.getElementById('metas_done');
+    if(doneEl){
+      if(!done.length){ doneEl.innerHTML=''; }
+      else {
+        const open=_metaDoneOpen;
+        doneEl.innerHTML=`<div class="metas-done-wrap">
+          <div class="metas-done-hdr" onclick="metaToggleDone()">
+            <span style="font-weight:700;font-size:12.5px;color:var(--ink-2)">🏆 Metas concluídas (${done.length})</span>
+            <span style="font-size:11px;color:var(--muted)">${open?'recolher ▴':'ver ▾'}</span>
+          </div>
+          <div class="metas-done-list" style="display:${open?'grid':'none'}">
+            ${done.map(x=>`<div class="metas-done-item">
+              <span style="font-size:16px">🏆</span>
+              <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.g.emoji||''} ${x.g.name}</div><div style="font-size:11px;color:var(--accent-2)">Concluída · ${fmtMoney(x.g.target)}</div></div>
+              ${editBtn(x.g.id)}
+            </div>`).join('')}
+          </div>
         </div>`;
       }
-      const barColor=x.status==='at'?'var(--danger)':x.status==='ad'?'var(--accent)':'var(--gold)';
-      const st=STAT[x.status];
-      let projTxt='';
-      if(x.status==='at'&&x.neededPerMonth){ projTxt=`Para bater o prazo: ~<b>${fmtMoney(x.neededPerMonth)}/mês</b>`; }
-      else if(x.projMeses!=null&&x.projMeses>0){ const mm=x.projMeses; const t=mm>=12?`${Math.floor(mm/12)} ano${Math.floor(mm/12)>1?'s':''}${mm%12?' e '+(mm%12)+' m':''}`:`${mm} ${mm>1?'meses':'mês'}`; projTxt=`No ritmo atual: meta em <b>${t}</b>`; }
-      const breakdown=x.isResult?`
-        <div style="display:flex;flex-direction:column;gap:5px;margin:10px 0 2px;padding-top:10px;border-top:1px solid var(--line)">
-          <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Entradas</span><span style="font-weight:700;color:var(--accent-2)">${fmtMoney(x.entradas)}</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">Saídas</span><span style="font-weight:700;color:var(--danger)">− ${fmtMoney(x.saidas)}</span></div>
-        </div>`:'';
-      return `<div class="goal-card">
-        <div class="gc-head">
-          <div class="gc-title">${g.emoji||'🎯'} ${g.name}</div>
-          <span class="gc-status ${st[2]}">${st[0]} ${st[1]}</span>
-        </div>
-        <div class="gc-vals">
-          <div class="gc-current">${fmtMoney(x.cur)}</div>
-          <div class="gc-target">meta: ${fmtMoney(g.target)}</div>
-        </div>
-        <div class="gc-bar"><i style="width:${x.pct}%;background:${barColor}"></i></div>
-        <div class="gc-foot">
-          <span class="gc-pct" style="color:${barColor}">${Math.round(x.pctRaw)}%</span>
-          <span>Faltam ${fmtMoney(x.falta)}</span>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px">${MOTIV(x.pctRaw)}</div>
-        ${x.prazoTxt?`<div style="font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Prazo: ${x.prazoTxt}</div>`:''}
-        ${projTxt?`<div style="font-size:11px;color:var(--ink-2);margin-top:7px;background:var(--bg-soft);border-radius:8px;padding:7px 10px">📈 ${projTxt}</div>`:''}
-        ${breakdown}
-        <div style="display:flex;justify-content:flex-end;margin-top:8px">${editBtn(g.id)}</div>
-      </div>`;
-    }).join('');
+    }
   }
 
   /* ---- Renda Modal ---- */
