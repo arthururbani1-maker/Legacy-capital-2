@@ -9828,6 +9828,10 @@
     const saldoInicial    = calcSaldoInicial(m, y);
     const saldoFinal      = calcSaldoFinal(m, y);   // = saldoInicial + rec - expPago
     const resultadoAcum   = calcResultadoAcumulado(m, y);
+    // Saldo REAL atual da conta corrente: base das contas + todas entradas recebidas − todas saídas pagas
+    const saldoCC = (RS.accounts||[]).reduce((a,c)=>a+Number(c.balance||0),0)
+      + (RS.income||[]).filter(i=>i.status==='recebido').reduce((a,i)=>a+Number(i.value||0),0)
+      - (RS.expenses||[]).filter(e=>e.paid).reduce((a,e)=>a+Number(e.value||0),0);
 
     // ── Renda passiva ──────────────────────────────────────────────
     const ativosRenda = (state.assets||[]).filter(a=>a.renda?.ativa && a.renda.valorMensal>0);
@@ -9892,8 +9896,7 @@
     const kpis=[
       {label:'Receita do Mês',     val:fmtMoney(rec),          sub:recDelta!==null?`<span class="${recDelta>=0?'up':'dn'}">${recDelta>=0?'▲':'▼'} ${Math.abs(recDelta)}% vs mês ant.</span>`:'', cls:'featured', ico:'💰'},
       {label:'Despesas do Mês',    val:fmtMoney(exp),          sub:expSubLabel,                                                                                                               cls:'red',      ico:'💸'},
-      {label:'Resultado Acumulado',val:fmtMoney(resultadoAcum),sub:resultadoAcum>=0?'Net flow histórico positivo':'⚠️ Déficit acumulado no histórico',                                        cls:resultadoAcum>=0?'green':'red', ico:'📊'},
-      {label:'Economia do Mês',    val:fmtMoney(eco),          sub:'',                                                                                                                        cls:'green',    ico:'🏦'},
+      {label:'Conta Corrente',     val:fmtMoney(saldoCC),      sub:saldoCC>=0?'saldo atual disponível':'⚠️ saldo negativo',                                                                      cls:saldoCC>=0?'featured':'red', ico:'🏦'},
       {label:'Renda Passiva',      val:fmtMoney(pass),         sub:`${ativosRenda.length} ativo(s) gerador(es)${passReceivedLabel}`,                                                          cls:'gold',     ico:'🌱'},
       {label:'Renda Ativa',        val:fmtMoney(active),       sub:rec>0?`${((active/rec)*100).toFixed(1)}% da receita recebida`:'',                                                          cls:'',         ico:'💼'},
       {label:'Projeção Anual Passiva', val:fmtMoney(projPassiva), sub:`${ativosRenda.length} ativo(s) × 12 meses`,                                                                           cls:'',         ico:'📅'},
