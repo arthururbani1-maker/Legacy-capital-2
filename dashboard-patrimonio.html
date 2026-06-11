@@ -1874,8 +1874,8 @@
         </button>
         <button class="sb-item" id="sb-relatorios" onclick="showSection('relatorios')">
           <span class="sb-item-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
-          <span class="sb-item-lbl">Relatórios</span>
-          <span class="sb-tip">Relatórios</span>
+          <span class="sb-item-lbl">Projeções</span>
+          <span class="sb-tip">Projeções</span>
         </button>
       </div>
     </div>
@@ -2942,6 +2942,39 @@
 
   <!-- ═══ RELATÓRIOS ═══ -->
   <div class="page-sec" id="sec-relatorios">
+
+    <!-- ── PROJEÇÕES ── -->
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <div>
+        <div style="font-family:'Manrope',system-ui;font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.4px">Projeção Financeira</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px">Para onde seu patrimônio e seu caixa caminham, com base nos seus dados.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <label style="font-size:11.5px;color:var(--muted);font-weight:600">Valorização anual</label>
+        <input id="pj_taxa" type="number" value="8" min="0" max="50" step="0.5" oninput="renderProjecoesView()" style="width:60px;padding:5px 8px;background:var(--bg-soft);border:1.5px solid var(--line);border-radius:8px;font-size:12.5px;font-weight:700;color:var(--ink);text-align:center;outline:none;font-family:inherit">
+        <span style="font-size:11.5px;color:var(--muted)">% a.a.</span>
+        <select id="pj_horizonte" onchange="renderProjecoesView()" style="padding:6px 10px;background:var(--bg-soft);border:1.5px solid var(--line);border-radius:8px;font-size:12.5px;color:var(--ink);outline:none;font-family:inherit">
+          <option value="1">1 ano</option><option value="3" selected>3 anos</option><option value="5">5 anos</option><option value="10">10 anos</option>
+        </select>
+      </div>
+    </div>
+    <div id="pj_kpis" style="margin-bottom:18px"></div>
+    <div class="row" style="grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:18px">
+      <div class="card" style="padding:20px">
+        <div class="card-h"><div><h3>Evolução do Patrimônio Líquido</h3><div class="sub">Cenários conservador · realista · otimista</div></div></div>
+        <div class="chart-wrap tall"><canvas id="pj_chart_pat"></canvas></div>
+      </div>
+      <div class="card" style="padding:20px">
+        <div class="card-h"><div><h3>Renda Passiva Projetada</h3><div class="sub">Aluguéis e rendimentos</div></div></div>
+        <div id="pj_passiva" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <div class="card" style="padding:20px;margin-bottom:22px">
+      <div class="card-h"><div><h3>Projeção de Fluxo de Caixa</h3><div class="sub">Receitas, despesas e saldo acumulado · próximos 12 meses</div></div></div>
+      <div class="chart-wrap"><canvas id="pj_chart_fluxo"></canvas></div>
+    </div>
+    <div style="height:1px;background:var(--line);margin-bottom:18px"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px">Dados e relatórios</div>
 
     <!-- ── KPI CARDS ── -->
     <div class="rel-kpi-grid" id="rel_kpi_row"></div>
@@ -5113,11 +5146,6 @@
           </div>
         </div>
         ${a.status?`<span class="a-status ${a.statusType||'ok'}">${a.status}</span>`:''}
-        ${(() => {
-          const ds = getDocStatus(a);
-          if(!ds) return '';
-          return `<span class="doc-status-mini ${ds}" onclick="event.stopPropagation();openHistoryModal('${a.id}');setTimeout(()=>setHistoryTab('docs'),50)" title="Ver documentos">📄 ${getDocStatusLabel(ds)}</span>`;
-        })()}
         <div class="a-value">${BRL(a.currentValue)}</div>
         <div class="a-vsub">
           ${(() => { const inv = getValorInvestido(a.id); return inv>0?`Compra: ${BRL(inv)}`:'Sem aporte registrado'; })()}
@@ -8380,7 +8408,7 @@
     metas:        { title:'Metas e Objetivos', sub:'Acompanhe suas metas pelo resultado líquido real' },
     dividas:      { title:'Dívidas',           sub:'Cartões, empréstimos e despesas fixas' },
     comprovantes: { title:'Comprovantes',      sub:'Leitor inteligente de boletos e recibos' },
-    relatorios:   { title:'Relatórios',        sub:'Dossiê, exportação e manutenção de dados' },
+    relatorios:   { title:'Projeções',         sub:'Planeje o futuro do seu patrimônio e do seu caixa' },
     indicar:      { title:'Indique e Ganhe',   sub:'Convide amigos e acumule comissões' },
     leilao:       { title:'Calculadora de Leilão', sub:'Análise inteligente de oportunidades em leilão' },
     suporte:      { title:'Central de Suporte',    sub:'Reporte bugs, sugestões e dúvidas para nossa equipe' },
@@ -9412,6 +9440,64 @@
     }).join('');
   }
 
+  function renderProjecoesView(){
+    if(!document.getElementById('pj_kpis')) return;
+    const k=calcKpis();
+    const rate=Math.max(0,parseFloat(document.getElementById('pj_taxa')?.value)||8);
+    const horizonte=parseInt(document.getElementById('pj_horizonte')?.value)||3;
+    const rOtim=rate+4,rReal=rate,rCons=Math.max(0,rate-4);
+    let monthlyPaydown=0; (state.assets||[]).forEach(a=>{ if(typeof isLinkedConsorcio==='function'&&isLinkedConsorcio(a)) monthlyPaydown+=(a.parcelaMensal||0); });
+    const totalDebt=k.dividas||0, assets0=k.total||0;
+    const startY=new Date().getFullYear();
+    const years=[]; for(let i=0;i<=horizonte;i++) years.push(String(startY+i));
+    const proj=r=>years.map((_,i)=>{ const dl=Math.max(0,totalDebt-monthlyPaydown*12*i); return Math.round(assets0*Math.pow(1+r/100,i)-dl); });
+    const otim=proj(rOtim),real=proj(rReal),cons=proj(rCons);
+    const projFinal=real[real.length-1];
+    const cresc=k.liquido>0?(projFinal-k.liquido)/k.liquido*100:0;
+    const rk=(typeof calcRendaKpis==='function')?calcRendaKpis():{totalMensal:0};
+    const passivaMensal=rk.totalMensal||0, passivaAnual=passivaMensal*12;
+    const money=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    document.getElementById('pj_kpis').innerHTML=`<div class="metas-kpis">
+      <div class="mkpi"><div class="mkpi-lbl">Patrimônio líquido hoje</div><div class="mkpi-val">${money(k.liquido)}</div></div>
+      <div class="mkpi"><div class="mkpi-lbl">Projeção em ${horizonte} ano${horizonte>1?'s':''}</div><div class="mkpi-val" style="color:var(--accent-2)">${money(projFinal)}</div></div>
+      <div class="mkpi"><div class="mkpi-lbl">Crescimento estimado</div><div class="mkpi-val">${cresc>=0?'+':''}${cresc.toFixed(0)}%</div></div>
+      <div class="mkpi"><div class="mkpi-lbl">Renda passiva anual</div><div class="mkpi-val">${money(passivaAnual)}</div></div>
+    </div>`;
+    if(typeof Chart!=='undefined' && document.getElementById('pj_chart_pat')){
+      if(window.charts && charts.pjPat) charts.pjPat.destroy();
+      charts.pjPat=new Chart(document.getElementById('pj_chart_pat'),{type:'line',data:{labels:years,datasets:[
+        {label:'Otimista',data:otim,borderColor:'#22C55E',backgroundColor:'rgba(34,197,94,.07)',fill:'+1',tension:.35,borderWidth:2.5,pointRadius:3},
+        {label:'Realista',data:real,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,.07)',fill:'+1',tension:.35,borderWidth:2.5,pointRadius:3},
+        {label:'Conservador',data:cons,borderColor:'#94A3B8',fill:false,tension:.35,borderWidth:2,pointRadius:3,borderDash:[4,4]}
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,usePointStyle:true,color:isDark?'#C8CDD6':'#334155',font:{size:11.5}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.parsed.y)}}},scales:{y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:isDark?'#8B92A0':'#64748B'},grid:{color:isDark?'#1F2433':'#F1F5F9'}},x:{grid:{display:false},ticks:{color:isDark?'#8B92A0':'#64748B'}}}}});
+    }
+    const m=(RS.month!=null?RS.month:new Date().getMonth()), y=(RS.year!=null?RS.year:new Date().getFullYear());
+    const receitaMes=calcIncome(m,y), despesaMes=calcExpense(m,y)+((typeof calcDividasKpis==='function')?(calcDividasKpis().faturaTotal||0):0);
+    const saldo0=(RS.accounts||[]).reduce((a,c)=>a+Number(c.balance||0),0)+(RS.income||[]).filter(i=>i.status==='recebido').reduce((a,i)=>a+Number(i.value||0),0)-(RS.expenses||[]).filter(e=>e.paid).reduce((a,e)=>a+Number(e.value||0),0);
+    const MESN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const labels12=[],rec12=[],desp12=[],saldo12=[]; let sa=saldo0;
+    for(let i=0;i<12;i++){ const dd=new Date(y,m+i,1); labels12.push(MESN[dd.getMonth()]); rec12.push(Math.round(receitaMes)); desp12.push(Math.round(despesaMes)); sa+=receitaMes-despesaMes; saldo12.push(Math.round(sa)); }
+    if(typeof Chart!=='undefined' && document.getElementById('pj_chart_fluxo')){
+      if(window.charts && charts.pjFluxo) charts.pjFluxo.destroy();
+      charts.pjFluxo=new Chart(document.getElementById('pj_chart_fluxo'),{data:{labels:labels12,datasets:[
+        {type:'bar',label:'Receitas',data:rec12,backgroundColor:'rgba(34,197,94,.55)',borderRadius:4},
+        {type:'bar',label:'Despesas',data:desp12,backgroundColor:'rgba(239,68,68,.5)',borderRadius:4},
+        {type:'line',label:'Saldo acumulado',data:saldo12,borderColor:'#3B82F6',borderWidth:2.5,tension:.3,pointRadius:2}
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:10,usePointStyle:true,color:isDark?'#C8CDD6':'#334155',font:{size:11.5}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.parsed.y)}}},scales:{y:{ticks:{callback:v=>'R$ '+Math.round(v/1000)+'k',color:isDark?'#8B92A0':'#64748B'},grid:{color:isDark?'#1F2433':'#F1F5F9'}},x:{grid:{display:false},ticks:{color:isDark?'#8B92A0':'#64748B'}}}}});
+    }
+    const pe=document.getElementById('pj_passiva');
+    if(pe){
+      const passivaFut=passivaAnual*Math.pow(1+rate/100,horizonte);
+      pe.innerHTML=`<div style="display:flex;flex-direction:column;gap:13px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:var(--muted)">Hoje (mensal)</span><span style="font-family:'Manrope',system-ui;font-weight:800;font-size:16px;color:var(--ink)">${money(passivaMensal)}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:var(--muted)">Hoje (anual)</span><span style="font-family:'Manrope',system-ui;font-weight:800;font-size:16px;color:var(--accent-2)">${money(passivaAnual)}</span></div>
+        <div style="height:1px;background:var(--line)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:var(--muted)">Em ${horizonte} ano${horizonte>1?'s':''} (anual)</span><span style="font-family:'Manrope',system-ui;font-weight:800;font-size:18px;color:var(--ink)">${money(passivaFut)}</span></div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">Projeção considerando ${rate}% a.a. de crescimento nos ativos geradores de renda.</div>
+      </div>`;
+    }
+  }
   function renderRelatoriosRenda(){
     // ── KPI row ──────────────────────────────────────────────────────────
     const m = RS.month, y = RS.year;
@@ -11489,7 +11575,7 @@
     if(name === 'metas') setTimeout(()=>{ if(typeof renderMetas==='function') renderMetas(); }, 60);
     if(name === 'calendario') setTimeout(()=>{ if(typeof renderCalendar==='function') renderCalendar(); }, 60);
     if(name === 'renda') setTimeout(()=>{ if(typeof renderRendaSection==='function') renderRendaSection(); }, 60);
-    if(name === 'relatorios') setTimeout(()=>{ if(typeof renderRelatoriosRenda==='function') renderRelatoriosRenda(); }, 60);
+    if(name === 'relatorios') setTimeout(()=>{ if(typeof renderProjecoesView==='function') renderProjecoesView(); if(typeof renderRelatoriosRenda==='function') renderRelatoriosRenda(); window.dispatchEvent(new Event('resize')); }, 60);
     if(name === 'ativos') setTimeout(()=>{ if(typeof renderAssets==='function') renderAssets(); }, 60);
     if(name === 'dividas') setTimeout(()=>{ if(typeof renderDividas==='function') renderDividas(); }, 60);
     if(name === 'leilao')   setTimeout(()=>{ if(typeof initLeilaoSection==='function') initLeilaoSection(); }, 60);
