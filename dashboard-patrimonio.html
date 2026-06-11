@@ -9178,7 +9178,8 @@
     const ativos = state.assets.filter(a=>a.renda?.ativa && a.renda.valorMensal>0);
     const totalMensal = ativos.reduce((s,a)=>s+(a.renda.valorMensal||0),0);
     const totalCustos = ativos.reduce((s,a)=>s+(a.renda.custoMensal||0),0);
-    const recebimentos = (state.rendaRecebimentos||[]).filter(x=>x.data&&x.data.startsWith(mesAtual));
+    const ativoIds = new Set(ativos.map(a=>a.id));
+    const recebimentos = (state.rendaRecebimentos||[]).filter(x=>x.data&&x.data.startsWith(mesAtual)&&ativoIds.has(x.assetId));
     const recebido = recebimentos.filter(x=>x.status==='recebido').reduce((s,x)=>s+(x.valor||0),0);
     const aReceber = totalMensal - recebido;
     const totalPatrimonio = ativos.reduce((s,a)=>s+(a.currentValue||0),0);
@@ -9724,8 +9725,8 @@
     // Limpeza global: remove entradas pendentes de ativos extintos/sem renda
     const activeRendaIds = new Set(
       (state.assets||[]).filter(a=>a.renda?.ativa && a.renda.valorMensal>0).map(a=>a.id));
-    RS.income = RS.income.filter(i =>
-      !i._assetId || i.status==='recebido' || activeRendaIds.has(i._assetId));
+    RS.income = RS.income.filter(i => !i._assetId || activeRendaIds.has(i._assetId));
+    state.rendaRecebimentos = (state.rendaRecebimentos||[]).filter(r => activeRendaIds.has(r.assetId));
 
     // Cria entrada pendente para cada ativo com renda ativa, se ainda não existir
     (state.assets||[]).forEach(a=>{
@@ -9749,7 +9750,7 @@
     // ── 1b. Custos mensais dos ativos de renda (IPTU/condomínio) → saídas ──
     const activeCustoIds = new Set(
       (state.assets||[]).filter(a=>a.renda?.ativa && (a.renda.custoMensal||0)>0).map(a=>a.id));
-    RS.expenses = RS.expenses.filter(e => !e._assetId || e.paid || activeCustoIds.has(e._assetId));
+    RS.expenses = RS.expenses.filter(e => !e._assetId || activeCustoIds.has(e._assetId));
     (state.assets||[]).forEach(a=>{
       if(!a.renda?.ativa || !(a.renda.custoMensal||0)) return;
       const exists = RS.expenses.find(e=>e._assetId===a.id && (e.date||'').startsWith(targetStr));
@@ -9823,7 +9824,7 @@
       });
     });
 
-    saveRS();
+    saveRS(); saveState();
   }
   function calcPassive(m,y){
     return RS.income.filter(i=>{ const d=new Date(i.date+'T12:00'); return d.getMonth()===m&&d.getFullYear()===y&&i.status==='recebido'&&PASSIVE_SUBS.includes(i.subcategory||i.category); }).reduce((s,i)=>s+Number(i.value||0),0);
