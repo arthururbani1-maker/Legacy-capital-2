@@ -5586,16 +5586,24 @@
     return {imovel:'🏡',terreno:'🌳',veiculo:'🚗',consorcio:'🎯',outro:'💼'}[cat]||'•';
   }
 
+  function _cleanupAssetLinks(assetId){
+    RS.income   = (RS.income||[]).filter(i=>i._assetId!==assetId);
+    RS.expenses = (RS.expenses||[]).filter(e=>e._assetId!==assetId);
+    state.rendaRecebimentos = (state.rendaRecebimentos||[]).filter(r=>r.assetId!==assetId);
+    saveRS();
+  }
   function deleteAsset(){
     if(!editingId) return;
     if(!confirm('Tem certeza que deseja excluir este ativo? Esta ação não pode ser desfeita.')) return;
     state.assets = state.assets.filter(a=>a.id!==editingId);
+    _cleanupAssetLinks(editingId);
     saveState();
     // Re-sync: remove entradas do ativo excluído e mantém os demais
     const _now1 = new Date();
     ensureRecurringForMonth(_now1.getMonth(), _now1.getFullYear());
     closeModal();
     renderAll();
+    if(typeof renderRendaSection==='function'){ try{ renderRendaSection(); }catch(e){} }
     toast('Ativo excluído','success');
   }
 
@@ -5604,10 +5612,12 @@
     if(!a) return;
     if(!confirm(`Excluir "${a.name}"?\n\nEsta ação não pode ser desfeita.`)) return;
     state.assets = state.assets.filter(x=>x.id!==id);
+    _cleanupAssetLinks(id);
     saveState();
     const _now2 = new Date();
     ensureRecurringForMonth(_now2.getMonth(), _now2.getFullYear());
     renderAll();
+    if(typeof renderRendaSection==='function'){ try{ renderRendaSection(); }catch(e){} }
     toast('Ativo excluído','success');
   }
 
@@ -9733,6 +9743,28 @@
         account:RS.accounts[0]?.id||null,
         tipo:'fixa', status:'pendente', recurring:true,
         note:a.renda.locatario?'Locatário: '+a.renda.locatario:''
+      });
+    });
+
+    // ── 1b. Custos mensais dos ativos de renda (IPTU/condomínio) → saídas ──
+    const activeCustoIds = new Set(
+      (state.assets||[]).filter(a=>a.renda?.ativa && (a.renda.custoMensal||0)>0).map(a=>a.id));
+    RS.expenses = RS.expenses.filter(e => !e._assetId || e.paid || activeCustoIds.has(e._assetId));
+    (state.assets||[]).forEach(a=>{
+      if(!a.renda?.ativa || !(a.renda.custoMensal||0)) return;
+      const exists = RS.expenses.find(e=>e._assetId===a.id && (e.date||'').startsWith(targetStr));
+      if(exists) return;
+      const dia = String(a.renda.diaRecebimento||1).padStart(2,'0');
+      RS.expenses.push({
+        id:'ca_'+uid(), _assetId:a.id,
+        date:`${targetStr}-${dia}`,
+        value:a.renda.custoMensal,
+        category:'Moradia',
+        description:'Custo · '+a.name,
+        account:RS.accounts[0]?.id||null,
+        tipo:'fixa', paid:false, recurring:true,
+        note:'Custo mensal do imóvel (IPTU/condomínio)',
+        cartaoId:null, cartaoParcelas:null, cartaoLancId:null
       });
     });
 
