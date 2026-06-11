@@ -9924,7 +9924,7 @@
       {label:'Renda Passiva',      val:fmtMoney(pass),         sub:`${ativosRenda.length} ativo(s) gerador(es)${passReceivedLabel}`,                                                          cls:'gold',     ico:'🌱'},
       {label:'Renda Ativa',        val:fmtMoney(active),       sub:rec>0?`${((active/rec)*100).toFixed(1)}% da receita recebida`:'',                                                          cls:'',         ico:'💼'},
       {label:'Projeção Anual Passiva', val:fmtMoney(projPassiva), sub:`${ativosRenda.length} ativo(s) × 12 meses`,                                                                           cls:'',         ico:'📅'},
-      {label:'Entradas Pendentes', val:fmtMoney(pend),         sub:'aguardando recebimento',                                                                                                  cls:'',         ico:'⏳'},
+      {label:'A Receber',          val:fmtMoney(pend),         sub:'entradas pendentes do mês',                                                                                               cls:'',         ico:'⏳'},
       {label:'Patrimônio Total',   val:fmtMoney(pat),          sub:'ativos + saldo contas',                                                                                                   cls:'featured', ico:'🏛️'},
     ];
     const kpisEl=document.getElementById('renda_kpis');
@@ -10104,7 +10104,7 @@
             <td><span style="font-size:11.5px;font-weight:600">${i.subcategory||i.category||'—'}</span>${i.recurring?'<span style="margin-left:5px;font-size:9px;background:var(--info-soft);color:var(--info);padding:1px 5px;border-radius:4px;font-weight:700">RECORRENTE</span>':''}</td>
             <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.description||'—'}</td>
             <td style="text-align:right"><span class="rtv ${isInc?'inc':'exp'}">${isInc?'+':'-'} ${fmtMoney(i.value)}</span></td>
-            <td>${isInc?`<span class="rsp ${i.status==='recebido'?'rec':'pend'}">${i.status==='recebido'?'✓ Recebido':'⏳ Pendente'}</span>`:`<span class="rsp ${i.tipo==='fixa'?'fixa':'var'}">${i.tipo==='fixa'?'Fixa':'Variável'}</span>`}</td>
+            <td>${isInc?`<button class="rsp ${i.status==='recebido'?'rec':'pend'}" onclick="toggleIncomeStatus('${i.id}')" title="${i.status==='recebido'?'Clique para voltar a a receber':'Clique para marcar como recebido'}" style="cursor:pointer;border:none;font:inherit;transition:opacity .15s" onmouseover="this.style.opacity=.7" onmouseout="this.style.opacity=1">${i.status==='recebido'?'✓ Recebido':'⏳ A receber'}</button>`:`<span class="rsp ${i.tipo==='fixa'?'fixa':'var'}">${i.tipo==='fixa'?'Fixa':'Variável'}</span>`}</td>
             <td>${isInc?'':paidBtn(i.id,i.paid)}</td>
             <td style="font-size:11.5px;color:var(--muted)">${acc?acc.icon+' '+acc.name:'—'}</td>
             <td><div class="rt-acts">
@@ -10521,6 +10521,25 @@
     arr.push(copy); saveRS(); renderRendaSection(); toast('Lançamento duplicado','success');
   }
 
+  function toggleIncomeStatus(id){
+    const e=RS.income.find(x=>x.id===id); if(!e) return;
+    e.status = e.status==='recebido' ? 'pendente' : 'recebido';
+    // Sincroniza com o recebimento do ativo (aluguel), se vinculado
+    if(e._assetId){
+      if(!state.rendaRecebimentos) state.rendaRecebimentos=[];
+      const mes=(e.date||'').slice(0,7);
+      let rr=state.rendaRecebimentos.find(x=>x.assetId===e._assetId && (x.data||'').startsWith(mes));
+      if(e.status==='recebido'){
+        if(rr){ rr.status='recebido'; rr.data=e.date||rr.data; }
+        else { rr={id:'rr_'+uid(), assetId:e._assetId, data:e.date, valor:e.value, status:'recebido', obs:''}; state.rendaRecebimentos.push(rr); }
+        e._rendaId=rr.id;
+      } else if(rr){ rr.status='a-receber'; }
+      saveState();
+    }
+    saveRS(); renderRendaSection();
+    if(typeof renderAll==='function'){ try{ renderAll(); }catch(err){} }
+    toast(e.status==='recebido'?'✓ Recebido — creditado na Conta Corrente':'Marcado como a receber','success');
+  }
   function toggleExpensePaid(id){
     const e=RS.expenses.find(x=>x.id===id); if(!e) return;
     e.paid=!e.paid;
