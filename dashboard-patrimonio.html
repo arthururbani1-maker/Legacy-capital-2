@@ -2407,7 +2407,7 @@
           <span class="tba-txt">Novo Empréstimo</span>
         </button>
       </div>
-      <div class="emp-list" id="div_emp_list"></div>
+      <div class="assets-grid" id="div_emp_list"></div>
     </div>
 
     <!-- ── Despesas Fixas ── -->
@@ -2420,7 +2420,7 @@
         </button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px" id="div_desp_kpis"></div>
-      <div class="desp-lista" id="div_desp_list"></div>
+      <div class="assets-grid" id="div_desp_list"></div>
     </div>
 
   </div><!-- /sec-dividas -->
@@ -11195,26 +11195,31 @@
       const restantes=Math.max(0,(e.totalParcelas||1)-(e.parcelasPagas||0));
       const saldoDevedor=restantes*(e.parcelaMensal||0);
       const concluido=(e.parcelasPagas||0)>=(e.totalParcelas||1);
-      return `<div class="emp-card">
-        <div class="ec-header">
-          <div>
-            <div class="ec-nome">${e.nome}${concluido?' ✅':''}</div>
-            <div class="ec-tipo">${EMP_TIPO_LABELS[e.tipo]||'Empréstimo'} · ${e.banco||'—'}</div>
-          </div>
-          <div class="ec-actions">
-            <button class="tba secondary" style="padding:5px 10px;font-size:11px" onclick="pagarParcelaEmprestimo('${e.id}')">✓ Pagar parcela</button>
-            <button class="rta" onclick="openEmprestimoModal('${e.id}')" title="Editar"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-            <button class="rta" onclick="deleteEmprestimo('${e.id}')" title="Excluir"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+      return `<div class="asset">
+        <div class="a-actions">
+          <button class="a-act" onclick="event.stopPropagation();openEmprestimoModal('${e.id}')" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="a-act del" onclick="event.stopPropagation();deleteEmprestimo('${e.id}')" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+        <div class="a-top">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="a-icon" style="background:rgba(239,68,68,.1);color:var(--danger)">🏦</div>
+            <div><div class="a-name">${e.nome}</div><div class="a-sub">${EMP_TIPO_LABELS[e.tipo]||'Empréstimo'} · ${e.banco||'—'}</div></div>
           </div>
         </div>
-        <div class="ec-kpis">
-          <div class="ek-item"><div class="ek-lbl">Parcela</div><div class="ek-val" style="color:var(--danger)">${BRL(e.parcelaMensal||0)}</div></div>
-          <div class="ek-item"><div class="ek-lbl">Saldo devedor</div><div class="ek-val" style="color:var(--danger)">${BRL(saldoDevedor)}</div></div>
-          <div class="ek-item"><div class="ek-lbl">Pagas</div><div class="ek-val">${e.parcelasPagas||0}/${e.totalParcelas||0}</div></div>
-          <div class="ek-item"><div class="ek-lbl">Venc. dia</div><div class="ek-val">${e.diaVencimento||'—'}</div></div>
+        <span class="a-status ${concluido?'ok':'alert'}">${concluido?'Quitado':'Em pagamento'}</span>
+        <div class="a-value" style="color:var(--danger)">${BRL(saldoDevedor)}</div>
+        <div class="a-vsub">saldo devedor · parcela ${BRL(e.parcelaMensal||0)}/mês</div>
+        <div class="progress">
+          <div class="prog-h"><span>Quitação</span><b>${e.parcelasPagas||0} / ${e.totalParcelas||0}</b></div>
+          <div class="bar"><i style="width:${pct}%;background:${concluido?'var(--accent)':'#3B82F6'}"></i></div>
         </div>
-        <div class="ec-bar"><div class="ec-bar-fill" style="width:${pct}%"></div></div>
-        <div class="ec-progress"><span>${pct.toFixed(0)}% quitado</span><span>${restantes} parcela(s) restante(s)</span></div>
+        <div class="a-meta">
+          <div class="item"><div class="k">Parcela</div><div class="v">${BRL(e.parcelaMensal||0)}</div></div>
+          <div class="item"><div class="k">Saldo devedor</div><div class="v">${BRL(saldoDevedor)}</div></div>
+          <div class="item"><div class="k">Restantes</div><div class="v">${restantes} parcela(s)</div></div>
+          <div class="item"><div class="k">Vencimento</div><div class="v">${e.diaVencimento?'dia '+e.diaVencimento:'—'}</div></div>
+        </div>
+        ${concluido?'':`<div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)"><button class="tba secondary" style="width:100%;justify-content:center" onclick="event.stopPropagation();pagarParcelaEmprestimo('${e.id}')">✓ Pagar parcela</button></div>`}
       </div>`;
     }).join('');
   }
@@ -11255,18 +11260,23 @@
       return;
     }
     elList.innerHTML=desps.sort((a,b)=>(a.dia||0)-(b.dia||0)).map(d=>`
-      <div class="desp-item">
-        <div class="di-cat">${DESP_CAT_ICONS[d.categoria]||'📦'}</div>
-        <div class="di-info">
-          <div class="di-nome">${d.nome}</div>
-          <div class="di-cat-label">${DESP_CAT_LABELS[d.categoria]||'Outro'}${d.obs?' · '+d.obs:''}</div>
+      <div class="asset">
+        <div class="a-actions">
+          <button class="a-act" onclick="event.stopPropagation();editDespesa('${d.id}')" title="Editar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="a-act del" onclick="event.stopPropagation();deleteDespesa('${d.id}')" title="Excluir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
         </div>
-        <div class="di-val">
-          <div class="di-amount">-${BRL(d.valor||0)}</div>
-          <div class="di-dia">Venc. dia ${d.dia||'—'}</div>
+        <div class="a-top">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="a-icon" style="background:var(--bg-soft)">${DESP_CAT_ICONS[d.categoria]||'📦'}</div>
+            <div><div class="a-name">${d.nome}</div><div class="a-sub">${DESP_CAT_LABELS[d.categoria]||'Outro'}${d.obs?' · '+d.obs:''}</div></div>
+          </div>
         </div>
-        <button class="di-del" onclick="editDespesa('${d.id}')" title="Editar">✎</button>
-        <button class="di-del" onclick="deleteDespesa('${d.id}')" title="Excluir">✕</button>
+        <div class="a-value" style="color:var(--danger)">${BRL(d.valor||0)} <span style="font-size:12px;color:var(--muted);font-weight:500">/mês</span></div>
+        <div class="a-vsub">Vencimento dia ${d.dia||'—'}</div>
+        <div class="a-meta">
+          <div class="item"><div class="k">Categoria</div><div class="v">${DESP_CAT_LABELS[d.categoria]||'Outro'}</div></div>
+          <div class="item"><div class="k">Vencimento</div><div class="v">${d.dia?'dia '+d.dia:'—'}</div></div>
+        </div>
       </div>`).join('');
   }
 
