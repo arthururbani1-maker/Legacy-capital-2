@@ -544,6 +544,36 @@
   .pb-item .pb-ic{font-size:15px;flex-shrink:0}
   .pb-item b{font-weight:600}
   .pb-item .pb-act{color:var(--muted)}
+  /* ===== SEÇÃO PROCESSOS (Kanban) ===== */
+  .proc-hint{font-size:11.5px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .proc-hint svg{width:15px;height:15px;flex-shrink:0;color:var(--gold)}
+  .proc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .proc-tab{padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--bg-elev);color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;transition:.15s}
+  .proc-tab:hover{border-color:var(--accent);color:var(--ink)}
+  .proc-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .proc-tab-n{font-size:10.5px;padding:1px 7px;border-radius:999px;background:rgba(0,0,0,.08)}
+  .proc-tab.active .proc-tab-n{background:rgba(255,255,255,.25)}
+  .proc-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
+  .proc-col{flex:0 0 218px;min-width:218px;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:10px;transition:border-color .15s,background .15s}
+  .proc-col.drop-hover{border-color:var(--accent);background:rgba(22,163,74,.06)}
+  .proc-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 11px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .proc-col-n{font-size:10.5px;color:var(--muted);background:var(--bg-elev);border-radius:999px;padding:1px 8px;letter-spacing:0}
+  .proc-col-body{display:flex;flex-direction:column;gap:9px;min-height:50px}
+  .proc-card{background:var(--bg-elev);border:1px solid var(--line);border-radius:11px;padding:11px 12px;cursor:grab;position:relative;transition:border-color .15s,box-shadow .15s,opacity .15s}
+  .proc-card:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .proc-card.dragging{opacity:.4}
+  .pc-top{display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;padding-right:18px}
+  .pc-ic{font-size:17px;flex-shrink:0;line-height:1.1}
+  .pc-name{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.25}
+  .pc-sub{font-size:10.5px;color:var(--muted);margin-top:1px}
+  .pc-val{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  .pc-next{font-size:10.5px;color:var(--muted);display:flex;gap:5px;align-items:flex-start;line-height:1.35;border-top:1px dashed var(--line);padding-top:7px;margin-top:1px}
+  .pc-next svg{width:11px;height:11px;flex-shrink:0;color:var(--accent);margin-top:1px}
+  .pc-edit{position:absolute;top:7px;right:7px;width:22px;height:22px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s}
+  .proc-card:hover .pc-edit{opacity:1}
+  .pc-edit:hover{background:var(--bg-soft);color:var(--accent)}
+  .pc-edit svg{width:13px;height:13px}
+  .proc-empty{padding:54px 20px;text-align:center;color:var(--muted);font-size:13px;width:100%}
   /* ── Premium Empty State ── */
   .es{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 24px;text-align:center;gap:0}
   .es-ico{font-size:44px;line-height:1;opacity:.22;margin-bottom:16px;filter:grayscale(.4)}
@@ -1865,6 +1895,11 @@
           <span class="sb-item-lbl">Ativos</span>
           <span class="sb-tip">Ativos</span>
         </button>
+        <button class="sb-item" id="sb-processos" onclick="showSection('processos')">
+          <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg></span>
+          <span class="sb-item-lbl">Processos</span>
+          <span class="sb-tip">Processos</span>
+        </button>
         <button class="sb-item" id="sb-calendario" onclick="showSection('calendario')">
           <span class="sb-item-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
           <span class="sb-item-lbl">Calendário</span>
@@ -2150,6 +2185,15 @@
       <div id="assetsContainer"></div>
     </section>
   </div><!-- /sec-ativos -->
+
+  <!-- ═══ PROCESSOS ═══ -->
+  <div class="page-sec" id="sec-processos">
+    <section class="assets">
+      <div class="proc-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Arraste um bem entre as colunas para mudar a etapa. Cada categoria tem sua própria trilha de processo.</div>
+      <div class="proc-tabs" id="proc_tabs"></div>
+      <div class="proc-board" id="proc_board"></div>
+    </section>
+  </div><!-- /sec-processos -->
 
   <!-- ═══ CALENDÁRIO ═══ -->
   <div class="page-sec" id="sec-calendario">
@@ -4724,6 +4768,62 @@
   // ============================================================
   // RENDER: ASSETS
   // ============================================================
+  // ============================================================
+  // PROCESSOS — Kanban por etapa (arrastar para avançar)
+  // ============================================================
+  let _procCat = 'imovel';
+  function setProcCat(c){ _procCat = c; renderProcessos(); }
+  function procCardHtml(a){
+    const next = a.proximaAcao && a.proximaAcao.trim()
+      ? `<div class="pc-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span>${a.proximaAcao}</span></div>` : '';
+    return `<div class="proc-card" draggable="true" ondragstart="procDragStart(event,'${a.id}')" ondragend="procDragEnd(this)">
+      <button class="pc-edit" title="Editar bem" onclick="event.stopPropagation();openEditModal('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <div class="pc-top"><span class="pc-ic">${a.icon||'•'}</span><div><div class="pc-name">${a.name}</div>${a.subtitle?`<div class="pc-sub">${a.subtitle}</div>`:''}</div></div>
+      <div class="pc-val">${BRL(a.currentValue||0)}</div>
+      ${next}
+    </div>`;
+  }
+  function renderProcessos(){
+    const tabsEl = document.getElementById('proc_tabs');
+    const boardEl = document.getElementById('proc_board');
+    if(!tabsEl || !boardEl) return;
+    const counts = {};
+    CATEGORIES.forEach(c=>counts[c.id] = (state.assets||[]).filter(a=>a.category===c.id).length);
+    if(!CATEGORIES.some(c=>c.id===_procCat)) _procCat = 'imovel';
+    tabsEl.innerHTML = CATEGORIES.map(c=>`<button class="proc-tab ${_procCat===c.id?'active':''}" onclick="setProcCat('${c.id}')">${c.label}<span class="proc-tab-n">${counts[c.id]||0}</span></button>`).join('');
+    const ets = getEtapasFor(_procCat);
+    const cols = [{id:'__none',label:'A definir'}, ...ets];
+    const assets = (state.assets||[]).filter(a=>a.category===_procCat);
+    if(assets.length===0){ boardEl.innerHTML = `<div class="proc-empty">Nenhum bem nesta categoria ainda. Cadastre na aba Ativos.</div>`; return; }
+    boardEl.innerHTML = cols.map(col=>{
+      const items = assets.filter(a=>{ const e=a.etapa||''; return col.id==='__none' ? (!e || !ets.some(x=>x.id===e)) : e===col.id; });
+      const cards = items.map(procCardHtml).join('') || `<div style="font-size:10.5px;color:var(--muted);text-align:center;padding:16px 0;opacity:.55">—</div>`;
+      return `<div class="proc-col" ondragover="procDragOver(event,this)" ondragleave="procDragLeave(this)" ondrop="procDrop(event,'${col.id}',this)">
+        <div class="proc-col-hdr"><span>${col.label}</span><span class="proc-col-n">${items.length}</span></div>
+        <div class="proc-col-body">${cards}</div>
+      </div>`;
+    }).join('');
+  }
+  let _procDragId = null;
+  function procDragStart(e,id){ _procDragId = id; e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain', id); }catch(_){ } const c=e.currentTarget; setTimeout(()=>{ if(c) c.classList.add('dragging'); },0); }
+  function procDragEnd(el){ if(el) el.classList.remove('dragging'); }
+  function procDragOver(e,col){ e.preventDefault(); if(e.dataTransfer) e.dataTransfer.dropEffect='move'; if(col) col.classList.add('drop-hover'); }
+  function procDragLeave(col){ if(col) col.classList.remove('drop-hover'); }
+  function procDrop(e,colId,col){
+    e.preventDefault(); if(col) col.classList.remove('drop-hover');
+    const id = _procDragId || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+    _procDragId = null;
+    if(!id) return;
+    const a = (state.assets||[]).find(x=>x.id===id); if(!a) return;
+    const newEtapa = colId==='__none' ? '' : colId;
+    if((a.etapa||'') === newEtapa) return;
+    a.etapa = newEtapa;
+    saveState();
+    renderProcessos();
+    const lbl = newEtapa ? ((getEtapasFor(a.category).find(x=>x.id===newEtapa)||{}).label || newEtapa) : 'A definir';
+    if(typeof toast==='function') toast(`${a.name} → ${lbl}`,'success');
+  }
+
   function renderPendenciasBanner(){
     const pend = (state.assets||[]).filter(a=>a.proximaAcao && a.proximaAcao.trim());
     if(pend.length===0) return '';
@@ -4743,7 +4843,7 @@
       return;
     }
     const cats = activeTab==='all'?CATEGORIES:CATEGORIES.filter(c=>c.id===activeTab);
-    cont.innerHTML = (activeTab==='all'?renderPendenciasBanner():'') + cats.map(cat=>{
+    cont.innerHTML = cats.map(cat=>{
       const items = state.assets.filter(a=>a.category===cat.id);
       const cards = items.length>0
         ? items.map(renderAssetCard).join('')
@@ -5249,19 +5349,6 @@
           <div class="renda-action-row">
             <button class="renda-chip ${statusMes}" onclick="event.stopPropagation();cycleRendaStatus('${a.id}')">${statusLabel}</button>
             ${r.locatario?`<span class="renda-last">${r.locatario}</span>`:''}
-          </div>`;
-        })()}
-        ${(() => {
-          const ets = getEtapasFor(a.category);
-          const curIdx = a.etapa ? ets.findIndex(e=>e.id===a.etapa) : -1;
-          if(curIdx<0 && !(a.proximaAcao&&a.proximaAcao.trim())) return '';
-          const steps = ets.map((e,i)=>{
-            const cls = curIdx<0?'':(i<curIdx?'done':i===curIdx?'current':'');
-            return `<div class="proc-step ${cls}"><div class="pd"></div>${e.label}</div>`;
-          }).join('');
-          return `<div class="proc-track">
-            ${curIdx>=0?`<div class="proc-steps">${steps}</div>`:''}
-            ${a.proximaAcao&&a.proximaAcao.trim()?`<div class="proc-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span><b>Próximo:</b> ${a.proximaAcao}</span></div>`:''}
           </div>`;
         })()}
       </div>`;
@@ -8485,6 +8572,7 @@
   const SECTION_TITLES = {
     dashboard:    { title:'Dashboard',        sub:'Visão consolidada' },
     ativos:       { title:'Meus Ativos',       sub:'Imóveis, consórcios, leilões e investimentos' },
+    processos:    { title:'Processos',         sub:'Em que etapa está cada bem — arraste para avançar' },
     calendario:   { title:'Calendário',        sub:'Parcelas, custos e contas recorrentes' },
     fluxo:        { title:'Fluxo de Caixa',    sub:'Projeção de compromissos e cenários futuros' },
     renda:        { title:'Controle de Renda', sub:'Entradas, saídas, contas e fluxo financeiro' },
@@ -11670,6 +11758,7 @@
     if(name === 'renda') setTimeout(()=>{ if(typeof renderRendaSection==='function') renderRendaSection(); }, 60);
     if(name === 'relatorios') setTimeout(()=>{ if(typeof renderProjecoesView==='function') renderProjecoesView(); if(typeof renderRelatoriosRenda==='function') renderRelatoriosRenda(); window.dispatchEvent(new Event('resize')); }, 60);
     if(name === 'ativos') setTimeout(()=>{ if(typeof renderAssets==='function') renderAssets(); }, 60);
+    if(name === 'processos') setTimeout(()=>{ if(typeof renderProcessos==='function') renderProcessos(); }, 60);
     if(name === 'dividas') setTimeout(()=>{ if(typeof renderDividas==='function') renderDividas(); }, 60);
     if(name === 'leilao')   setTimeout(()=>{ if(typeof initLeilaoSection==='function') initLeilaoSection(); }, 60);
     if(name === 'suporte')  setTimeout(()=>{ if(typeof renderSuporteSection==='function') renderSuporteSection(); }, 60);
