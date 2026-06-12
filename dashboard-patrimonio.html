@@ -544,7 +544,7 @@
   .pb-item .pb-ic{font-size:15px;flex-shrink:0}
   .pb-item b{font-weight:600}
   .pb-item .pb-act{color:var(--muted)}
-  /* ===== SEÇÃO PROCESSOS (Kanban) ===== */
+  /* ===== SEÇÃO PROCESSOS (painel por bem) ===== */
   .proc-hint{font-size:11.5px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
   .proc-hint svg{width:15px;height:15px;flex-shrink:0;color:var(--gold)}
   .proc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
@@ -553,6 +553,57 @@
   .proc-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
   .proc-tab-n{font-size:10.5px;padding:1px 7px;border-radius:999px;background:rgba(0,0,0,.08)}
   .proc-tab.active .proc-tab-n{background:rgba(255,255,255,.25)}
+  /* ===== PAINEL POR BEM (Processos) ===== */
+  .bem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:18px}
+  @media(max-width:560px){.bem-grid{grid-template-columns:1fr}}
+  .bem-card{background:var(--bg-elev);border:1px solid var(--line);border-radius:18px;padding:20px 22px;transition:.2s}
+  .bem-card:hover{box-shadow:var(--shadow-lg);border-color:var(--line-2)}
+  .bem-head{display:flex;align-items:flex-start;gap:14px}
+  .bem-ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:21px;flex-shrink:0}
+  .bem-ic.imovel{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);color:#16A34A}
+  .bem-ic.terreno{background:linear-gradient(135deg,#FFF4E1,#FFE2B5);color:#A86A14}
+  .bem-ic.veiculo{background:linear-gradient(135deg,#EAF0FE,#CFD9FA);color:#2447B0}
+  .bem-ic.consorcio{background:linear-gradient(135deg,#F2EAFE,#E0CFFA);color:#5A2BA8}
+  .bem-ic.outro{background:linear-gradient(135deg,#FEEAF1,#FACFDC);color:#A8254E}
+  .bem-titles{flex:1;min-width:0}
+  .bem-name{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.2px;line-height:1.2}
+  .bem-sub{font-size:12px;color:var(--muted);margin-top:3px}
+  .bem-right{text-align:right;flex-shrink:0;margin-left:8px}
+  .bem-val{font-family:'Manrope';font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.4px;white-space:nowrap}
+  .bem-etapa{font-size:10px;color:var(--muted);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .bem-track{margin-top:20px}
+  .bem-steps{display:flex;align-items:flex-start}
+  .bem-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;font-size:11px;line-height:1.25;color:var(--muted);text-align:center;cursor:pointer;padding:0 2px}
+  .bem-step .bd{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--line-2);background:var(--bg-elev);margin-bottom:8px;z-index:1;transition:.15s}
+  .bem-step:not(:last-child)::after{content:"";position:absolute;top:7px;left:50%;width:100%;height:2.5px;background:var(--line-2);z-index:0}
+  .bem-step.done .bd{background:var(--accent);border-color:var(--accent)}
+  .bem-step.done:not(:last-child)::after{background:var(--accent)}
+  .bem-step.current .bd{background:var(--bg-elev);border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,158,11,.18)}
+  .bem-step.current{color:var(--gold);font-weight:700}
+  .bem-step:hover .bd{border-color:var(--accent)}
+  .pend-box{margin-top:20px;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .pend-hd{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .pend-hd .pend-mk{width:18px;height:18px;border-radius:5px;border:2px solid var(--gold);flex-shrink:0}
+  .pend-hd b{font-size:14px;font-weight:700;color:var(--ink);flex:1}
+  .pend-count{font-size:11px;font-weight:700;color:var(--gold);background:rgba(245,158,11,.12);border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .pend-list{display:flex;flex-direction:column}
+  .pend-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink);cursor:pointer}
+  .pend-row:first-child{border-top:none}
+  .pend-cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--line-2);flex-shrink:0;display:grid;place-items:center;transition:.15s}
+  .pend-row:hover .pend-cb{border-color:var(--accent)}
+  .pend-row.done .pend-cb{background:var(--accent);border-color:var(--accent)}
+  .pend-cb svg{width:12px;height:12px;color:#fff;opacity:0}
+  .pend-row.done .pend-cb svg{opacity:1}
+  .pend-txt{flex:1}
+  .pend-row.done .pend-txt{text-decoration:line-through;color:var(--muted)}
+  .pend-del{opacity:0;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px 7px;border-radius:6px;flex-shrink:0;font-family:inherit}
+  .pend-row:hover .pend-del{opacity:1}
+  .pend-del:hover{color:var(--danger);background:var(--danger-soft)}
+  .pend-empty{font-size:12.5px;color:var(--muted);padding:8px 0 4px;font-style:italic}
+  .pend-add{display:flex;align-items:center;gap:11px;padding:11px 0 2px;border-top:1px solid var(--line)}
+  .pend-add .pend-cb{border-style:dashed}
+  .pend-add input{flex:1;border:none;background:transparent;font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;padding:0}
+  .pend-add input::placeholder{color:var(--muted)}
   .proc-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
   .proc-col{flex:0 0 218px;min-width:218px;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:10px;transition:border-color .15s,background .15s}
   .proc-col.drop-hover{border-color:var(--accent);background:rgba(22,163,74,.06)}
@@ -2189,9 +2240,9 @@
   <!-- ═══ PROCESSOS ═══ -->
   <div class="page-sec" id="sec-processos">
     <section class="assets">
-      <div class="proc-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Arraste um bem entre as colunas para mudar a etapa. Cada categoria tem sua própria trilha de processo.</div>
+      <div class="proc-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Acompanhe em que etapa está cada bem e o que falta fazer. Toque numa etapa da trilha para avançar.</div>
       <div class="proc-tabs" id="proc_tabs"></div>
-      <div class="proc-board" id="proc_board"></div>
+      <div class="bem-grid" id="bem_grid"></div>
     </section>
   </div><!-- /sec-processos -->
 
@@ -4544,6 +4595,13 @@
         if(!parsed.cartaoLancamentos) parsed.cartaoLancamentos = [];
         if(!parsed.emprestimos) parsed.emprestimos = [];
         if(!parsed.despesasFixas) parsed.despesasFixas = [];
+        (parsed.assets||[]).forEach(a=>{
+          if(!Array.isArray(a.pendencias)){
+            a.pendencias = (a.proximaAcao && a.proximaAcao.trim())
+              ? [{id:'p'+Math.random().toString(36).slice(2,9), txt:a.proximaAcao.trim(), done:false}]
+              : [];
+          }
+        });
         return parsed;
       }
     }catch(e){}
@@ -4769,59 +4827,100 @@
   // RENDER: ASSETS
   // ============================================================
   // ============================================================
-  // PROCESSOS — Kanban por etapa (arrastar para avançar)
+  // PROCESSOS — Painel por bem (trilha de etapas + pendências)
   // ============================================================
   let _procCat = 'imovel';
   function setProcCat(c){ _procCat = c; renderProcessos(); }
-  function procCardHtml(a){
-    const next = a.proximaAcao && a.proximaAcao.trim()
-      ? `<div class="pc-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span>${a.proximaAcao}</span></div>` : '';
-    return `<div class="proc-card" draggable="true" ondragstart="procDragStart(event,'${a.id}')" ondragend="procDragEnd(this)">
-      <button class="pc-edit" title="Editar bem" onclick="event.stopPropagation();openEditModal('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-      <div class="pc-top"><span class="pc-ic">${a.icon||'•'}</span><div><div class="pc-name">${a.name}</div>${a.subtitle?`<div class="pc-sub">${a.subtitle}</div>`:''}</div></div>
-      <div class="pc-val">${BRL(a.currentValue||0)}</div>
-      ${next}
+  function _uid(){ return 'p'+Math.random().toString(36).slice(2,9); }
+  function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>\"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m])); }
+  function _findAsset(id){ return (state.assets||[]).find(a=>a.id===id); }
+  function ensurePend(a){ if(!Array.isArray(a.pendencias)) a.pendencias=[]; return a.pendencias; }
+
+  function bemStepsHtml(a){
+    const ets = getEtapasFor(a.category);
+    const cur = ets.findIndex(e=>e.id===a.etapa);
+    return ets.map((e,i)=>{
+      const cls = cur<0 ? '' : (i<cur ? 'done' : (i===cur ? 'current' : ''));
+      return `<div class="bem-step ${cls}" onclick="setEtapa('${a.id}','${e.id}')" title="Marcar etapa: ${e.label}"><span class="bd"></span><span>${e.label}</span></div>`;
+    }).join('');
+  }
+
+  function pendRowsHtml(a){
+    const list = a.pendencias||[];
+    if(list.length===0) return `<div class="pend-empty">Nenhuma pendência ainda.</div>`;
+    return list.map(p=>`
+      <div class="pend-row ${p.done?'done':''}" onclick="togglePend('${a.id}','${p.id}')">
+        <span class="pend-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="pend-txt">${escapeHtml(p.txt)}</span>
+        <button class="pend-del" title="Remover" onclick="event.stopPropagation();delPend('${a.id}','${p.id}')">&times;</button>
+      </div>`).join('');
+  }
+
+  function bemCardHtml(a){
+    const ets = getEtapasFor(a.category);
+    const cur = ets.findIndex(e=>e.id===a.etapa);
+    const etapaLbl = cur<0 ? 'Etapa não definida' : `Etapa ${cur+1} de ${ets.length}`;
+    const todo = (a.pendencias||[]).filter(p=>!p.done).length;
+    return `<div class="bem-card">
+      <div class="bem-head">
+        <span class="bem-ic ${a.category}">${a.icon||'•'}</span>
+        <div class="bem-titles">
+          <div class="bem-name">${escapeHtml(a.name)}</div>
+          ${a.subtitle?`<div class="bem-sub">${escapeHtml(a.subtitle)}</div>`:''}
+        </div>
+        <div class="bem-right">
+          <div class="bem-val">${BRL(a.currentValue||0)}</div>
+          <div class="bem-etapa">${etapaLbl}</div>
+        </div>
+      </div>
+      <div class="bem-track"><div class="bem-steps">${bemStepsHtml(a)}</div></div>
+      <div class="pend-box">
+        <div class="pend-hd"><span class="pend-mk"></span><b>Pendências</b><span class="pend-count">${todo} a fazer</span></div>
+        <div class="pend-list">${pendRowsHtml(a)}</div>
+        <div class="pend-add">
+          <span class="pend-cb"></span>
+          <input type="text" id="padd_${a.id}" placeholder="Adicionar pendência..." onkeydown="if(event.key==='Enter'){addPend('${a.id}',this);}">
+        </div>
+      </div>
     </div>`;
   }
+
   function renderProcessos(){
     const tabsEl = document.getElementById('proc_tabs');
-    const boardEl = document.getElementById('proc_board');
-    if(!tabsEl || !boardEl) return;
+    const gridEl = document.getElementById('bem_grid');
+    if(!tabsEl || !gridEl) return;
     const counts = {};
     CATEGORIES.forEach(c=>counts[c.id] = (state.assets||[]).filter(a=>a.category===c.id).length);
     if(!CATEGORIES.some(c=>c.id===_procCat)) _procCat = 'imovel';
     tabsEl.innerHTML = CATEGORIES.map(c=>`<button class="proc-tab ${_procCat===c.id?'active':''}" onclick="setProcCat('${c.id}')">${c.label}<span class="proc-tab-n">${counts[c.id]||0}</span></button>`).join('');
-    const ets = getEtapasFor(_procCat);
-    const cols = [{id:'__none',label:'A definir'}, ...ets];
     const assets = (state.assets||[]).filter(a=>a.category===_procCat);
-    if(assets.length===0){ boardEl.innerHTML = `<div class="proc-empty">Nenhum bem nesta categoria ainda. Cadastre na aba Ativos.</div>`; return; }
-    boardEl.innerHTML = cols.map(col=>{
-      const items = assets.filter(a=>{ const e=a.etapa||''; return col.id==='__none' ? (!e || !ets.some(x=>x.id===e)) : e===col.id; });
-      const cards = items.map(procCardHtml).join('') || `<div style="font-size:10.5px;color:var(--muted);text-align:center;padding:16px 0;opacity:.55">—</div>`;
-      return `<div class="proc-col" ondragover="procDragOver(event,this)" ondragleave="procDragLeave(this)" ondrop="procDrop(event,'${col.id}',this)">
-        <div class="proc-col-hdr"><span>${col.label}</span><span class="proc-col-n">${items.length}</span></div>
-        <div class="proc-col-body">${cards}</div>
-      </div>`;
-    }).join('');
+    if(assets.length===0){ gridEl.innerHTML = `<div class="proc-empty">Nenhum bem nesta categoria ainda. Cadastre na aba Ativos.</div>`; return; }
+    gridEl.innerHTML = assets.map(bemCardHtml).join('');
   }
-  let _procDragId = null;
-  function procDragStart(e,id){ _procDragId = id; e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain', id); }catch(_){ } const c=e.currentTarget; setTimeout(()=>{ if(c) c.classList.add('dragging'); },0); }
-  function procDragEnd(el){ if(el) el.classList.remove('dragging'); }
-  function procDragOver(e,col){ e.preventDefault(); if(e.dataTransfer) e.dataTransfer.dropEffect='move'; if(col) col.classList.add('drop-hover'); }
-  function procDragLeave(col){ if(col) col.classList.remove('drop-hover'); }
-  function procDrop(e,colId,col){
-    e.preventDefault(); if(col) col.classList.remove('drop-hover');
-    const id = _procDragId || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
-    _procDragId = null;
-    if(!id) return;
-    const a = (state.assets||[]).find(x=>x.id===id); if(!a) return;
-    const newEtapa = colId==='__none' ? '' : colId;
-    if((a.etapa||'') === newEtapa) return;
-    a.etapa = newEtapa;
-    saveState();
-    renderProcessos();
-    const lbl = newEtapa ? ((getEtapasFor(a.category).find(x=>x.id===newEtapa)||{}).label || newEtapa) : 'A definir';
+
+  function setEtapa(id, etId){
+    const a=_findAsset(id); if(!a) return;
+    a.etapa = (a.etapa===etId) ? '' : etId;
+    saveState(); renderProcessos();
+    const lbl = a.etapa ? ((getEtapasFor(a.category).find(x=>x.id===a.etapa)||{}).label||a.etapa) : 'A definir';
     if(typeof toast==='function') toast(`${a.name} → ${lbl}`,'success');
+  }
+  function addPend(id, inp){
+    const a=_findAsset(id); if(!a) return;
+    const txt=(inp.value||'').trim(); if(!txt) return;
+    ensurePend(a).push({id:_uid(), txt, done:false});
+    saveState(); renderProcessos();
+    const el=document.getElementById('padd_'+id); if(el) el.focus();
+  }
+  function togglePend(id, pid){
+    const a=_findAsset(id); if(!a) return;
+    const p=ensurePend(a).find(x=>x.id===pid); if(!p) return;
+    p.done=!p.done; saveState(); renderProcessos();
+  }
+  function delPend(id, pid){
+    const a=_findAsset(id); if(!a) return;
+    a.pendencias = ensurePend(a).filter(x=>x.id!==pid);
+    saveState(); renderProcessos();
   }
 
   function renderPendenciasBanner(){
@@ -8572,7 +8671,7 @@
   const SECTION_TITLES = {
     dashboard:    { title:'Dashboard',        sub:'Visão consolidada' },
     ativos:       { title:'Meus Ativos',       sub:'Imóveis, consórcios, leilões e investimentos' },
-    processos:    { title:'Processos',         sub:'Em que etapa está cada bem — arraste para avançar' },
+    processos:    { title:'Processos',         sub:'Acompanhe a etapa e as pendências de cada bem' },
     calendario:   { title:'Calendário',        sub:'Parcelas, custos e contas recorrentes' },
     fluxo:        { title:'Fluxo de Caixa',    sub:'Projeção de compromissos e cenários futuros' },
     renda:        { title:'Controle de Renda', sub:'Entradas, saídas, contas e fluxo financeiro' },
