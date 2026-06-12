@@ -521,6 +521,29 @@
   .assets-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
   @media(max-width:1100px){.assets-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:640px){.assets-grid{grid-template-columns:1fr}}
+  /* ===== ACOMPANHAMENTO DE PROCESSO (etapas + próxima ação) ===== */
+  .proc-track{margin-top:14px;padding-top:13px;border-top:1px dashed var(--line)}
+  .proc-steps{display:flex;align-items:flex-start;gap:0;margin-bottom:4px}
+  .proc-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;font-size:9.5px;line-height:1.25;color:var(--muted);text-align:center}
+  .proc-step .pd{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);background:var(--bg-elev);margin-bottom:5px;z-index:1}
+  .proc-step:not(:last-child)::after{content:"";position:absolute;top:6px;left:50%;width:100%;height:2px;background:var(--line);z-index:0}
+  .proc-step.done .pd{background:var(--accent);border-color:var(--accent)}
+  .proc-step.done:not(:last-child)::after{background:var(--accent)}
+  .proc-step.current .pd{background:var(--bg-elev);border-color:var(--accent);box-shadow:0 0 0 3px rgba(22,163,74,.2)}
+  .proc-step.current{color:var(--ink);font-weight:700}
+  .proc-next{margin-top:10px;font-size:11.5px;color:var(--muted);display:flex;gap:7px;align-items:flex-start}
+  .proc-next svg{width:13px;height:13px;flex-shrink:0;color:var(--accent);margin-top:1px}
+  .proc-next b{color:var(--ink);font-weight:600}
+  /* ===== FAIXA DE PENDÊNCIAS ===== */
+  .pend-banner{background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.32);border-radius:14px;padding:14px 16px;margin-bottom:22px}
+  .pb-head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--gold);margin-bottom:11px}
+  .pb-head svg{width:16px;height:16px;flex-shrink:0}
+  .pb-list{display:flex;flex-direction:column;gap:8px}
+  .pb-item{display:flex;align-items:center;gap:8px;font-size:12.5px;cursor:pointer;color:var(--ink);transition:opacity .15s}
+  .pb-item:hover{opacity:.65}
+  .pb-item .pb-ic{font-size:15px;flex-shrink:0}
+  .pb-item b{font-weight:600}
+  .pb-item .pb-act{color:var(--muted)}
   /* ── Premium Empty State ── */
   .es{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 24px;text-align:center;gap:0}
   .es-ico{font-size:44px;line-height:1;opacity:.22;margin-bottom:16px;filter:grayscale(.4)}
@@ -3602,6 +3625,22 @@
           </div>
         </div>
 
+        <div class="form-section">
+          <h4>📍 Acompanhamento do processo</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Etapa atual</label>
+              <select id="f_etapa"></select>
+              <div class="hint">As etapas mudam conforme a categoria do bem</div>
+            </div>
+            <div class="field">
+              <label>Próxima ação (o que falta fazer)</label>
+              <input type="text" id="f_proximaAcao" placeholder="Ex: falar com engenheiro sobre topografia">
+              <div class="hint">Aparece na faixa de pendências no topo dos Ativos</div>
+            </div>
+          </div>
+        </div>
+
         <!-- VÍNCULO (visível só pra consórcios) -->
         <div class="form-section" id="f_linkSection" style="display:none">
           <h4>🔗 Vínculo com bem (consórcio contemplado)</h4>
@@ -4416,6 +4455,23 @@
     {id:'outro',label:'💼 Outros',title:'💼 Outros Investimentos',color:'#EF4444'}
   ];
 
+  // Trilha de etapas de processo por categoria de bem
+  const PROCESSO_ETAPAS = {
+    imovel:[{id:'negociacao',label:'Negociação'},{id:'compra',label:'Compra'},{id:'documentacao',label:'Documentação'},{id:'posse',label:'Posse'},{id:'regularizado',label:'Regularizado'}],
+    terreno:[{id:'negociacao',label:'Negociação'},{id:'compra',label:'Compra'},{id:'documentacao',label:'Documentação'},{id:'posse',label:'Posse'},{id:'regularizado',label:'Regularizado'}],
+    veiculo:[{id:'compra',label:'Compra'},{id:'transferencia',label:'Transferência'},{id:'regularizado',label:'Regularizado'}],
+    consorcio:[{id:'ativo',label:'Ativo'},{id:'contemplado',label:'Contemplado'},{id:'adquirido',label:'Bem adquirido'},{id:'quitado',label:'Quitado'}],
+    outro:[{id:'aplicado',label:'Aplicado'},{id:'rentabilizando',label:'Rentabilizando'},{id:'resgatado',label:'Resgatado'}],
+    _default:[{id:'andamento',label:'Em andamento'},{id:'concluido',label:'Concluído'}]
+  };
+  function getEtapasFor(cat){ return PROCESSO_ETAPAS[cat] || PROCESSO_ETAPAS._default; }
+  function populateEtapaSelect(cat,current){
+    const sel=document.getElementById('f_etapa'); if(!sel) return;
+    const ets=getEtapasFor(cat);
+    sel.innerHTML='<option value="">— Não definida —</option>'+ets.map(e=>`<option value="${e.id}">${e.label}</option>`).join('');
+    sel.value=current||'';
+  }
+
   let state = loadState();
   let activeTab = 'all';
   let editingId = null;
@@ -4668,6 +4724,16 @@
   // ============================================================
   // RENDER: ASSETS
   // ============================================================
+  function renderPendenciasBanner(){
+    const pend = (state.assets||[]).filter(a=>a.proximaAcao && a.proximaAcao.trim());
+    if(pend.length===0) return '';
+    const items = pend.map(a=>`<div class="pb-item" onclick="openEditModal('${a.id}')"><span class="pb-ic">${a.icon||'•'}</span><b>${a.name}</b><span class="pb-act">— ${a.proximaAcao}</span></div>`).join('');
+    return `<div class="pend-banner">
+      <div class="pb-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>${pend.length} ${pend.length===1?'bem precisa':'bens precisam'} da sua atenção</div>
+      <div class="pb-list">${items}</div>
+    </div>`;
+  }
+
   function renderAssets(){
     const cont = document.getElementById('assetsContainer');
     // Special enriched view for Consórcios tab
@@ -4677,7 +4743,7 @@
       return;
     }
     const cats = activeTab==='all'?CATEGORIES:CATEGORIES.filter(c=>c.id===activeTab);
-    cont.innerHTML = cats.map(cat=>{
+    cont.innerHTML = (activeTab==='all'?renderPendenciasBanner():'') + cats.map(cat=>{
       const items = state.assets.filter(a=>a.category===cat.id);
       const cards = items.length>0
         ? items.map(renderAssetCard).join('')
@@ -5185,6 +5251,19 @@
             ${r.locatario?`<span class="renda-last">${r.locatario}</span>`:''}
           </div>`;
         })()}
+        ${(() => {
+          const ets = getEtapasFor(a.category);
+          const curIdx = a.etapa ? ets.findIndex(e=>e.id===a.etapa) : -1;
+          if(curIdx<0 && !(a.proximaAcao&&a.proximaAcao.trim())) return '';
+          const steps = ets.map((e,i)=>{
+            const cls = curIdx<0?'':(i<curIdx?'done':i===curIdx?'current':'');
+            return `<div class="proc-step ${cls}"><div class="pd"></div>${e.label}</div>`;
+          }).join('');
+          return `<div class="proc-track">
+            ${curIdx>=0?`<div class="proc-steps">${steps}</div>`:''}
+            ${a.proximaAcao&&a.proximaAcao.trim()?`<div class="proc-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span><b>Próximo:</b> ${a.proximaAcao}</span></div>`:''}
+          </div>`;
+        })()}
       </div>`;
   }
 
@@ -5369,6 +5448,8 @@
     document.getElementById('f_subtitle').value = a.subtitle||'';
     document.getElementById('f_status').value = a.status||'';
     document.getElementById('f_statusType').value = a.statusType||'ok';
+    populateEtapaSelect(a.category, a.etapa);
+    document.getElementById('f_proximaAcao').value = a.proximaAcao||'';
     document.getElementById('f_currentValue').value = a.currentValue||'';
     document.getElementById('f_purchaseValue').value = a.purchaseValue||'';
     document.getElementById('f_parcelasPagas').value = a.parcelasPagas||'';
@@ -5389,7 +5470,7 @@
     populateLinkedAssetDropdown(a.linkedAssetId || '');
     // Re-toggle quando o usuário muda a categoria no modal
     const catSel = document.getElementById('f_category');
-    catSel.onchange = ()=>{ updateLinkSectionVisibility(); };
+    catSel.onchange = ()=>{ updateLinkSectionVisibility(); populateEtapaSelect(catSel.value, document.getElementById('f_etapa').value); };
 
     // Renda Patrimonial
     const renda = a.renda || {};
@@ -5514,6 +5595,8 @@
       parcelaMensal: newValor,
       proxVencimento: newProxVenc || '',
       progressLabel: document.getElementById('f_progressLabel').value.trim(),
+      etapa: document.getElementById('f_etapa').value || '',
+      proximaAcao: document.getElementById('f_proximaAcao').value.trim(),
       linkedAssetId,
       renda: rendaData,
       meta
