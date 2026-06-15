@@ -604,6 +604,27 @@
   .pend-add .pend-cb{border-style:dashed}
   .pend-add input{flex:1;border:none;background:transparent;font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;padding:0}
   .pend-add input::placeholder{color:var(--muted)}
+  /* ===== CARD DE STATUS — Sincronização Patrimônio ↔ Renda ===== */
+  .sync-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-radius:16px;padding:15px 20px;margin-bottom:22px;border:1px solid var(--line);background:var(--bg-elev);transition:.2s}
+  .sync-card.on{border-color:rgba(5,150,105,.4);background:linear-gradient(135deg,rgba(5,150,105,.08),rgba(34,197,94,.03))}
+  .sync-card.off{border-color:var(--line-2);background:var(--bg-soft)}
+  .sync-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+  .sync-card.on .sync-dot{background:#059669;box-shadow:0 0 0 4px rgba(5,150,105,.14)}
+  .sync-card.off .sync-dot{background:var(--muted-2);box-shadow:0 0 0 4px rgba(148,163,184,.12)}
+  .sync-main{flex:1;min-width:210px}
+  .sync-title{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+  .sync-sub{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .sync-stats{display:flex;gap:20px;flex-wrap:wrap}
+  .sync-stat{text-align:center}
+  .sync-stat b{display:block;font-family:'Manrope';font-size:18px;font-weight:800;color:var(--ink);line-height:1.1}
+  .sync-stat span{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+  .sync-toggle{display:flex;align-items:center;gap:9px;flex-shrink:0}
+  .sync-toggle .lbl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .sync-modal-opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:14px 16px;border:1px solid var(--line-2);border-radius:12px;background:var(--bg-elev);cursor:pointer;transition:.15s;font-family:inherit;margin-bottom:10px}
+  .sync-modal-opt:hover{border-color:var(--primary);background:var(--primary-soft)}
+  .sync-modal-opt .ico{font-size:20px;flex-shrink:0;line-height:1.1}
+  .sync-modal-opt .t{font-size:13.5px;font-weight:700;color:var(--ink)}
+  .sync-modal-opt .d{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45}
   .proc-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
   .proc-col{flex:0 0 218px;min-width:218px;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:10px;transition:border-color .15s,background .15s}
   .proc-col.drop-hover{border-color:var(--accent);background:rgba(22,163,74,.06)}
@@ -2227,6 +2248,16 @@
 
   <!-- ═══ ATIVOS ═══ -->
   <div class="page-sec" id="sec-ativos">
+    <!-- STATUS DA INTEGRAÇÃO (Sincronização Patrimônio ↔ Renda) -->
+    <div class="sync-card off" id="syncStatusCard">
+      <span class="sync-dot"></span>
+      <div class="sync-main">
+        <div class="sync-title" id="syncStatusTitle">Status da Integração</div>
+        <div class="sync-sub" id="syncStatusSub"></div>
+      </div>
+      <div class="sync-stats" id="syncStatusStats"></div>
+      <div class="sync-toggle"><span class="lbl">Sincr. global</span><button type="button" class="sw" id="syncGlobalSw" onclick="toggleSyncGlobal()"></button></div>
+    </div>
     <!-- ASSET TABS + GRID -->
     <section class="assets">
       <div class="sec-head">
@@ -2236,6 +2267,36 @@
       <div id="assetsContainer"></div>
     </section>
   </div><!-- /sec-ativos -->
+
+  <!-- MODAL: ATIVAR SINCRONIZAÇÃO (OFF → ON) -->
+  <div class="backdrop" id="syncOnModal" onclick="if(event.target.id==='syncOnModal')closeSyncModal('syncOnModal')">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:440px">
+      <div class="modal-h">
+        <div><h3>Ativar sincronização</h3><p>Patrimônio → Controle de Renda</p></div>
+        <button class="modal-close" onclick="closeSyncModal('syncOnModal')">✕</button>
+      </div>
+      <div style="margin-top:14px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Deseja sincronizar também todos os lançamentos patrimoniais já existentes?</p>
+        <button class="sync-modal-opt" onclick="applySyncOn('all')"><span class="ico">🔄</span><div><div class="t">Sincronizar tudo</div><div class="d">Cria agora os lançamentos do mês atual para todos os itens sincronizáveis.</div></div></button>
+        <button class="sync-modal-opt" onclick="applySyncOn('future')"><span class="ico">⏭️</span><div><div class="t">Apenas movimentações futuras</div><div class="d">Não mexe no mês atual; passa a sincronizar a partir do próximo mês.</div></div></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DESATIVAR SINCRONIZAÇÃO (ON → OFF) -->
+  <div class="backdrop" id="syncOffModal" onclick="if(event.target.id==='syncOffModal')closeSyncModal('syncOffModal')">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:440px">
+      <div class="modal-h">
+        <div><h3>Desativar sincronização</h3><p>Patrimônio independente do financeiro</p></div>
+        <button class="modal-close" onclick="closeSyncModal('syncOffModal')">✕</button>
+      </div>
+      <div style="margin-top:14px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">Deseja remover os lançamentos financeiros já criados pela sincronização patrimonial?</p>
+        <button class="sync-modal-opt" onclick="applySyncOff('remove')"><span class="ico">🗑️</span><div><div class="t">Remover lançamentos sincronizados</div><div class="d">Apaga os lançamentos ainda pendentes criados pela integração. Os já realizados (recebidos/pagos) são mantidos.</div></div></button>
+        <button class="sync-modal-opt" onclick="applySyncOff('keep')"><span class="ico">📌</span><div><div class="t">Manter histórico e parar novas</div><div class="d">Conserva tudo que já foi lançado e apenas interrompe novas sincronizações.</div></div></button>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══ PROCESSOS ═══ -->
   <div class="page-sec" id="sec-processos">
@@ -4595,6 +4656,7 @@
         if(!parsed.cartaoLancamentos) parsed.cartaoLancamentos = [];
         if(!parsed.emprestimos) parsed.emprestimos = [];
         if(!parsed.despesasFixas) parsed.despesasFixas = [];
+        if(typeof parsed.syncGlobal!=='boolean') parsed.syncGlobal = true;
         (parsed.assets||[]).forEach(a=>{
           if(!Array.isArray(a.pendencias)){
             a.pendencias = (a.proximaAcao && a.proximaAcao.trim())
@@ -4605,7 +4667,7 @@
         return parsed;
       }
     }catch(e){}
-    return {assets: structuredClone(DEFAULT_ASSETS), parcelas: [], payments: [], custos: [], recorrentes: [], documentos: [], rendaRecebimentos: [], cartoes: [], cartaoLancamentos: [], emprestimos: [], despesasFixas: []};
+    return {assets: structuredClone(DEFAULT_ASSETS), parcelas: [], payments: [], custos: [], recorrentes: [], documentos: [], rendaRecebimentos: [], cartoes: [], cartaoLancamentos: [], emprestimos: [], despesasFixas: [], syncGlobal:true};
   }
   function saveState(){
     try{
@@ -4934,6 +4996,7 @@
   }
 
   function renderAssets(){
+    if(typeof renderSyncStatus==='function') renderSyncStatus();
     const cont = document.getElementById('assetsContainer');
     // Special enriched view for Consórcios tab
     if(activeTab === 'consorcio'){
@@ -9621,6 +9684,7 @@
   // ────────────────────────────────────────────────────────────
   function syncAtivoRenda(asset){
     if(!RS.income) RS.income=[];
+    if(!isSyncGlobalOn()){ saveRS(); return; }
 
     const now = new Date();
     const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
@@ -9675,6 +9739,7 @@
   // Sincroniza TODOS os ativos com renda para o mês atual (chamado no loadRS)
   function syncAllAtivosRenda(){
     if(!RS.income) RS.income=[];
+    if(!isSyncGlobalOn()) return;
     const now = new Date();
     const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
@@ -9688,6 +9753,65 @@
     (state.assets||[]).forEach(a => {
       if(a.renda?.ativa && a.renda.valorMensal > 0) syncAtivoRenda(a);
     });
+  }
+
+  // ============================================================
+  // SINCRONIZAÇÃO GLOBAL — Patrimônio ↔ Controle de Renda
+  // ============================================================
+  function isSyncGlobalOn(){ return state.syncGlobal!==false; }
+
+  function renderSyncStatus(){
+    const card=document.getElementById('syncStatusCard'); if(!card) return;
+    const on=isSyncGlobalOn();
+    const ativosSync=(state.assets||[]).filter(a=>a.renda&&a.renda.ativa).length;
+    let lanc=0;
+    try{ lanc=((RS.income||[]).filter(i=>i._assetId).length)+((RS.expenses||[]).filter(e=>e._assetId).length); }catch(_){ lanc=0; }
+    card.classList.toggle('on',on); card.classList.toggle('off',!on);
+    const sw=document.getElementById('syncGlobalSw'); if(sw) sw.classList.toggle('on',on);
+    const title=document.getElementById('syncStatusTitle');
+    const sub=document.getElementById('syncStatusSub');
+    const stats=document.getElementById('syncStatusStats');
+    if(title) title.textContent = on ? '🟢 Patrimônio sincronizado com Controle de Renda'
+                                     : '⚪ Patrimônio operando de forma independente';
+    if(sub) sub.textContent = on ? 'Movimentações dos ativos alimentam entradas, saídas e fluxo automaticamente.'
+                                 : 'O patrimônio funciona normalmente, sem impactar o financeiro pessoal.';
+    if(stats) stats.innerHTML =
+      `<div class="sync-stat"><b>${on?ativosSync:0}</b><span>Ativos sincr.</span></div>`+
+      `<div class="sync-stat"><b>—</b><span>Dívidas · Fase 2</span></div>`+
+      `<div class="sync-stat"><b>${lanc}</b><span>Lançamentos</span></div>`;
+  }
+
+  function openSyncModal(id){ const m=document.getElementById(id); if(m) m.classList.add('show'); }
+  function closeSyncModal(id){ const m=document.getElementById(id); if(m) m.classList.remove('show'); }
+  function toggleSyncGlobal(){ if(isSyncGlobalOn()) openSyncModal('syncOffModal'); else openSyncModal('syncOnModal'); }
+
+  function applySyncOn(mode){
+    state.syncGlobal=true;
+    const now=new Date();
+    if(mode==='future'){ state._syncSkipMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; }
+    else { state._syncSkipMonth=null; }
+    saveState();
+    if(mode==='all' && typeof ensureRecurringForMonth==='function'){ ensureRecurringForMonth(now.getMonth(),now.getFullYear()); if(typeof saveRS==='function') saveRS(); }
+    closeSyncModal('syncOnModal');
+    if(typeof renderAll==='function') renderAll();
+    renderSyncStatus();
+    if(typeof toast==='function') toast(mode==='all'?'Sincronização ativada · lançamentos atualizados':'Sincronização ativada · a partir do próximo mês','success');
+  }
+
+  function applySyncOff(mode){
+    state.syncGlobal=false;
+    if(mode==='remove'){
+      try{
+        RS.income=(RS.income||[]).filter(i=>!(i._assetId && i.status!=='recebido'));
+        RS.expenses=(RS.expenses||[]).filter(e=>!(e._assetId && !e.paid));
+        if(typeof saveRS==='function') saveRS();
+      }catch(_){}
+    }
+    saveState();
+    closeSyncModal('syncOffModal');
+    if(typeof renderAll==='function') renderAll();
+    renderSyncStatus();
+    if(typeof toast==='function') toast(mode==='remove'?'Sincronização desligada · pendentes removidos':'Sincronização desligada · histórico mantido','info');
   }
 
   // ── RELATÓRIOS: helper ──────────────────────────────────────────────────
@@ -10077,6 +10201,7 @@
 
     const targetStr = `${y}-${String(m+1).padStart(2,'0')}`; // 'YYYY-MM'
 
+    if(isSyncGlobalOn() && targetStr!==state._syncSkipMonth){
     // ── 1. Renda dos ativos ──────────────────────────────────────
     // Limpeza global: remove entradas pendentes de ativos extintos/sem renda
     const activeRendaIds = new Set(
@@ -10124,6 +10249,8 @@
         cartaoId:null, cartaoParcelas:null, cartaoLancId:null
       });
     });
+
+    }
 
     // ── 2. Entradas recorrentes manuais ─────────────────────────
     // Pega a entrada mais recente de cada item recorrente de meses anteriores
