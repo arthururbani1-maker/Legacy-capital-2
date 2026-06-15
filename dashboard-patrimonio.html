@@ -544,7 +544,7 @@
   .pb-item .pb-ic{font-size:15px;flex-shrink:0}
   .pb-item b{font-weight:600}
   .pb-item .pb-act{color:var(--muted)}
-  /* ===== SEÇÃO PROCESSOS (Kanban) ===== */
+  /* ===== SEÇÃO PROCESSOS (painel por bem) ===== */
   .proc-hint{font-size:11.5px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
   .proc-hint svg{width:15px;height:15px;flex-shrink:0;color:var(--gold)}
   .proc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
@@ -553,34 +553,78 @@
   .proc-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
   .proc-tab-n{font-size:10.5px;padding:1px 7px;border-radius:999px;background:rgba(0,0,0,.08)}
   .proc-tab.active .proc-tab-n{background:rgba(255,255,255,.25)}
-  /* painel por bem — compacto */
-  .proc-board{display:block}
+  /* ===== PAINEL POR BEM (Processos) ===== */
+  .bem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:18px}
+  @media(max-width:560px){.bem-grid{grid-template-columns:1fr}}
+  .bem-card{background:var(--bg-elev);border:1px solid var(--line);border-radius:18px;padding:20px 22px;transition:.2s}
+  .bem-card:hover{box-shadow:var(--shadow-lg);border-color:var(--line-2)}
+  .bem-head{display:flex;align-items:flex-start;gap:14px}
+  .bem-ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:21px;flex-shrink:0}
+  .bem-ic.imovel{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);color:#16A34A}
+  .bem-ic.terreno{background:linear-gradient(135deg,#FFF4E1,#FFE2B5);color:#A86A14}
+  .bem-ic.veiculo{background:linear-gradient(135deg,#EAF0FE,#CFD9FA);color:#2447B0}
+  .bem-ic.consorcio{background:linear-gradient(135deg,#F2EAFE,#E0CFFA);color:#5A2BA8}
+  .bem-ic.outro{background:linear-gradient(135deg,#FEEAF1,#FACFDC);color:#A8254E}
+  .bem-titles{flex:1;min-width:0}
+  .bem-name{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.2px;line-height:1.2}
+  .bem-sub{font-size:12px;color:var(--muted);margin-top:3px}
+  .bem-right{text-align:right;flex-shrink:0;margin-left:8px}
+  .bem-val{font-family:'Manrope';font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.4px;white-space:nowrap}
+  .bem-etapa{font-size:10px;color:var(--muted);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .bem-track{margin-top:20px}
+  .bem-steps{display:flex;align-items:flex-start}
+  .bem-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;font-size:11px;line-height:1.25;color:var(--muted);text-align:center;cursor:pointer;padding:0 2px}
+  .bem-step .bd{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--line-2);background:var(--bg-elev);margin-bottom:8px;z-index:1;transition:.15s}
+  .bem-step:not(:last-child)::after{content:"";position:absolute;top:7px;left:50%;width:100%;height:2.5px;background:var(--line-2);z-index:0}
+  .bem-step.done .bd{background:var(--accent);border-color:var(--accent)}
+  .bem-step.done:not(:last-child)::after{background:var(--accent)}
+  .bem-step.current .bd{background:var(--bg-elev);border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,158,11,.18)}
+  .bem-step.current{color:var(--gold);font-weight:700}
+  .bem-step:hover .bd{border-color:var(--accent)}
+  .pend-box{margin-top:20px;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .pend-hd{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .pend-hd .pend-mk{width:18px;height:18px;border-radius:5px;border:2px solid var(--gold);flex-shrink:0}
+  .pend-hd b{font-size:14px;font-weight:700;color:var(--ink);flex:1}
+  .pend-count{font-size:11px;font-weight:700;color:var(--gold);background:rgba(245,158,11,.12);border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .pend-list{display:flex;flex-direction:column}
+  .pend-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink);cursor:pointer}
+  .pend-row:first-child{border-top:none}
+  .pend-cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--line-2);flex-shrink:0;display:grid;place-items:center;transition:.15s}
+  .pend-row:hover .pend-cb{border-color:var(--accent)}
+  .pend-row.done .pend-cb{background:var(--accent);border-color:var(--accent)}
+  .pend-cb svg{width:12px;height:12px;color:#fff;opacity:0}
+  .pend-row.done .pend-cb svg{opacity:1}
+  .pend-txt{flex:1}
+  .pend-row.done .pend-txt{text-decoration:line-through;color:var(--muted)}
+  .pend-del{opacity:0;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px 7px;border-radius:6px;flex-shrink:0;font-family:inherit}
+  .pend-row:hover .pend-del{opacity:1}
+  .pend-del:hover{color:var(--danger);background:var(--danger-soft)}
+  .pend-empty{font-size:12.5px;color:var(--muted);padding:8px 0 4px;font-style:italic}
+  .pend-add{display:flex;align-items:center;gap:11px;padding:11px 0 2px;border-top:1px solid var(--line)}
+  .pend-add .pend-cb{border-style:dashed}
+  .pend-add input{flex:1;border:none;background:transparent;font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;padding:0}
+  .pend-add input::placeholder{color:var(--muted)}
+  .proc-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
+  .proc-col{flex:0 0 218px;min-width:218px;background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:10px;transition:border-color .15s,background .15s}
+  .proc-col.drop-hover{border-color:var(--accent);background:rgba(22,163,74,.06)}
+  .proc-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 11px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .proc-col-n{font-size:10.5px;color:var(--muted);background:var(--bg-elev);border-radius:999px;padding:1px 8px;letter-spacing:0}
+  .proc-col-body{display:flex;flex-direction:column;gap:9px;min-height:50px}
+  .proc-card{background:var(--bg-elev);border:1px solid var(--line);border-radius:11px;padding:11px 12px;cursor:grab;position:relative;transition:border-color .15s,box-shadow .15s,opacity .15s}
+  .proc-card:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .proc-card.dragging{opacity:.4}
+  .pc-top{display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;padding-right:18px}
+  .pc-ic{font-size:17px;flex-shrink:0;line-height:1.1}
+  .pc-name{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.25}
+  .pc-sub{font-size:10.5px;color:var(--muted);margin-top:1px}
+  .pc-val{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  .pc-next{font-size:10.5px;color:var(--muted);display:flex;gap:5px;align-items:flex-start;line-height:1.35;border-top:1px dashed var(--line);padding-top:7px;margin-top:1px}
+  .pc-next svg{width:11px;height:11px;flex-shrink:0;color:var(--accent);margin-top:1px}
+  .pc-edit{position:absolute;top:7px;right:7px;width:22px;height:22px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s}
+  .proc-card:hover .pc-edit{opacity:1}
+  .pc-edit:hover{background:var(--bg-soft);color:var(--accent)}
+  .pc-edit svg{width:13px;height:13px}
   .proc-empty{padding:54px 20px;text-align:center;color:var(--muted);font-size:13px;width:100%}
-  .ppanel{background:var(--bg-elev);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:11px;padding:13px 15px;margin-bottom:11px;transition:box-shadow .15s}
-  .ppanel:hover{box-shadow:0 2px 10px rgba(0,0,0,.04)}
-  .ppanel-hdr{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-  .pph-left{display:flex;gap:10px;align-items:center;min-width:0;cursor:pointer}
-  .pph-ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;line-height:1}
-  .pph-name{font-size:13.5px;font-weight:700;color:var(--ink);font-family:'Manrope',sans-serif;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pph-sub{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pph-stage{font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;cursor:pointer}
-  .pbar{display:flex;align-items:center;gap:5px;margin-bottom:11px}
-  .pbar-seg{flex:1;height:5px;border-radius:3px;cursor:pointer;transition:transform .12s}
-  .pbar-seg:hover{transform:scaleY(1.7)}
-  .ppend2{display:flex;flex-direction:column}
-  .pp2-item{display:flex;align-items:center;gap:9px;padding:5px 0}
-  .pp2-check{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--line-2,var(--line));background:var(--bg-soft);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;color:#fff;transition:.15s}
-  .pp2-check.on{background:var(--accent);border-color:var(--accent)}
-  .pp2-check svg{width:10px;height:10px}
-  .pp2-txt{flex:1;font-size:12.5px;color:var(--ink);line-height:1.35;word-break:break-word}
-  .pp2-item.done .pp2-txt{color:var(--muted);text-decoration:line-through}
-  .pp2-del{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;opacity:0;padding:1px 4px;border-radius:5px;transition:.15s;flex-shrink:0}
-  .pp2-item:hover .pp2-del{opacity:.55}
-  .pp2-del:hover{opacity:1;color:var(--danger)}
-  .pp2-add{display:flex;align-items:center;gap:9px;padding:6px 0 1px;margin-top:3px;border-top:1px dashed var(--line)}
-  .pp2-plus{width:16px;text-align:center;color:var(--muted);font-style:normal;font-size:15px;flex-shrink:0;line-height:1}
-  .pp2-input{flex:1;min-width:0;border:none;background:transparent;font-size:12.5px;color:var(--ink);outline:none;font-family:inherit;padding:3px 0}
-  .pp2-input::placeholder{color:var(--muted)}
   /* ── Premium Empty State ── */
   .es{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 24px;text-align:center;gap:0}
   .es-ico{font-size:44px;line-height:1;opacity:.22;margin-bottom:16px;filter:grayscale(.4)}
@@ -2196,9 +2240,9 @@
   <!-- ═══ PROCESSOS ═══ -->
   <div class="page-sec" id="sec-processos">
     <section class="assets">
-      <div class="proc-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Clique numa etapa da trilha para mudar a situação do bem, e use a lista de pendências de cada card. Cada categoria tem sua própria trilha.</div>
+      <div class="proc-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Acompanhe em que etapa está cada bem e o que falta fazer. Toque numa etapa da trilha para avançar.</div>
       <div class="proc-tabs" id="proc_tabs"></div>
-      <div class="proc-board" id="proc_board"></div>
+      <div class="bem-grid" id="bem_grid"></div>
     </section>
   </div><!-- /sec-processos -->
 
@@ -4551,6 +4595,13 @@
         if(!parsed.cartaoLancamentos) parsed.cartaoLancamentos = [];
         if(!parsed.emprestimos) parsed.emprestimos = [];
         if(!parsed.despesasFixas) parsed.despesasFixas = [];
+        (parsed.assets||[]).forEach(a=>{
+          if(!Array.isArray(a.pendencias)){
+            a.pendencias = (a.proximaAcao && a.proximaAcao.trim())
+              ? [{id:'p'+Math.random().toString(36).slice(2,9), txt:a.proximaAcao.trim(), done:false}]
+              : [];
+          }
+        });
         return parsed;
       }
     }catch(e){}
@@ -4776,111 +4827,103 @@
   // RENDER: ASSETS
   // ============================================================
   // ============================================================
-  // PROCESSOS — Painel por bem (trilha de etapas + lista de pendências)
+  // PROCESSOS — Painel por bem (trilha de etapas + pendências)
   // ============================================================
   let _procCat = 'imovel';
   function setProcCat(c){ _procCat = c; renderProcessos(); }
-  function procEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function procHexA(hex,a){ if(!hex||hex[0]!=='#') return 'rgba(22,163,74,'+a+')'; const n=hex.replace('#',''); const r=parseInt(n.substr(0,2),16),g=parseInt(n.substr(2,2),16),b=parseInt(n.substr(4,2),16); return `rgba(${r},${g},${b},${a})`; }
-  function ensurePendencias(a){
-    if(!Array.isArray(a.pendencias)){
-      a.pendencias = [];
-      if(a.proximaAcao && a.proximaAcao.trim()){
-        a.pendencias.push({id:'p'+Date.now()+Math.floor(Math.random()*1000), texto:a.proximaAcao.trim(), feito:false});
-      }
-    }
-    return a.pendencias;
-  }
-  function procBarHtml(a){
+  function _uid(){ return 'p'+Math.random().toString(36).slice(2,9); }
+  function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>\"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m])); }
+  function _findAsset(id){ return (state.assets||[]).find(a=>a.id===id); }
+  function ensurePend(a){ if(!Array.isArray(a.pendencias)) a.pendencias=[]; return a.pendencias; }
+
+  function bemStepsHtml(a){
     const ets = getEtapasFor(a.category);
-    const accent = (CATEGORIES.find(c=>c.id===a.category)||{}).color || '#16A34A';
-    const curIdx = a.etapa ? ets.findIndex(e=>e.id===a.etapa) : -1;
-    return `<div class="pbar">` + ets.map((e,i)=>{
-      const reached = curIdx>=0 && i<=curIdx;
-      return `<div class="pbar-seg" onclick="setProcEtapa('${a.id}','${e.id}')" title="${procEsc(e.label)}" style="background:${reached?accent:'var(--bg-soft)'}"></div>`;
-    }).join('') + `</div>`;
+    const cur = ets.findIndex(e=>e.id===a.etapa);
+    return ets.map((e,i)=>{
+      const cls = cur<0 ? '' : (i<cur ? 'done' : (i===cur ? 'current' : ''));
+      return `<div class="bem-step ${cls}" onclick="setEtapa('${a.id}','${e.id}')" title="Marcar etapa: ${e.label}"><span class="bd"></span><span>${e.label}</span></div>`;
+    }).join('');
   }
-  function procPendHtml(a){
-    const pend = ensurePendencias(a);
-    const ordered = pend.slice().sort((x,y)=>(x.feito?1:0)-(y.feito?1:0));
-    const list = ordered.map(p=>`
-      <div class="pp2-item ${p.feito?'done':''}">
-        <button class="pp2-check ${p.feito?'on':''}" onclick="procTogglePend('${a.id}','${p.id}')" title="${p.feito?'Desmarcar':'Marcar como feito'}">${p.feito?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</button>
-        <span class="pp2-txt">${procEsc(p.texto)}</span>
-        <button class="pp2-del" onclick="procDelPend('${a.id}','${p.id}')" title="Excluir">✕</button>
+
+  function pendRowsHtml(a){
+    const list = a.pendencias||[];
+    if(list.length===0) return `<div class="pend-empty">Nenhuma pendência ainda.</div>`;
+    return list.map(p=>`
+      <div class="pend-row ${p.done?'done':''}" onclick="togglePend('${a.id}','${p.id}')">
+        <span class="pend-cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="pend-txt">${escapeHtml(p.txt)}</span>
+        <button class="pend-del" title="Remover" onclick="event.stopPropagation();delPend('${a.id}','${p.id}')">&times;</button>
       </div>`).join('');
-    return `<div class="ppend2">
-      ${list}
-      <div class="pp2-add">
-        <i class="pp2-plus">+</i>
-        <input type="text" class="pp2-input" id="ppend-input-${a.id}" placeholder="Adicionar pendência" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();procAddPend('${a.id}');}">
+  }
+
+  function bemCardHtml(a){
+    const ets = getEtapasFor(a.category);
+    const cur = ets.findIndex(e=>e.id===a.etapa);
+    const etapaLbl = cur<0 ? 'Etapa não definida' : `Etapa ${cur+1} de ${ets.length}`;
+    const todo = (a.pendencias||[]).filter(p=>!p.done).length;
+    return `<div class="bem-card">
+      <div class="bem-head">
+        <span class="bem-ic ${a.category}">${a.icon||'•'}</span>
+        <div class="bem-titles">
+          <div class="bem-name">${escapeHtml(a.name)}</div>
+          ${a.subtitle?`<div class="bem-sub">${escapeHtml(a.subtitle)}</div>`:''}
+        </div>
+        <div class="bem-right">
+          <div class="bem-val">${BRL(a.currentValue||0)}</div>
+          <div class="bem-etapa">${etapaLbl}</div>
+        </div>
+      </div>
+      <div class="bem-track"><div class="bem-steps">${bemStepsHtml(a)}</div></div>
+      <div class="pend-box">
+        <div class="pend-hd"><span class="pend-mk"></span><b>Pendências</b><span class="pend-count">${todo} a fazer</span></div>
+        <div class="pend-list">${pendRowsHtml(a)}</div>
+        <div class="pend-add">
+          <span class="pend-cb"></span>
+          <input type="text" id="padd_${a.id}" placeholder="Adicionar pendência..." onkeydown="if(event.key==='Enter'){addPend('${a.id}',this);}">
+        </div>
       </div>
     </div>`;
   }
+
   function renderProcessos(){
     const tabsEl = document.getElementById('proc_tabs');
-    const boardEl = document.getElementById('proc_board');
-    if(!tabsEl || !boardEl) return;
+    const gridEl = document.getElementById('bem_grid');
+    if(!tabsEl || !gridEl) return;
     const counts = {};
     CATEGORIES.forEach(c=>counts[c.id] = (state.assets||[]).filter(a=>a.category===c.id).length);
     if(!CATEGORIES.some(c=>c.id===_procCat)) _procCat = 'imovel';
     tabsEl.innerHTML = CATEGORIES.map(c=>`<button class="proc-tab ${_procCat===c.id?'active':''}" onclick="setProcCat('${c.id}')">${c.label}<span class="proc-tab-n">${counts[c.id]||0}</span></button>`).join('');
     const assets = (state.assets||[]).filter(a=>a.category===_procCat);
-    if(assets.length===0){ boardEl.innerHTML = `<div class="proc-empty">Nenhum bem nesta categoria ainda. Cadastre na aba Ativos.</div>`; return; }
-    const ets = getEtapasFor(_procCat);
-    boardEl.innerHTML = assets.map(a=>{
-      const accent = (CATEGORIES.find(c=>c.id===a.category)||{}).color || '#16A34A';
-      const curIdx = a.etapa ? ets.findIndex(e=>e.id===a.etapa) : -1;
-      const stage = curIdx>=0 ? `${procEsc(ets[curIdx].label)} · ${curIdx+1}/${ets.length}` : 'Definir etapa';
-      const sub = [a.subtitle, BRL(a.currentValue||0)].filter(Boolean).join(' · ');
-      return `<div class="ppanel" style="border-left-color:${accent}">
-        <div class="ppanel-hdr">
-          <div class="pph-left" onclick="openEditModal('${a.id}')" title="Abrir bem">
-            <div class="pph-ic" style="background:${procHexA(accent,.12)};color:${accent}">${a.icon||'•'}</div>
-            <div style="min-width:0"><div class="pph-name">${procEsc(a.name)}</div><div class="pph-sub">${sub}</div></div>
-          </div>
-          <span class="pph-stage" style="color:${accent};background:${procHexA(accent,.12)}" title="Clique numa etapa da barra para mudar">${stage}</span>
-        </div>
-        ${procBarHtml(a)}
-        ${procPendHtml(a)}
-      </div>`;
-    }).join('');
-  }
-    function setProcEtapa(assetId, etapaId){
-    const a = (state.assets||[]).find(x=>x.id===assetId); if(!a) return;
-    a.etapa = etapaId;
-    saveState();
-    renderProcessos();
-    const lbl = (getEtapasFor(a.category).find(x=>x.id===etapaId)||{}).label || etapaId;
-    if(typeof toast==='function') toast(`${a.name}: ${lbl}`,'success');
-  }
-  function procAddPend(assetId){
-    const inp = document.getElementById('ppend-input-'+assetId);
-    if(!inp) return;
-    const txt = inp.value.trim();
-    if(!txt) return;
-    const a = (state.assets||[]).find(x=>x.id===assetId); if(!a) return;
-    ensurePendencias(a);
-    a.pendencias.push({id:'p'+Date.now()+Math.floor(Math.random()*1000), texto:txt, feito:false});
-    saveState();
-    renderProcessos();
-    setTimeout(()=>{ const el=document.getElementById('ppend-input-'+assetId); if(el){ el.focus(); } },0);
-  }
-  function procTogglePend(assetId, pendId){
-    const a = (state.assets||[]).find(x=>x.id===assetId); if(!a) return;
-    const p = (a.pendencias||[]).find(x=>x.id===pendId); if(!p) return;
-    p.feito = !p.feito;
-    saveState();
-    renderProcessos();
-  }
-  function procDelPend(assetId, pendId){
-    const a = (state.assets||[]).find(x=>x.id===assetId); if(!a) return;
-    a.pendencias = (a.pendencias||[]).filter(x=>x.id!==pendId);
-    saveState();
-    renderProcessos();
+    if(assets.length===0){ gridEl.innerHTML = `<div class="proc-empty">Nenhum bem nesta categoria ainda. Cadastre na aba Ativos.</div>`; return; }
+    gridEl.innerHTML = assets.map(bemCardHtml).join('');
   }
 
-    function renderPendenciasBanner(){
+  function setEtapa(id, etId){
+    const a=_findAsset(id); if(!a) return;
+    a.etapa = (a.etapa===etId) ? '' : etId;
+    saveState(); renderProcessos();
+    const lbl = a.etapa ? ((getEtapasFor(a.category).find(x=>x.id===a.etapa)||{}).label||a.etapa) : 'A definir';
+    if(typeof toast==='function') toast(`${a.name} → ${lbl}`,'success');
+  }
+  function addPend(id, inp){
+    const a=_findAsset(id); if(!a) return;
+    const txt=(inp.value||'').trim(); if(!txt) return;
+    ensurePend(a).push({id:_uid(), txt, done:false});
+    saveState(); renderProcessos();
+    const el=document.getElementById('padd_'+id); if(el) el.focus();
+  }
+  function togglePend(id, pid){
+    const a=_findAsset(id); if(!a) return;
+    const p=ensurePend(a).find(x=>x.id===pid); if(!p) return;
+    p.done=!p.done; saveState(); renderProcessos();
+  }
+  function delPend(id, pid){
+    const a=_findAsset(id); if(!a) return;
+    a.pendencias = ensurePend(a).filter(x=>x.id!==pid);
+    saveState(); renderProcessos();
+  }
+
+  function renderPendenciasBanner(){
     const pend = (state.assets||[]).filter(a=>a.proximaAcao && a.proximaAcao.trim());
     if(pend.length===0) return '';
     const items = pend.map(a=>`<div class="pb-item" onclick="openEditModal('${a.id}')"><span class="pb-ic">${a.icon||'•'}</span><b>${a.name}</b><span class="pb-act">— ${a.proximaAcao}</span></div>`).join('');
@@ -8628,7 +8671,7 @@
   const SECTION_TITLES = {
     dashboard:    { title:'Dashboard',        sub:'Visão consolidada' },
     ativos:       { title:'Meus Ativos',       sub:'Imóveis, consórcios, leilões e investimentos' },
-    processos:    { title:'Processos',         sub:'Situação e pendências de cada bem' },
+    processos:    { title:'Processos',         sub:'Acompanhe a etapa e as pendências de cada bem' },
     calendario:   { title:'Calendário',        sub:'Parcelas, custos e contas recorrentes' },
     fluxo:        { title:'Fluxo de Caixa',    sub:'Projeção de compromissos e cenários futuros' },
     renda:        { title:'Controle de Renda', sub:'Entradas, saídas, contas e fluxo financeiro' },
