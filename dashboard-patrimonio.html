@@ -7276,6 +7276,7 @@
     p.dataPagamento = todayLocalStr();
     if(!p.valorPago) p.valorPago = p.valorPrevisto;
     syncAssetFromParcelas(p.assetId);
+    syncParcelaRenda(p);
     saveState();
     renderHistoryModal();
     renderAll();
@@ -7325,6 +7326,7 @@
     if(p.status==='paga' && !p.dataPagamento) p.dataPagamento = todayLocalStr();
     if(p.dataPagamento) p.status = 'paga';
     syncAssetFromParcelas(p.assetId);
+    syncParcelaRenda(p);
     saveState();
     closeParcelaModal();
     renderHistoryModal();
@@ -7352,6 +7354,7 @@
     // Status reverts based on date
     updateParcelaStatus(p);
     syncAssetFromParcelas(p.assetId);
+    syncParcelaRenda(p);
     return p;
   }
 
@@ -9174,6 +9177,7 @@
     p.dataPagamento = todayLocalStr();
     if(!p.valorPago) p.valorPago = p.valorPrevisto;
     syncAssetFromParcelas(p.assetId);
+    syncParcelaRenda(p);
     saveState();
     renderAll();
     if(dayModalDate) openDayModal(dayModalDate);
@@ -9765,7 +9769,7 @@
     const on=isSyncGlobalOn();
     const ativosSync=(state.assets||[]).filter(a=>a.renda&&a.renda.ativa).length;
     let lanc=0;
-    try{ lanc=((RS.income||[]).filter(i=>i._assetId).length)+((RS.expenses||[]).filter(e=>e._assetId).length); }catch(_){ lanc=0; }
+    try{ lanc=((RS.income||[]).filter(i=>i._assetId).length)+((RS.expenses||[]).filter(e=>e._assetId||e._parcelaId).length); }catch(_){ lanc=0; }
     card.classList.toggle('on',on); card.classList.toggle('off',!on);
     const sw=document.getElementById('syncGlobalSw'); if(sw) sw.classList.toggle('on',on);
     const title=document.getElementById('syncStatusTitle');
@@ -9791,7 +9795,7 @@
     if(mode==='future'){ state._syncSkipMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; }
     else { state._syncSkipMonth=null; }
     saveState();
-    if(mode==='all' && typeof ensureRecurringForMonth==='function'){ ensureRecurringForMonth(now.getMonth(),now.getFullYear()); if(typeof saveRS==='function') saveRS(); }
+    if(mode==='all' && typeof ensureRecurringForMonth==='function'){ ensureRecurringForMonth(now.getMonth(),now.getFullYear()); if(typeof syncAllParcelasRenda==='function') syncAllParcelasRenda(); if(typeof saveRS==='function') saveRS(); }
     closeSyncModal('syncOnModal');
     if(typeof renderAll==='function') renderAll();
     renderSyncStatus();
@@ -9803,7 +9807,7 @@
     if(mode==='remove'){
       try{
         RS.income=(RS.income||[]).filter(i=>!(i._assetId && i.status!=='recebido'));
-        RS.expenses=(RS.expenses||[]).filter(e=>!(e._assetId && !e.paid));
+        RS.expenses=(RS.expenses||[]).filter(e=>!((e._assetId||e._parcelaId) && !e.paid));
         if(typeof saveRS==='function') saveRS();
       }catch(_){}
     }
@@ -9812,6 +9816,37 @@
     if(typeof renderAll==='function') renderAll();
     renderSyncStatus();
     if(typeof toast==='function') toast(mode==='remove'?'Sincronização desligada · pendentes removidos':'Sincronização desligada · histórico mantido','info');
+  }
+
+  // ── Fase 2a · Sincronização de PARCELAS → saídas no Controle de Renda ──
+  function syncParcelaRenda(p, skipSave){
+    if(!p) return;
+    if(!RS.expenses) RS.expenses=[];
+    RS.expenses = RS.expenses.filter(e=> e._parcelaId!==p.id);
+    const enabled = isSyncGlobalOn() && p.sync!==false;
+    const date = p.dataPagamento || p.dataVencimento;
+    if(enabled && date){
+      const asset=(state.assets||[]).find(a=>a.id===p.assetId);
+      RS.expenses.push({
+        id:'pa_'+uid(), _parcelaId:p.id,
+        date: date,
+        value: Number(p.valorPago||p.valorPrevisto||0),
+        category:'Financiamento',
+        description:`Parcela ${p.numero||''}${asset?' · '+asset.name:''}`.trim(),
+        account:(RS.accounts[0]&&RS.accounts[0].id)||null,
+        tipo:'fixa', paid: p.status==='paga', recurring:false,
+        note:'Sincronizado do patrimônio',
+        cartaoId:null, cartaoParcelas:null, cartaoLancId:null
+      });
+    }
+    if(!skipSave && typeof saveRS==='function') saveRS();
+  }
+  function syncAllParcelasRenda(){
+    if(!RS.expenses) RS.expenses=[];
+    const ids=new Set((state.parcelas||[]).map(p=>p.id));
+    RS.expenses = RS.expenses.filter(e=> !e._parcelaId || ids.has(e._parcelaId));
+    (state.parcelas||[]).forEach(p=> syncParcelaRenda(p, true));
+    if(typeof saveRS==='function') saveRS();
   }
 
   // ── RELATÓRIOS: helper ──────────────────────────────────────────────────
